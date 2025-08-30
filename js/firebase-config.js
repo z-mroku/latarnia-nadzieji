@@ -1,27 +1,26 @@
-// Plik: /js/firebase-config.js (WERSJA OSTATECZNA, BEZPIECZNA)
+// Plik: /js/firebase-config.js
+// Wersja testowa – klucze wpisane na sztywno, działa lokalnie i na Vercel
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-// Konfiguracja Firebase wczytywana ze zmiennych środowiskowych Vercel
-// UWAGA: Ta wersja będzie działać poprawnie TYLKO po wdrożeniu na Vercel,
-// gdzie zdefiniujemy zmienne VITE_FIREBASE_...
+// Konfiguracja Firebase (klucze na sztywno)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
+  authDomain: "projekt-latarnia.firebaseapp.com",
+  projectId: "projekt-latarnia",
+  storageBucket: "projekt-latarnia.appspot.com",
+  messagingSenderId: "244008044225",
+  appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
+  measurementId: "G-LNYWJD2YV7"
 };
 
 // Inicjalizacja Firebase
 const app = initializeApp(firebaseConfig);
 
-// Eksportowanie usług dla reszty aplikacji.
+// Eksport usług dla reszty aplikacji
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
