@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Czytaj Wpis – Od Dna do Światła</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Proste style dla strony wpisu, pasujące do klimatu */
+    .article-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      text-align: left;
+    }
+    .article-header {
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .article-header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      color: var(--accent-2);
+    }
+    .article-header .meta {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .article-content {
+      font-family: 'Georgia', serif;
+      font-size: 1.2em;
+      line-height: 1.8;
+      color: #e6eef8;
+    }
+    .article-content p, .article-content blockquote {
+        margin-bottom: 1.5em;
+    }
+    .actions {
+        text-align: right;
+        margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    
+    <article class="article-container">
+        <header class="article-header">
+            <h1 id="entry-title">Ładowanie wpisu...</h1>
+            <div id="entry-meta" class="meta">
+                <span id="entry-author"></span>
+                <span id="entry-date"></span>
+            </div>
+        </header>
+
+        <div id="entry-text" class="article-content">
+            <p>Proszę czekać...</p>
+        </div>
+
+        <div class="actions">
+            <button id="speak-btn" class="primary"><i class="fa-solid fa-headphones-simple"></i> Odsłuchaj</button>
+            <a href="index.html" class="ghost">Wróć na stronę główną</a>
+        </div>
+    </article>
+
+  </div>
+  <script type="module" src="js/read.js"></script>
+</body>
+</html>
