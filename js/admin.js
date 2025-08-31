@@ -1,4 +1,4 @@
-// /js/admin.js - WERSJA OSTATECZNA "NA MEDAL" v2 - KOMPLETNA I POPRAWIONA
+// /js/admin.js - WERSJA OSTATECZNA "NA MEDAL" v3 - KOMPLETNA I POPRAWIONA
 import { db, auth, storage } from './firebase-config.js';
 import {
   collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, where, limit, collectionGroup
@@ -34,7 +34,7 @@ async function initPanel(user){
   logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
 
   let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null;
-  let editEntryId = null; 
+  let editEntryData = null; 
   let entriesCache = [];
 
   function getEditorHtml(){ try { if (window.CKEDITOR && CKEDITOR.instances.contentInput) return CKEDITOR.instances.contentInput.getData(); } catch(e){} return contentInput?.value || ''; }
@@ -142,17 +142,17 @@ async function initPanel(user){
         attachment = { url, meta:{ path } };
       }
       const payload = { section, title, author, text, attachment, theme, updatedAt: serverTimestamp() };
-      if (editEntryId) {
-        const entryRef = doc(db, 'sekcje', editEntryId.section, 'entries', editEntryId.id);
+      if (editEntryData) {
+        const entryRef = doc(db, 'sekcje', editEntryData.section, 'entries', editEntryData.id);
         await updateDoc(entryRef, payload);
       } else {
         const entriesCollectionRef = collection(db, 'sekcje', section, 'entries');
         await addDoc(entriesCollectionRef, { ...payload, createdAt: serverTimestamp() });
       }
-      entryForm.reset(); setEditorHtml(''); editEntryId=null; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; cancelEntryEditBtn.style.display='none'; updateLivePreview(); clearDraft(); showTemp(formMsg, 'Zapisano');
+      entryForm.reset(); setEditorHtml(''); editEntryData=null; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; cancelEntryEditBtn.style.display='none'; updateLivePreview(); clearDraft(); showTemp(formMsg, 'Zapisano');
     } catch (e) { showTemp(formMsg, 'Błąd zapisu', false); console.error(e); } finally { publishBtn.disabled = false; }
   });
-  cancelEntryEditBtn?.addEventListener('click', ()=>{ editEntryId=null; entryForm?.reset(); setEditorHtml(''); cancelEntryEditBtn.style.display='none'; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; updateLivePreview(); });
+  cancelEntryEditBtn?.addEventListener('click', ()=>{ editEntryData=null; entryForm?.reset(); setEditorHtml(''); cancelEntryEditBtn.style.display='none'; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; updateLivePreview(); });
 
   function renderEntries(list=[]){
     if (!entriesList) return;
@@ -162,7 +162,9 @@ async function initPanel(user){
     const sort = (sortSelect?.value || 'desc');
     if (filter) arr = arr.filter(x => (x.section || '') === filter);
     if (q) arr = arr.filter(x => { const t = stripHtml(x.title||'').toLowerCase(); const s = stripHtml(x.text||'').toLowerCase(); return t.includes(q) || s.includes(q); });
-    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); 
+    else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); 
+    else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
     
     entriesList.innerHTML = '';
     arr.forEach(e=>{
@@ -193,7 +195,7 @@ async function initPanel(user){
           const snap = await getDoc(entryRef);
           if (!snap.exists()) return alert('Wpis nie istnieje');
           const d = snap.data();
-          editEntryId = { id: id, section: entry.section };
+          editEntryData = { id: id, section: entry.section }; // ZMIANA: Przechowujemy dane do edycji
           sectionSelect.value = d.section || '';
           titleInput.value = d.title || '';
           authorInput.value = d.author || '';
@@ -215,7 +217,7 @@ async function initPanel(user){
     });
   }
 
-  onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, ...d.data() })); renderEntries(entriesCache); });
+  onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, section:d.ref.parent.parent.id, ...d.data() })); renderEntries(entriesCache); });
   
   const rerender = debounce(()=> renderEntries(entriesCache), 200);
   searchInput?.addEventListener('input', rerender);
@@ -249,7 +251,7 @@ async function initPanel(user){
       const snap = await getDoc(entryRef);
       if (!snap.exists()) return alert('Wpis nie istnieje');
       const docData = snap.data();
-      editEntryId = { id: id, section: d.section };
+      editEntryData = { id: id, section: d.section }; // ZMIANA: Przechowujemy dane do edycji
       if (sectionSelect) sectionSelect.value = docData.section || '';
       if (titleInput) titleInput.value = docData.title || '';
       if (authorInput) authorInput.value = docData.author || '';
@@ -270,4 +272,3 @@ async function initPanel(user){
 
   updateLivePreview();
 }
-
