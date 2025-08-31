@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -19,15 +20,7 @@
     const sectionName = (params.get('nazwa') || '').trim();
     const wrapper = document.getElementById('dynamic-content-wrapper');
 
-    function applyTheme(sectionName) {
-        document.documentElement.className = '';
-        let themeClass = 'theme-kronika'; 
-        if (sectionName === 'Piciorys Chudego') { themeClass = 'theme-piciorys'; } 
-        else if (sectionName.toLowerCase().includes('księżniczki')) { themeClass = 'theme-ksiezniczka'; } 
-        else if (sectionName === 'Pomoc') { themeClass = 'theme-pomoc'; }
-        else if (sectionName === 'Galeria') { themeClass = 'theme-galeria'; }
-        document.documentElement.className = themeClass;
-    }
+    document.documentElement.className = '';
 
     function createLector(buttonId, textElementId, buttonText = "Odsłuchaj") {
         const btn = document.getElementById(buttonId);
@@ -42,20 +35,37 @@
             return;
         }
 
-        const synth = window.speechSynthesis;
-        btn.addEventListener("click", () => {
-            if (synth.speaking) {
-                synth.cancel();
+        const sentences = fullText.match(/[^.!?…]+[.!?…]?/g) || [fullText];
+        let currentIndex = 0;
+        let isReading = false;
+
+        function readSentence(i) {
+            if (!isReading || i >= sentences.length) {
+                window.speechSynthesis.cancel();
+                isReading = false;
                 btn.textContent = `▶️ ${buttonText}`;
+                currentIndex = 0;
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(sentences[i].trim());
+            utterance.lang = "pl-PL";
+            utterance.onend = () => { if (isReading) { currentIndex++; readSentence(currentIndex); } };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        btn.addEventListener("click", () => {
+            const synth = window.speechSynthesis;
+            if (isReading) {
+                isReading = false;
+                synth.cancel();
+                btn.textContent = `🔄 Wznów`;
             } else {
-                const utterance = new SpeechSynthesisUtterance(fullText);
-                utterance.lang = "pl-PL";
-                utterance.onend = () => { btn.textContent = `▶️ ${buttonText}`; };
-                synth.speak(utterance);
-                btn.textContent = `⏸️ Zatrzymaj`;
+                isReading = true;
+                btn.textContent = `⏸️ Pauza`;
+                readSentence(currentIndex);
             }
         });
-        window.addEventListener("beforeunload", () => synth.cancel());
+        window.addEventListener("beforeunload", () => window.speechSynthesis.cancel());
     }
 
     (async () => {
@@ -65,11 +75,33 @@
           return;
         }
 
-        applyTheme(sectionName);
+        let themeClass = 'theme-kronika'; 
+        if (sectionName === 'Piciorys Chudego') { themeClass = 'theme-piciorys'; } 
+        else if (sectionName.toLowerCase().includes('księżniczki')) { themeClass = 'theme-ksiezniczka'; } 
+        else if (sectionName === 'Pomoc') { themeClass = 'theme-pomoc'; }
+        else if (sectionName === 'Galeria') { themeClass = 'theme-galeria'; }
+        document.documentElement.className = themeClass;
+
         document.title = `${sectionName} — Od Dna do Światła`;
+        const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
         
-        if (sectionName === 'Pomoc') {
-            const snap = await getDocs(query(collection(db, 'help'), orderBy("woj")));
+        if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
+            const snap = await getDocs(query(entriesRef, limit(1)));
+            if (snap.empty) { wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`; return; }
+            const entry = snap.docs[0].data();
+            
+            if (sectionName === 'Piciorys Chudego') {
+                const [quote, historia] = (entry.text || '').split('---PODZIAL---');
+                wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><article class="newspaper-article"><div id="piciorys-wstep"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div></div><div class="speak-button-container"><button id="speakBtn1" class="speak-button">▶️ Odsłuchaj Wstęp</button></div><div id="piciorys-historia" class="newspaper-text-content">${historia || ''}</div><div class="speak-button-container"><button id="speakBtn2" class="speak-button">▶️ Odsłuchaj Historię</button></div></article></main>`;
+                createLector("speakBtn1", "piciorys-wstep", "Odsłuchaj Wstęp");
+                createLector("speakBtn2", "piciorys-historia", "Odsłuchaj Historię");
+            } else { // Księżniczka
+                wrapper.innerHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="content-wrapper"><div class="story-box"><div id="ksiezniczka-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div></div></main>`;
+                createLector("speakBtn", "ksiezniczka-text");
+            }
+        } 
+        else if (sectionName === 'Pomoc') {
+            const snap = await getDocs(query(entriesRef, orderBy("woj")));
         
             const groupedByWoj = snap.docs.reduce((acc, doc) => {
                 const entry = doc.data();
@@ -87,20 +119,35 @@
                     const entriesHTML = groupedByWoj[woj].map(e => {
                       return `<div class="place-entry">
                             <h3>${e.name || 'Brak nazwy'}</h3>
-                            ${e.address ? `<p><strong>Adres:</strong> ${e.address}</p>` : ''}
-                            ${e.phone ? `<p><strong>Telefon:</strong> ${e.phone}</p>` : ''}
-                            ${e.desc ? `<p>${e.desc}</p>` : ''}
+                            <p>${e.address ? 'Adres: ' + e.address : ''}</p>
+                            <p>${e.phone ? 'Telefon: ' + e.phone : ''}</p>
+                            <p>${e.desc || 'Brak opisu.'}</p>
                             ${e.link ? `<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>` : ''}
                         </div>`
                     }).join('');
+
                     const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
-                    accordionsHTML += `<button class="accordion">${icon} ${woj}</button><div class="panel">${entriesHTML}</div>`;
+                    accordionsHTML += `
+                        <div class="woj-group" data-woj="${woj}">
+                            <button class="accordion">${icon} ${woj}</button>
+                            <div class="panel">${entriesHTML}</div>
+                        </div>
+                    `;
                 }
             }
             
             wrapper.innerHTML = `
             <header class="page-header"><h1>Gdzie szukać pomocy – Uzależnienia</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
-            <main><div class="container">${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}</div></main>`;
+            <main><div class="container">
+                <div class="filter-bar">
+                    <label for="wojewodztwoSelect"><strong>Filtruj wg województwa:</strong></label>
+                    <select id="wojewodztwoSelect">
+                        <option value="all">Wszystkie</option>
+                        ${wojOrder.map(w => `<option value="${w}">${w}</option>`).join('')}
+                    </select>
+                </div>
+                ${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}
+            </div></main>`;
             
             document.querySelectorAll('.accordion').forEach(acc => {
                 acc.addEventListener('click', function() {
@@ -109,49 +156,76 @@
                     panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
                 });
             });
+
+            const select = document.getElementById('wojewodztwoSelect');
+            const wojGroups = document.querySelectorAll('.woj-group');
+            select.addEventListener('change', function() {
+                wojGroups.forEach(group => {
+                    group.style.display = (this.value === 'all' || group.dataset.woj === this.value) ? 'block' : 'none';
+                });
+            });
         }
         else { 
-            const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
-            if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
-                const snap = await getDocs(query(entriesRef, limit(1)));
-                if (snap.empty) { wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`; return; }
-                const entry = snap.docs[0].data();
-                
-                if (sectionName === 'Piciorys Chudego') {
-                    const [quote, historia] = (entry.text || '').split('---PODZIAL---');
-                    wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><article class="newspaper-article"><div id="piciorys-text"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div><div class="newspaper-text-content">${historia || ''}</div></div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></article></main>`;
-                    createLector("speakBtn", "piciorys-text");
-                } else { // Księżniczka
-                    wrapper.innerHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="content-wrapper"><div class="story-box"><div id="ksiezniczka-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div></div></main>`;
-                    createLector("speakBtn", "ksiezniczka-text");
-                }
-            } 
-            else { // Kronika i inne listy wpisów
-                const sortOrder = sectionName === 'Kronika' ? 'asc' : 'desc';
-                const snap = await getDocs(query(entriesRef, orderBy("createdAt", sortOrder)));
-                let entriesHTML = '';
-                if (snap.empty) {
-                    entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
-                } else {
-                    entriesHTML = snap.docs.map(doc => {
-                        const e = doc.data();
-                        const url = `wpis.html?section=${encodeURIComponent(sectionName)}&id=${doc.id}`;
-                        const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
-                        return `
-                            <div class="story-item">
-                                <h2><a href="${url}">${e.title || 'Bez tytułu'}</a></h2>
-                                <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
-                                <p>${skrot}...</p>
-                                <a href="${url}" class="speak-button" style="text-decoration: none;">Czytaj dalej</a>
-                            </div>`;
-                    }).join('');
-                }
-                wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
+            const snap = await getDocs(query(entriesRef, orderBy("createdAt", "desc")));
+            let entriesHTML = '';
+            if (snap.empty) {
+                entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
+            } else {
+                entriesHTML = snap.docs.map(doc => {
+                    const e = doc.data();
+                    const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
+                    const contentId = `content-full-${doc.id}`;
+                    const buttonId = `button-speak-${doc.id}`;
+                    
+                    return `
+                        <div class="story-item">
+                            <h2 class="fancy-title">${e.title || 'Bez tytułu'}</h2>
+                            <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
+                            <div class="wpis-skrot"><p>${skrot}...</p></div>
+                            <div id="${contentId}" class="wpis-calosc" style="display: none;">${e.text}</div>
+                            <div class="speak-button-container">
+                                <button class="czytaj-dalej-btn">...czytaj dalej</button>
+                                <button id="${buttonId}" class="speak-button" style="display: none;">▶️ Odsłuchaj</button>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+            
+            wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
+
+            document.querySelectorAll('.czytaj-dalej-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const storyItem = this.closest('.story-item');
+                    const skrot = storyItem.querySelector('.wpis-skrot');
+                    const calosc = storyItem.querySelector('.wpis-calosc');
+                    const lektorBtn = storyItem.querySelector('.speak-button');
+                    const isVisible = calosc.style.display === 'block';
+
+                    if (isVisible) {
+                        calosc.style.display = 'none';
+                        lektorBtn.style.display = 'none';
+                        skrot.style.display = 'block';
+                        this.textContent = '...czytaj dalej';
+                    } else {
+                        calosc.style.display = 'block';
+                        lektorBtn.style.display = 'inline-flex';
+                        skrot.style.display = 'none';
+                        this.textContent = 'Zwiń';
+                    }
+                });
+            });
+
+            if (!snap.empty) {
+                snap.docs.forEach(doc => {
+                    const contentId = `content-full-${doc.id}`;
+                    const buttonId = `button-speak-${doc.id}`;
+                    createLector(buttonId, contentId);
+                });
             }
         }
       } catch (err) {
-        console.error("Błąd krytyczny w sekcja.html:", err);
-        wrapper.innerHTML = `<header class="page-header"><h1>Błąd krytyczny</h1></header><main><div class="story-container"><p>Wystąpił błąd podczas ładowania strony. Sprawdź konsolę (F12).</p></div></main>`;
+        console.error("Błąd krytyczny w Sekcja.html:", err);
+        wrapper.innerHTML = `<header class="page-header"><h1>Błąd krytyczny</h1></header><main><div class="story-container"><p>Wystąpił błąd podczas ładowania strony. Sprawdź konsolę (F12), aby zobaczyć szczegóły.</p></div></main>`;
       }
     })();
   </script>
