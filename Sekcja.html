@@ -19,162 +19,134 @@
     const sectionName = (params.get('nazwa') || '').trim();
     const wrapper = document.getElementById('dynamic-content-wrapper');
 
-    // --- LOGIKA MOTYWÓW ---
     function applyTheme(sectionName) {
-        document.documentElement.className = ''; // Reset
+        document.documentElement.className = '';
         let themeClass = 'theme-kronika'; 
-        if (sectionName === 'Piciorys Chudego') themeClass = 'theme-piciorys'; 
-        else if (sectionName.toLowerCase().includes('księżniczki')) themeClass = 'theme-ksiezniczka'; 
-        else if (sectionName === 'Pomoc') themeClass = 'theme-pomoc'; 
-        else if (sectionName === 'Galeria') themeClass = 'theme-galeria';
+        if (sectionName === 'Piciorys Chudego') { themeClass = 'theme-piciorys'; } 
+        else if (sectionName.toLowerCase().includes('księżniczki')) { themeClass = 'theme-ksiezniczka'; } 
+        else if (sectionName === 'Pomoc') { themeClass = 'theme-pomoc'; }
+        else if (sectionName === 'Galeria') { themeClass = 'theme-galeria'; }
         document.documentElement.className = themeClass;
     }
 
-    // --- LOGIKA LEKTORA ---
-    function createLector(buttonId, textElementId) {
+    function createLector(buttonId, textElementId, buttonText = "Odsłuchaj") {
         const btn = document.getElementById(buttonId);
+        if (!btn) return;
         const textElement = document.getElementById(textElementId);
-        if (!btn || !textElement) return;
+        if (!textElement) return;
         
-        const textToRead = (textElement.textContent || textElement.innerText || "").trim();
-        if (!textToRead) {
-            btn.style.display = 'none';
+        const fullText = (textElement.textContent || textElement.innerText || "").trim();
+        if (!fullText) {
+            btn.disabled = true;
+            btn.style.opacity = 0.5;
             return;
         }
 
         const synth = window.speechSynthesis;
-        let utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.lang = "pl-PL";
-
         btn.addEventListener("click", () => {
             if (synth.speaking) {
                 synth.cancel();
+                btn.textContent = `▶️ ${buttonText}`;
             } else {
+                const utterance = new SpeechSynthesisUtterance(fullText);
+                utterance.lang = "pl-PL";
+                utterance.onend = () => { btn.textContent = `▶️ ${buttonText}`; };
                 synth.speak(utterance);
+                btn.textContent = `⏸️ Zatrzymaj`;
             }
         });
-
-        // Reset lektora przy zmianie stanu
-        utterance.onend = () => { btn.textContent = '▶️ Odsłuchaj'; };
-        synth.onvoiceschanged = () => synth.cancel();
-    }
-    
-    // --- RENDEROWANIE SEKCJI "POMOC" ---
-    async function renderHelpSection() {
-        applyTheme('Pomoc');
-        document.title = `Pomoc — Od Dna do Światła`;
-        const helpCollectionRef = collection(db, 'help');
-        const snap = await getDocs(query(helpCollectionRef, orderBy("woj")));
-    
-        const groupedByWoj = snap.docs.reduce((acc, doc) => {
-            const entry = doc.data();
-            const woj = entry.woj || 'Inne';
-            if (!acc[woj]) { acc[woj] = []; }
-            acc[woj].push(entry);
-            return acc;
-        }, {});
-
-        const wojOrder = ['Ogólnopolskie', ...Object.keys(groupedByWoj).filter(w => w !== 'Ogólnopolskie').sort()];
-        let accordionsHTML = '';
-
-        for (const woj of wojOrder) {
-            if (groupedByWoj[woj]) {
-                const entriesHTML = groupedByWoj[woj].map(e => `
-                    <div class="place-entry">
-                        <h3>${e.name || 'Brak nazwy'}</h3>
-                        ${e.address ? `<p><strong>Adres:</strong> ${e.address}</p>` : ''}
-                        ${e.phone ? `<p><strong>Telefon:</strong> ${e.phone}</p>` : ''}
-                        ${e.desc ? `<p>${e.desc}</p>` : ''}
-                        ${e.link ? `<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>` : ''}
-                    </div>`
-                ).join('');
-                const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
-                accordionsHTML += `<button class="accordion">${icon} ${woj}</button><div class="panel">${entriesHTML}</div>`;
-            }
-        }
-        
-        wrapper.innerHTML = `
-        <header class="page-header"><h1>Gdzie szukać pomocy</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
-        <main><div class="container">${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}</div></main>`;
-        
-        document.querySelectorAll('.accordion').forEach(acc => {
-            acc.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const panel = this.nextElementSibling;
-                panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
-            });
-        });
+        window.addEventListener("beforeunload", () => synth.cancel());
     }
 
-    // --- RENDEROWANIE POJEDYNCZYCH WPISÓW (PICIORYS, KSIĘŻNICZKA) ---
-    async function renderSingleEntrySection(sectionName, entriesRef) {
-        applyTheme(sectionName);
-        document.title = `${sectionName} — Od Dna do Światła`;
-        const snap = await getDocs(query(entriesRef, limit(1)));
-        if (snap.empty) {
-            wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><p>Brak wpisu w tej sekcji.</p></div></main>`;
-            return;
-        }
-        const entry = snap.docs[0].data();
-        
-        let contentHTML = '';
-        if (sectionName === 'Piciorys Chudego') {
-            const [quote, historia] = (entry.text || '').split('---PODZIAL---');
-            contentHTML = `<article class="newspaper-article"><div id="piciorys-text"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div><div class="newspaper-text-content">${historia || ''}</div></div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></article>`;
-        } else { // Księżniczka
-            contentHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><div class="story-box"><div id="story-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div>`;
-        }
-        
-        wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main>${contentHTML}</main>`;
-        createLector("speakBtn", sectionName === 'Piciorys Chudego' ? "piciorys-text" : "story-text");
-    }
-
-    // --- RENDEROWANIE LISTY WPISÓW (KRONIKA, OPOWIEŚCI) ---
-    async function renderEntriesList(sectionName, entriesRef) {
-        applyTheme(sectionName);
-        document.title = `${sectionName} — Od Dna do Światła`;
-        
-        // ZMIANA: Sortowanie dla Kroniki
-        const sortOrder = sectionName === 'Kronika' ? 'asc' : 'desc';
-        const snap = await getDocs(query(entriesRef, orderBy("createdAt", sortOrder)));
-        
-        let entriesHTML = '';
-        if (snap.empty) {
-            entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
-        } else {
-            entriesHTML = snap.docs.map(doc => {
-                const e = doc.data();
-                const url = `wpis.html?section=${encodeURIComponent(sectionName)}&id=${doc.id}`;
-                const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
-                return `
-                    <div class="story-item">
-                        <h2><a href="${url}">${e.title || 'Bez tytułu'}</a></h2>
-                        <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
-                        <p>${skrot}...</p>
-                        <a href="${url}" class="speak-button" style="text-decoration: none;">Czytaj dalej</a>
-                    </div>`;
-            }).join('');
-        }
-        wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
-    }
-
-
-    // --- GŁÓWNY PUNKT WEJŚCIA ---
     (async () => {
       try {
         if (!sectionName) {
-            wrapper.innerHTML = `<header class="page-header"><h1>Błąd</h1></header><main><div class="story-container">Brak nazwy sekcji w adresie URL.</div></main>`;
-            return;
+          wrapper.innerHTML = `<header class="page-header"><h1>Błąd</h1></header><main><div class="story-container">Brak nazwy sekcji w adresie URL.</div></main>`;
+          return;
         }
 
+        applyTheme(sectionName);
+        document.title = `${sectionName} — Od Dna do Światła`;
+        
         if (sectionName === 'Pomoc') {
-            await renderHelpSection();
-        } else {
+            const snap = await getDocs(query(collection(db, 'help'), orderBy("woj")));
+        
+            const groupedByWoj = snap.docs.reduce((acc, doc) => {
+                const entry = doc.data();
+                const woj = entry.woj || 'Inne';
+                if (!acc[woj]) { acc[woj] = []; }
+                acc[woj].push(entry);
+                return acc;
+            }, {});
+
+            const wojOrder = ['Ogólnopolskie', ...Object.keys(groupedByWoj).filter(w => w !== 'Ogólnopolskie').sort()];
+            let accordionsHTML = '';
+
+            for (const woj of wojOrder) {
+                if (groupedByWoj[woj]) {
+                    const entriesHTML = groupedByWoj[woj].map(e => {
+                      return `<div class="place-entry">
+                            <h3>${e.name || 'Brak nazwy'}</h3>
+                            ${e.address ? `<p><strong>Adres:</strong> ${e.address}</p>` : ''}
+                            ${e.phone ? `<p><strong>Telefon:</strong> ${e.phone}</p>` : ''}
+                            ${e.desc ? `<p>${e.desc}</p>` : ''}
+                            ${e.link ? `<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>` : ''}
+                        </div>`
+                    }).join('');
+                    const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
+                    accordionsHTML += `<button class="accordion">${icon} ${woj}</button><div class="panel">${entriesHTML}</div>`;
+                }
+            }
+            
+            wrapper.innerHTML = `
+            <header class="page-header"><h1>Gdzie szukać pomocy – Uzależnienia</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
+            <main><div class="container">${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}</div></main>`;
+            
+            document.querySelectorAll('.accordion').forEach(acc => {
+                acc.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const panel = this.nextElementSibling;
+                    panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
+                });
+            });
+        }
+        else { 
             const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
             if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
-                await renderSingleEntrySection(sectionName, entriesRef);
-            } else {
-                await renderEntriesList(sectionName, entriesRef);
+                const snap = await getDocs(query(entriesRef, limit(1)));
+                if (snap.empty) { wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`; return; }
+                const entry = snap.docs[0].data();
+                
+                if (sectionName === 'Piciorys Chudego') {
+                    const [quote, historia] = (entry.text || '').split('---PODZIAL---');
+                    wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><article class="newspaper-article"><div id="piciorys-text"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div><div class="newspaper-text-content">${historia || ''}</div></div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></article></main>`;
+                    createLector("speakBtn", "piciorys-text");
+                } else { // Księżniczka
+                    wrapper.innerHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="content-wrapper"><div class="story-box"><div id="ksiezniczka-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div></div></main>`;
+                    createLector("speakBtn", "ksiezniczka-text");
+                }
+            } 
+            else { // Kronika i inne listy wpisów
+                const sortOrder = sectionName === 'Kronika' ? 'asc' : 'desc';
+                const snap = await getDocs(query(entriesRef, orderBy("createdAt", sortOrder)));
+                let entriesHTML = '';
+                if (snap.empty) {
+                    entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
+                } else {
+                    entriesHTML = snap.docs.map(doc => {
+                        const e = doc.data();
+                        const url = `wpis.html?section=${encodeURIComponent(sectionName)}&id=${doc.id}`;
+                        const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
+                        return `
+                            <div class="story-item">
+                                <h2><a href="${url}">${e.title || 'Bez tytułu'}</a></h2>
+                                <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
+                                <p>${skrot}...</p>
+                                <a href="${url}" class="speak-button" style="text-decoration: none;">Czytaj dalej</a>
+                            </div>`;
+                    }).join('');
+                }
+                wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
             }
         }
       } catch (err) {
