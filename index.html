@@ -4,10 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Od Dna do Światła</title>
-  <link rel="stylesheet" href="css/style.css"> 
+  <link rel="stylesheet" href="/css/style.css"> 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Styl dla przycisku admina - teraz zawsze widoczny */
+    .admin-button {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1001;
+    }
+  </style>
 </head>
 <body>
+  
+  <a href="login.html" class="admin-button back-to-home-button" style="font-size: 1em; padding: 12px 25px;">
+    <i class="fa-solid fa-satellite-dish"></i> Panel
+  </a>
+
   <header>
     <h1>Od Dna do Światła</h1>
     <div class="scrolling-subtitle-container">
@@ -60,53 +74,6 @@
     </div>
   </footer>
 
-  <script type="module">
-    // POPRAWIONA ŚCIEŻKA
-    import { db } from './js/firebase-config.js'; 
-    import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    let sparksFromDB = [], player, playlist = [], currentIndex = 0;
-
-    async function fetchAndRenderMenu(container) { try { const snapshot = await getDocs(query(collection(db, "menu"), orderBy("order", "asc"))); container.innerHTML = snapshot.docs.map(doc => `<li><a href="${doc.data().url}">${doc.data().text}</a></li>`).join('') || '<li><a>Brak menu</a></li>'; } catch (err) { console.error("Błąd menu: ", err); container.innerHTML = '<li><a>Błąd</a></li>'; } }
-    async function fetchLatarniaNadziei(container) { try { const entriesQuery = query(collectionGroup(db, "entries"), orderBy("createdAt", "desc")); const snapshot = await getDocs(entriesQuery); const allowedSections = ['Kronika', 'Z punktu widzenia księżniczki']; const entries = snapshot.docs.map(doc => doc.data()).filter(e => allowedSections.includes(e.section)); if (!entries.length) { container.innerHTML = "<p style='text-align:center;'>Brak wpisów w Ostatniej Latarni Nadziei.</p>"; return; } container.innerHTML = entries.slice(0, 3).map(e => { const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300); return `<article class="story-item"><h3 class="fancy-title">${e.title || 'Bez tytułu'}</h3><div class="entry-item-meta"><strong>W sekcji: ${e.section}</strong> • ${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div><div class="wpis-skrot"><p>${skrot}...</p></div><div class="wpis-calosc" style="display: none;">${e.text}</div><div style="text-align: center; margin-top: 15px;"><button class="czytaj-dalej-btn speak-button">...czytaj dalej</button></div></article>`; }).join(''); } catch (err) { console.error("Błąd wczytywania Ostatniej Latarni Nadziei:", err); container.innerHTML = "<p style='text-align:center;'>Błąd wczytywania wpisów.</p>"; } }
-    async function fetchSparks(textElement) { try { const q = query(collection(db, "sparks"), orderBy("createdAt", "desc")); const snapshot = await getDocs(q); sparksFromDB = snapshot.docs.map(doc => doc.data().quote); if (sparksFromDB.length > 0) changeSpark(textElement); else textElement.innerText = "Brak iskierek w bazie."; } catch (err) { console.error("Błąd iskierek:", err); textElement.innerText = "Błąd ładowania iskierek."; } }
-    function changeSpark(textElement) { if (!sparksFromDB.length) return; const newSpark = sparksFromDB[Math.floor(Math.random() * sparksFromDB.length)]; textElement.style.opacity = 0; setTimeout(() => { textElement.innerText = newSpark; textElement.style.opacity = 1; }, 300); }
-    function getVideoId(url) { if (!url) return null; const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/; const matches = url.match(regex); return matches ? matches[1] : null; }
-    const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
-    window.onYouTubeIframeAPIReady = function() { player = new YT.Player('youtube-player', { height: '0', width: '0', playerVars: { 'playsinline': 1, 'origin': window.location.origin }, events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange } }); };
-    async function onPlayerReady(event) { const songTitle = document.getElementById("current-song-title"); try { const q = query(collection(db, "playlist"), orderBy("createdAt", "asc")); const snapshot = await getDocs(q); playlist = snapshot.docs.map(doc => ({ title: doc.data().title, videoId: getVideoId(doc.data().link) })).filter(song => song.videoId); if (playlist.length > 0) loadCurrentSong(false); else songTitle.innerText = "Brak utworów w playliście."; } catch (err) { console.error("Błąd playlisty:", err); songTitle.innerText = "Błąd ładowania playlisty."; } }
-    function onPlayerStateChange(event) { const btn = document.getElementById('play-pause-btn'), icon = btn ? btn.querySelector('i') : null; if(icon) icon.className = (event.data === YT.PlayerState.PLAYING) ? 'fas fa-pause' : 'fas fa-play'; if (event.data === YT.PlayerState.ENDED) nextSong(); }
-    function togglePlayPause() { if (!player || !playlist.length) return; const playerState = player.getPlayerState(); (playerState === YT.PlayerState.PLAYING) ? player.pauseVideo() : player.playVideo(); }
-    function loadCurrentSong(autoplay = true) { const sTitle = document.getElementById("current-song-title"); if (!playlist.length || !player || !sTitle) return; const song = playlist[currentIndex]; sTitle.style.opacity = 0; setTimeout(() => { sTitle.innerText = song.title; sTitle.style.opacity = 1; }, 300); if (autoplay) player.loadVideoById(song.videoId); else player.cueVideoById(song.videoId); }
-    function nextSong() { if (!playlist.length) return; currentIndex = (currentIndex + 1) % playlist.length; loadCurrentSong(true); }
-    function prevSong() { if (!playlist.length) return; currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadCurrentSong(true); }
-    function initializeDisqus() { (function() { var d = document, s = d.createElement('script'); s.src = 'https://od-dna-do-swiatla.disqus.com/embed.js'; s.setAttribute('data-timestamp', +new Date()); (d.head || d.body).appendChild(s); })(); }
-    document.addEventListener("DOMContentLoaded", () => {
-        const menuContainer = document.getElementById('main-menu');
-        const entriesContainer = document.getElementById("entries-container");
-        const sparkTextElement = document.getElementById("sparkText");
-        const sparkButton = document.getElementById("sparkButton");
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const prevBtn = document.getElementById("prev-btn");
-        const nextBtn = document.getElementById("next-btn");
-        fetchAndRenderMenu(menuContainer);
-        fetchLatarniaNadziei(entriesContainer);
-        fetchSparks(sparkTextElement);
-        initializeDisqus();
-        sparkButton.addEventListener("click", () => changeSpark(sparkTextElement));
-        playPauseBtn.addEventListener('click', togglePlayPause);
-        nextBtn.addEventListener("click", nextSong);
-        prevBtn.addEventListener("click", prevSong);
-        entriesContainer.addEventListener('click', (event) => {
-            const button = event.target.closest('.czytaj-dalej-btn');
-            if (!button) return;
-            const storyItem = button.closest('.story-item'), skrot = storyItem.querySelector('.wpis-skrot'), calosc = storyItem.querySelector('.wpis-calosc');
-            const isVisible = calosc.style.display === 'block';
-            calosc.style.display = isVisible ? 'none' : 'block';
-            skrot.style.display = isVisible ? 'block' : 'none';
-            button.textContent = isVisible ? '...czytaj dalej' : 'Zwiń';
-        });
-    });
-  </script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
