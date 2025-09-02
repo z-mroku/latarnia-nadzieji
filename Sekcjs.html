@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id="dynamic-content-wrapper">
-      <p style="text-align:center; padding-top: 50px;">Ładowanie...</p>
+    <p style="text-align:center; padding-top: 50px;">Ładowanie...</p>
   </div>
 
   <script type="module">
@@ -22,49 +22,49 @@
     document.documentElement.className = '';
 
     function createLector(buttonId, textElementId, buttonText = "Odsłuchaj") {
-        const btn = document.getElementById(buttonId);
-        if (!btn) return;
-        const textElement = document.getElementById(textElementId);
-        if (!textElement) return;
-        
-        const fullText = (textElement.textContent || textElement.innerText || "").trim();
-        if (!fullText) {
-            btn.disabled = true;
-            btn.style.opacity = 0.5;
-            return;
+      const btn = document.getElementById(buttonId);
+      if (!btn) return;
+      const textElement = document.getElementById(textElementId);
+      if (!textElement) return;
+      
+      const fullText = (textElement.textContent || textElement.innerText || "").trim();
+      if (!fullText) {
+        btn.disabled = true;
+        btn.style.opacity = 0.5;
+        return;
+      }
+
+      const sentences = fullText.match(/[^.!?…]+[.!?…]?/g) || [fullText];
+      let currentIndex = 0;
+      let isReading = false;
+
+      function readSentence(i) {
+        if (!isReading || i >= sentences.length) {
+          window.speechSynthesis.cancel();
+          isReading = false;
+          btn.textContent = `▶️ ${buttonText}`;
+          currentIndex = 0;
+          return;
         }
+        const utterance = new SpeechSynthesisUtterance(sentences[i].trim());
+        utterance.lang = "pl-PL";
+        utterance.onend = () => { if (isReading) { currentIndex++; readSentence(currentIndex); } };
+        window.speechSynthesis.speak(utterance);
+      }
 
-        const sentences = fullText.match(/[^.!?…]+[.!?…]?/g) || [fullText];
-        let currentIndex = 0;
-        let isReading = false;
-
-        function readSentence(i) {
-            if (!isReading || i >= sentences.length) {
-                window.speechSynthesis.cancel();
-                isReading = false;
-                btn.textContent = `▶️ ${buttonText}`;
-                currentIndex = 0;
-                return;
-            }
-            const utterance = new SpeechSynthesisUtterance(sentences[i].trim());
-            utterance.lang = "pl-PL";
-            utterance.onend = () => { if (isReading) { currentIndex++; readSentence(currentIndex); } };
-            window.speechSynthesis.speak(utterance);
+      btn.addEventListener("click", () => {
+        const synth = window.speechSynthesis;
+        if (isReading) {
+          isReading = false;
+          synth.cancel();
+          btn.textContent = `🔄 Wznów`;
+        } else {
+          isReading = true;
+          btn.textContent = `⏸️ Pauza`;
+          readSentence(currentIndex);
         }
-
-        btn.addEventListener("click", () => {
-            const synth = window.speechSynthesis;
-            if (isReading) {
-                isReading = false;
-                synth.cancel();
-                btn.textContent = `🔄 Wznów`;
-            } else {
-                isReading = true;
-                btn.textContent = `⏸️ Pauza`;
-                readSentence(currentIndex);
-            }
-        });
-        window.addEventListener("beforeunload", () => window.speechSynthesis.cancel());
+      });
+      window.addEventListener("beforeunload", () => window.speechSynthesis.cancel());
     }
 
     (async () => {
@@ -82,186 +82,155 @@
         document.documentElement.className = themeClass;
 
         document.title = `${sectionName} — Od Dna do Światła`;
-        const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
         
-        if (sectionName === 'Galeria') {
-            const snap = await getDocs(query(entriesRef, orderBy("createdAt", "desc")));
-            let items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (sectionName === 'Pomoc') {
+          // === POCZĄTEK POPRAWKI DLA SEKCJI "POMOC" ===
+          const helpCollectionRef = collection(db, 'help');
+          const snap = await getDocs(query(helpCollectionRef, orderBy("woj")));
 
-            let gridHTML = items.map((item, index) => `
-                <div class="photo-card" data-index="${index}" role="button" tabindex="0" aria-label="Otwórz: ${item.title || ''}">
-                ${item.type === "video" 
-                    ? `<div class="video-thumb" style="height: 220px; display: flex; align-items: center; justify-content: center; background: #000; font-size: 3em;">🎥</div>`
-                    : `<img src="${item.url}" alt="${item.title || 'Zdjęcie'}">`}
-                <div class="caption">
-                    <h3>${item.title || 'Bez tytułu'}</h3>
-                    <p>${item.text || ''}</p>
+          const groupedByWoj = snap.docs.reduce((acc, doc) => {
+            const entry = doc.data();
+            const woj = entry.woj || 'Inne';
+            if (!acc[woj]) { acc[woj] = []; }
+            acc[woj].push(entry);
+            return acc;
+          }, {});
+
+          const wojOrder = ['Ogólnopolskie', ...Object.keys(groupedByWoj).filter(w => w !== 'Ogólnopolskie').sort()];
+
+          let accordionsHTML = '';
+
+          for (const woj of wojOrder) {
+            if (groupedByWoj[woj]) {
+              const sortedEntries = groupedByWoj[woj].sort((a, b) => ((a.name || '').localeCompare(b.name || '')));
+
+              const entriesHTML = sortedEntries.map(e => {
+                return `<div class="place-entry">
+                  <h3>${e.name || 'Brak nazwy'}</h3>
+                  ${e.address ? `<p>Adres: ${e.address}</p>` : ''}
+                  ${e.phone ? `<p>Telefon: <strong>${e.phone}</strong></p>` : ''}
+                  <p>${e.desc || 'Brak opisu.'}</p>
+                  ${e.link ? `<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>` : ''}
+                </div>`;
+              }).join('');
+
+              const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
+              accordionsHTML += `
+                <div class="woj-group" data-woj="${woj}">
+                  <button class="accordion">${icon} ${woj}</button>
+                  <div class="panel">${entriesHTML}</div>
                 </div>
-                </div>
-            `).join('');
-
-            wrapper.innerHTML = `
-                <header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
-                <main><div class="grid-container"><div class="photo-grid">${gridHTML || '<p style="text-align:center;">Galeria jest pusta.</p>'}</div></div>
-                <div id="lightbox" class="lightbox">
-                    <div class="lb-inner">
-                        <button id="lbClose" class="lb-close" aria-label="Zamknij">&times;</button>
-                        <button id="lbPrev" class="lb-nav lb-prev">❮</button>
-                        <div id="lbMedia"></div>
-                        <button id="lbNext" class="lb-nav lb-next">❯</button>
-                        <div id="lbDesc" class="lb-desc"></div>
-                    </div>
-                </div>
-                </main>`;
-
-            const lightbox = document.getElementById('lightbox');
-            const lbMedia = document.getElementById('lbMedia');
-            const lbDesc = document.getElementById('lbDesc');
-            let currentIndex = -1;
-
-            function showItem(index) {
-                if (index < 0) index = items.length - 1;
-                if (index >= items.length) index = 0;
-                currentIndex = index;
-                let item = items[index];
-
-                if (item.type === "video") {
-                    lbMedia.innerHTML = `<video src="${item.url}" controls autoplay style="max-width: 90vw; max-height: 80vh; border-radius: 5px;"></video>`;
-                } else {
-                    lbMedia.innerHTML = `<img src="${item.url}" alt="${item.title}" style="max-width: 90vw; max-height: 80vh; border-radius: 5px;">`;
-                }
-
-                lbDesc.textContent = item.text || '';
-                lightbox.classList.add('active');
+              `;
             }
-            
-            document.querySelectorAll('.photo-card').forEach(card => {
-                card.addEventListener('click', () => showItem(parseInt(card.dataset.index, 10)));
-            });
-            
-            function closeLightbox() {
-                lightbox.classList.remove('active');
-                lbMedia.innerHTML = '';
-            }
+          }
 
-            document.getElementById('lbClose').addEventListener('click', closeLightbox);
-            document.getElementById('lbPrev').addEventListener('click', () => showItem(currentIndex - 1));
-            document.getElementById('lbNext').addEventListener('click', () => showItem(currentIndex + 1));
-            lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
-            window.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === "Escape") closeLightbox();
-            if (e.key === "ArrowLeft") showItem(currentIndex - 1);
-            if (e.key === "ArrowRight") showItem(currentIndex + 1);
+          wrapper.innerHTML = `
+            <header class="page-header"><h1>Gdzie szukać pomocy – Uzależnienia</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
+            <main><div class="container">
+              <div class="filter-bar">
+                <label for="wojewodztwoSelect"><strong>Filtruj wg województwa:</strong></label>
+                <select id="wojewodztwoSelect">
+                  <option value="all">Wszystkie</option>
+                  ${wojOrder.map(w => `<option value="${w}">${w}</option>`).join('')}
+                </select>
+              </div>
+              ${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}
+            </div></main>`;
+
+          document.querySelectorAll('.accordion').forEach(acc => {
+            acc.addEventListener('click', function() {
+              this.classList.toggle('active');
+              const panel = this.nextElementSibling;
+              panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
             });
+          });
+
+          const select = document.getElementById('wojewodztwoSelect');
+          const wojGroups = document.querySelectorAll('.woj-group');
+          select.addEventListener('change', function() {
+            wojGroups.forEach(group => {
+              group.style.display = (this.value === 'all' || group.dataset.woj === this.value) ? 'block' : 'none';
+            });
+          });
+          // === KONIEC POPRAWKI DLA SEKCJI "POMOC" ===
         }
-        else if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
+        else {
+          const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
+          if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
             const snap = await getDocs(query(entriesRef, limit(1)));
-            if (snap.empty) { wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`; return; }
+            if (snap.empty) {
+              wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`;
+              return;
+            }
             const entry = snap.docs[0].data();
             
             if (sectionName === 'Piciorys Chudego') {
-                const [quote, historia] = (entry.text || '').split('---PODZIAL---');
-                wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><article class="newspaper-article"><div id="piciorys-wstep"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div></div><div class="speak-button-container"><button id="speakBtn1" class="speak-button">▶️ Odsłuchaj Wstęp</button></div><div id="piciorys-historia" class="newspaper-text-content">${historia || ''}</div><div class="speak-button-container"><button id="speakBtn2" class="speak-button">▶️ Odsłuchaj Historię</button></div></article></main>`;
-                createLector("speakBtn1", "piciorys-wstep", "Odsłuchaj Wstęp");
-                createLector("speakBtn2", "piciorys-historia", "Odsłuchaj Historię");
+              const [quote, historia] = (entry.text || '').split('---PODZIAL---');
+              wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><article class="newspaper-article"><div id="piciorys-wstep"><div class="newspaper-headline-wrapper"><h2 class="newspaper-headline">${entry.title || ''}</h2><div class="newspaper-headline-quote">${quote || ''}</div></div></div><div class="speak-button-container"><button id="speakBtn1" class="speak-button">▶️ Odsłuchaj Wstęp</button></div><div id="piciorys-historia" class="newspaper-text-content">${historia || ''}</div><div class="speak-button-container"><button id="speakBtn2" class="speak-button">▶️ Odsłuchaj Historię</button></div></article></main>`;
+              createLector("speakBtn1", "piciorys-wstep", "Odsłuchaj Wstęp");
+              createLector("speakBtn2", "piciorys-historia", "Odsłuchaj Historię");
             } else { // Księżniczka
-                wrapper.innerHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="content-wrapper"><div class="story-box"><div id="ksiezniczka-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div></div></main>`;
-                createLector("speakBtn", "ksiezniczka-text");
+              wrapper.innerHTML = `<div class="magic-background"><div id="stars1"></div><div id="stars2"></div><div id="stars3"></div></div><header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="content-wrapper"><div class="story-box"><div id="ksiezniczka-text"><h2>${entry.title || ''}</h2>${entry.text || ''}</div><div class="speak-button-container"><button id="speakBtn" class="speak-button">▶️ Odsłuchaj</button></div></div></div></main>`;
+              createLector("speakBtn", "ksiezniczka-text");
             }
-        } 
-        else if (sectionName === 'Pomoc') {
-            const snap = await getDocs(query(entriesRef, orderBy('woj'), orderBy('title')));
-        
-            const groupedByWoj = snap.docs.reduce((acc, doc) => {
-                const entry = doc.data();
-                const woj = entry.woj || 'Inne';
-                if (!acc[woj]) { acc[woj] = []; }
-                acc[woj].push(entry);
-                return acc;
-            }, {});
-
-            const wojOrder = ['Ogólnopolskie', ...Object.keys(groupedByWoj).filter(w => w !== 'Ogólnopolskie').sort()];
-            let accordionsHTML = '';
-
-            for (const woj of wojOrder) {
-                if (groupedByWoj[woj]) {
-                    const entriesHTML = groupedByWoj[woj].map(e => `
-                        <div class="place-entry">
-                            <h3>${e.title || 'Brak nazwy'}</h3>
-                            <div>${e.text || 'Brak opisu.'}</div>
-                        </div>
-                    `).join('');
-
-                    const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
-                    accordionsHTML += `
-                        <div class="woj-group" data-woj="${woj}">
-                            <button class="accordion">${icon} ${woj}</button>
-                            <div class="panel">${entriesHTML}</div>
-                        </div>
-                    `;
-                }
-            }
-            
-            wrapper.innerHTML = `
-            <header class="page-header"><h1>Gdzie szukać pomocy – Uzależnienia</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
-            <main><div class="container">
-                <div class="filter-bar">
-                    <label for="wojewodztwoSelect"><strong>Filtruj wg województwa:</strong></label>
-                    <select id="wojewodztwoSelect">
-                        <option value="all">Wszystkie</option>
-                        ${wojOrder.map(w => `<option value="${w}">${w}</option>`).join('')}
-                    </select>
-                </div>
-                ${accordionsHTML || '<p>Brak ośrodków w bazie danych.</p>'}
-            </div></main>`;
-            
-            document.querySelectorAll('.accordion').forEach(acc => {
-            acc.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const panel = this.nextElementSibling;
-                panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
-            });
-            });
-
-            const select = document.getElementById('wojewodztwoSelect');
-            const wojGroups = document.querySelectorAll('.woj-group');
-            select.addEventListener('change', function() {
-                wojGroups.forEach(group => {
-                    group.style.display = (this.value === 'all' || group.dataset.woj === this.value) ? 'block' : 'none';
-                });
-            });
-        }
-        else { 
+          } else { 
             const snap = await getDocs(query(entriesRef, orderBy("createdAt", "desc")));
             let entriesHTML = '';
             if (snap.empty) {
-                entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
-            } else if (snap.docs.length === 1 && sectionName !== 'Kronika') {
-                const doc = snap.docs[0];
-                const e = doc.data();
-                const contentId = `content-${doc.id}`;
-                const buttonId = `button-${doc.id}`;
-                entriesHTML = `
-                    <div class="story-item">
-                        <div id="${contentId}">
-                            <h2>${e.title || ''}</h2>
-                            <div class="entry-content">${e.text || ''}</div>
-                        </div>
-                        <div class="speak-button-container">
-                            <button id="${buttonId}" class="speak-button">▶️ Odsłuchaj</button>
-                        </div>
-                    </div>`;
-                setTimeout(() => createLector(buttonId, contentId), 0);
+              entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
             } else {
-                entriesHTML = snap.docs.map(doc => {
+              entriesHTML = snap.docs.map(doc => {
                 const e = doc.data();
-                const excerpt = e.text.replace(/<[^>]*>?/gm, '').substring(0, 250) + '...';
-                const link = `Wpis.html?section=${encodeURIComponent(sectionName)}&id=${doc.id}`;
-                return `<div class="story-item"><h2><a href="${link}">${e.title || 'Bez tytułu'}</a></h2><div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div><p>${excerpt}</p></div>`;
-                }).join('');
+                const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
+                const contentId = `content-full-${doc.id}`;
+                const buttonId = `button-speak-${doc.id}`;
+                
+                return `
+                <div class="story-item">
+                  <h2 class="fancy-title">${e.title || 'Bez tytułu'}</h2>
+                  <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
+                  <div class="wpis-skrot"><p>${skrot}...</p></div>
+                  <div id="${contentId}" class="wpis-calosc" style="display: none;">${e.text}</div>
+                  <div class="speak-button-container">
+                    <button class="czytaj-dalej-btn">...czytaj dalej</button>
+                    <button id="${buttonId}" class="speak-button" style="display: none;">▶️ Odsłuchaj</button>
+                  </div>
+                </div>`;
+              }).join('');
             }
+            
             wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
+
+            document.querySelectorAll('.czytaj-dalej-btn').forEach(button => {
+              button.addEventListener('click', function() {
+                const storyItem = this.closest('.story-item');
+                const skrot = storyItem.querySelector('.wpis-skrot');
+                const calosc = storyItem.querySelector('.wpis-calosc');
+                const lektorBtn = storyItem.querySelector('.speak-button');
+                const isVisible = calosc.style.display === 'block';
+
+                if (isVisible) {
+                  calosc.style.display = 'none';
+                  lektorBtn.style.display = 'none';
+                  skrot.style.display = 'block';
+                  this.textContent = '...czytaj dalej';
+                } else {
+                  calosc.style.display = 'block';
+                  lektorBtn.style.display = 'inline-flex';
+                  skrot.style.display = 'none';
+                  this.textContent = 'Zwiń';
+                }
+              });
+            });
+
+            if (!snap.empty) {
+              snap.docs.forEach(doc => {
+                const contentId = `content-full-${doc.id}`;
+                const buttonId = `button-speak-${doc.id}`;
+                createLector(buttonId, contentId);
+              });
+            }
+          }
         }
       } catch (err) {
         console.error("Błąd krytyczny w Sekcja.html:", err);
