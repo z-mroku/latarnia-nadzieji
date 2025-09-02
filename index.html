@@ -1,59 +1,93 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wpis — Od Dna do Światła</title>
+<title>Od Dna do Światła</title>
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+
 <header>
-  <h1 id="section-title">Ładowanie...</h1>
-  <a id="back-button" href="index.html" class="back-to-home-button">⟵ Powrót</a>
+  <h1>Od Dna do Światła</h1>
+  <div class="scrolling-subtitle-container">
+    <p class="special-subtitle">To miejsce dla ubrudzonych życiem – i dla tych, którzy szukają światła</p>
+  </div>
 </header>
 
 <main>
-  <article id="entry-content"><p>Ładowanie wpisu...</p></article>
+  <section id="latest-entries" class="content-section">
+    <h2 class="fancy-title entries-title">Ostatnia Latarnia Nadziei</h2>
+    <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
+  </section>
 </main>
 
 <script type="module">
 import { db } from './js/firebase-config.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, query, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-async function loadEntry() {
-  const params = new URLSearchParams(location.search);
-  const section = params.get('section');
-  const id = params.get('id');
-  const content = document.getElementById('entry-content');
-  const titleEl = document.getElementById('section-title');
-  const backBtn = document.getElementById('back-button');
+function createLector(button, textElement) {
+  const sentences = (textElement.textContent || '').match(/[^.!?…]+[.!?…]?/g) || [];
+  let i = 0, reading = false;
 
-  if(!section || !id) {
-    content.innerHTML = '<p>Nieprawidłowy adres wpisu.</p>';
-    return;
-  }
-
-  try {
-    const docRef = doc(db, 'sekcje', section, 'entries', id);
-    const docSnap = await getDoc(docRef);
-    if(docSnap.exists()) {
-      const data = docSnap.data();
-      titleEl.textContent = data.title || section;
-      content.innerHTML = data.text || '<p>Brak treści.</p>';
-
-      // przycisk powrotu
-      backBtn.href = 'index.html';
-    } else {
-      content.innerHTML = '<p>Nie znaleziono wpisu.</p>';
+  button.addEventListener('click', () => {
+    const synth = window.speechSynthesis;
+    if(reading) { synth.cancel(); reading=false; button.textContent='▶️ Odsłuch'; return; }
+    reading = true;
+    button.textContent='⏸️ Pauza';
+    function readNext() {
+      if(!reading || i>=sentences.length){ synth.cancel(); reading=false; button.textContent='▶️ Odsłuch'; i=0; return; }
+      const utter = new SpeechSynthesisUtterance(sentences[i].trim());
+      utter.lang='pl-PL';
+      utter.onend = ()=>{ i++; readNext(); };
+      synth.speak(utter);
     }
-  } catch(e) {
-    console.error(e);
-    content.innerHTML = '<p>Błąd ładowania wpisu.</p>';
-  }
+    readNext();
+  });
 }
 
-loadEntry();
+async function loadLatarnia() {
+  const container = document.getElementById('entries-container');
+  try {
+    const sekcje = ['Kronika', 'Opowieści Aurela'];
+    let html='';
+    for(const sekcja of sekcje){
+      const colRef = collection(db, 'sekcje', sekcja, 'entries');
+      const snap = await getDocs(query(colRef, orderBy("createdAt","desc"), limit(3)));
+      snap.docs.forEach(doc=>{
+        const data = doc.data();
+        const textPreview = (data.text||'').replace(/<[^>]*>?/gm,'').substring(0,250);
+        const url = `wpis.html?section=${encodeURIComponent(sekcja)}&id=${doc.id}`;
+        html+=`
+          <div class="story-item">
+            <h3>${data.title||'Bez tytułu'}</h3>
+            <p id="preview-${doc.id}">${textPreview}...</p>
+            <div class="button-row">
+              <a href="${url}" class="read-more-button">Czytaj dalej</a>
+              <button class="speak-button" id="speak-${doc.id}">▶️ Odsłuch</button>
+            </div>
+          </div>`;
+      });
+    }
+    container.innerHTML = html || '<p>Brak wpisów w bazie.</p>';
+
+    // aktywacja odsłuchu
+    sekcje.forEach(async sekcja=>{
+      const colRef = collection(db, 'sekcje', sekcja, 'entries');
+      const snap = await getDocs(query(colRef, orderBy("createdAt","desc"), limit(3)));
+      snap.docs.forEach(doc=>{
+        const btn = document.getElementById(`speak-${doc.id}`);
+        const textEl = document.getElementById(`preview-${doc.id}`);
+        if(btn && textEl) createLector(btn, textEl);
+      });
+    });
+
+  } catch(e){ console.error(e); container.innerHTML='<p>Błąd ładowania wpisów.</p>'; }
+}
+
+loadLatarnia();
 </script>
 
 </body>
