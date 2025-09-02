@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wpis — Od Dna do Światła</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+<header>
+  <h1 id="section-title">Ładowanie...</h1>
+  <a id="back-button" href="index.html" class="back-to-home-button">⟵ Powrót</a>
+</header>
+
+<main>
+  <article id="entry-content"><p>Ładowanie wpisu...</p></article>
+</main>
+
+<script type="module">
+import { db } from './js/firebase-config.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+async function loadEntry() {
+  const params = new URLSearchParams(location.search);
+  const section = params.get('section');
+  const id = params.get('id');
+  const content = document.getElementById('entry-content');
+  const titleEl = document.getElementById('section-title');
+  const backBtn = document.getElementById('back-button');
+
+  if(!section || !id) {
+    content.innerHTML = '<p>Nieprawidłowy adres wpisu.</p>';
+    return;
+  }
+
+  try {
+    const docRef = doc(db, 'sekcje', section, 'entries', id);
+    const docSnap = await getDoc(docRef);
+    if(docSnap.exists()) {
+      const data = docSnap.data();
+      titleEl.textContent = data.title || section;
+      content.innerHTML = data.text || '<p>Brak treści.</p>';
+
+      // przycisk powrotu
+      backBtn.href = 'index.html';
+    } else {
+      content.innerHTML = '<p>Nie znaleziono wpisu.</p>';
+    }
+  } catch(e) {
+    console.error(e);
+    content.innerHTML = '<p>Błąd ładowania wpisu.</p>';
+  }
+}
+
+loadEntry();
+</script>
+
+</body>
+</html>
