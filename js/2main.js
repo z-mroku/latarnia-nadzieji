@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchSparks(sparkTextElement);
     initializeDisqus();
 
+
     // Podpięcie eventów
     sparkButton.addEventListener("click", () => changeSpark(sparkTextElement));
     playPauseBtn.addEventListener('click', togglePlayPause);
