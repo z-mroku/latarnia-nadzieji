@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -85,7 +84,78 @@
         document.title = `${sectionName} — Od Dna do Światła`;
         const entriesRef = collection(db, 'sekcje', sectionName, 'entries');
         
-        if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
+        if (sectionName === 'Galeria') {
+            const snap = await getDocs(query(entriesRef, orderBy("createdAt", "desc")));
+            let items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            let gridHTML = items.map((item, index) => `
+                <div class="photo-card" data-index="${index}" role="button" tabindex="0" aria-label="Otwórz: ${item.title || ''}">
+                ${item.type === "video" 
+                    ? `<div class="video-thumb" style="height: 220px; display: flex; align-items: center; justify-content: center; background: #000; font-size: 3em;">🎥</div>`
+                    : `<img src="${item.url}" alt="${item.title || 'Zdjęcie'}">`}
+                <div class="caption">
+                    <h3>${item.title || 'Bez tytułu'}</h3>
+                    <p>${item.text || ''}</p>
+                </div>
+                </div>
+            `).join('');
+
+            wrapper.innerHTML = `
+                <header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header>
+                <main><div class="grid-container"><div class="photo-grid">${gridHTML || '<p style="text-align:center;">Galeria jest pusta.</p>'}</div></div>
+                <div id="lightbox" class="lightbox">
+                    <div class="lb-inner">
+                        <button id="lbClose" class="lb-close" aria-label="Zamknij">&times;</button>
+                        <button id="lbPrev" class="lb-nav lb-prev">❮</button>
+                        <div id="lbMedia"></div>
+                        <button id="lbNext" class="lb-nav lb-next">❯</button>
+                        <div id="lbDesc" class="lb-desc"></div>
+                    </div>
+                </div>
+                </main>`;
+
+            const lightbox = document.getElementById('lightbox');
+            const lbMedia = document.getElementById('lbMedia');
+            const lbDesc = document.getElementById('lbDesc');
+            let currentIndex = -1;
+
+            function showItem(index) {
+                if (index < 0) index = items.length - 1;
+                if (index >= items.length) index = 0;
+                currentIndex = index;
+                let item = items[index];
+
+                if (item.type === "video") {
+                    lbMedia.innerHTML = `<video src="${item.url}" controls autoplay style="max-width: 90vw; max-height: 80vh; border-radius: 5px;"></video>`;
+                } else {
+                    lbMedia.innerHTML = `<img src="${item.url}" alt="${item.title}" style="max-width: 90vw; max-height: 80vh; border-radius: 5px;">`;
+                }
+
+                lbDesc.textContent = item.text || '';
+                lightbox.classList.add('active');
+            }
+            
+            document.querySelectorAll('.photo-card').forEach(card => {
+                card.addEventListener('click', () => showItem(parseInt(card.dataset.index, 10)));
+            });
+            
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                lbMedia.innerHTML = '';
+            }
+
+            document.getElementById('lbClose').addEventListener('click', closeLightbox);
+            document.getElementById('lbPrev').addEventListener('click', () => showItem(currentIndex - 1));
+            document.getElementById('lbNext').addEventListener('click', () => showItem(currentIndex + 1));
+            lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+            window.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === "Escape") closeLightbox();
+            if (e.key === "ArrowLeft") showItem(currentIndex - 1);
+            if (e.key === "ArrowRight") showItem(currentIndex + 1);
+            });
+        }
+        else if (sectionName === 'Piciorys Chudego' || sectionName.toLowerCase().includes('księżniczki')) {
             const snap = await getDocs(query(entriesRef, limit(1)));
             if (snap.empty) { wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container"><div class="story-item"><p>Brak wpisu w tej sekcji.</p></div></div></main>`; return; }
             const entry = snap.docs[0].data();
@@ -101,7 +171,7 @@
             }
         } 
         else if (sectionName === 'Pomoc') {
-            const snap = await getDocs(query(entriesRef, orderBy("woj")));
+            const snap = await getDocs(query(entriesRef, orderBy('woj'), orderBy('title')));
         
             const groupedByWoj = snap.docs.reduce((acc, doc) => {
                 const entry = doc.data();
@@ -116,15 +186,12 @@
 
             for (const woj of wojOrder) {
                 if (groupedByWoj[woj]) {
-                    const entriesHTML = groupedByWoj[woj].map(e => {
-                      return `<div class="place-entry">
-                            <h3>${e.name || 'Brak nazwy'}</h3>
-                            <p>${e.address ? 'Adres: ' + e.address : ''}</p>
-                            <p>${e.phone ? 'Telefon: ' + e.phone : ''}</p>
-                            <p>${e.desc || 'Brak opisu.'}</p>
-                            ${e.link ? `<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>` : ''}
-                        </div>`
-                    }).join('');
+                    const entriesHTML = groupedByWoj[woj].map(e => `
+                        <div class="place-entry">
+                            <h3>${e.title || 'Brak nazwy'}</h3>
+                            <div>${e.text || 'Brak opisu.'}</div>
+                        </div>
+                    `).join('');
 
                     const icon = woj === 'Ogólnopolskie' ? '📞' : '🏥';
                     accordionsHTML += `
@@ -150,11 +217,11 @@
             </div></main>`;
             
             document.querySelectorAll('.accordion').forEach(acc => {
-                acc.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                    const panel = this.nextElementSibling;
-                    panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
-                });
+            acc.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const panel = this.nextElementSibling;
+                panel.style.maxHeight = panel.style.maxHeight ? null : panel.scrollHeight + "px";
+            });
             });
 
             const select = document.getElementById('wojewodztwoSelect');
@@ -170,58 +237,31 @@
             let entriesHTML = '';
             if (snap.empty) {
                 entriesHTML = `<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>`;
+            } else if (snap.docs.length === 1 && sectionName !== 'Kronika') {
+                const doc = snap.docs[0];
+                const e = doc.data();
+                const contentId = `content-${doc.id}`;
+                const buttonId = `button-${doc.id}`;
+                entriesHTML = `
+                    <div class="story-item">
+                        <div id="${contentId}">
+                            <h2>${e.title || ''}</h2>
+                            <div class="entry-content">${e.text || ''}</div>
+                        </div>
+                        <div class="speak-button-container">
+                            <button id="${buttonId}" class="speak-button">▶️ Odsłuchaj</button>
+                        </div>
+                    </div>`;
+                setTimeout(() => createLector(buttonId, contentId), 0);
             } else {
                 entriesHTML = snap.docs.map(doc => {
-                    const e = doc.data();
-                    const skrot = e.text.replace(/<[^>]*>?/gm, '').substring(0, 300);
-                    const contentId = `content-full-${doc.id}`;
-                    const buttonId = `button-speak-${doc.id}`;
-                    
-                    return `
-                        <div class="story-item">
-                            <h2 class="fancy-title">${e.title || 'Bez tytułu'}</h2>
-                            <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
-                            <div class="wpis-skrot"><p>${skrot}...</p></div>
-                            <div id="${contentId}" class="wpis-calosc" style="display: none;">${e.text}</div>
-                            <div class="speak-button-container">
-                                <button class="czytaj-dalej-btn">...czytaj dalej</button>
-                                <button id="${buttonId}" class="speak-button" style="display: none;">▶️ Odsłuchaj</button>
-                            </div>
-                        </div>`;
+                const e = doc.data();
+                const excerpt = e.text.replace(/<[^>]*>?/gm, '').substring(0, 250) + '...';
+                const link = `Wpis.html?section=${encodeURIComponent(sectionName)}&id=${doc.id}`;
+                return `<div class="story-item"><h2><a href="${link}">${e.title || 'Bez tytułu'}</a></h2><div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div><p>${excerpt}</p></div>`;
                 }).join('');
             }
-            
             wrapper.innerHTML = `<header class="page-header"><h1>${sectionName}</h1><a href="index.html" class="back-to-home-button">⟵ Powrót</a></header><main><div class="story-container">${entriesHTML}</div></main>`;
-
-            document.querySelectorAll('.czytaj-dalej-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const storyItem = this.closest('.story-item');
-                    const skrot = storyItem.querySelector('.wpis-skrot');
-                    const calosc = storyItem.querySelector('.wpis-calosc');
-                    const lektorBtn = storyItem.querySelector('.speak-button');
-                    const isVisible = calosc.style.display === 'block';
-
-                    if (isVisible) {
-                        calosc.style.display = 'none';
-                        lektorBtn.style.display = 'none';
-                        skrot.style.display = 'block';
-                        this.textContent = '...czytaj dalej';
-                    } else {
-                        calosc.style.display = 'block';
-                        lektorBtn.style.display = 'inline-flex';
-                        skrot.style.display = 'none';
-                        this.textContent = 'Zwiń';
-                    }
-                });
-            });
-
-            if (!snap.empty) {
-                snap.docs.forEach(doc => {
-                    const contentId = `content-full-${doc.id}`;
-                    const buttonId = `button-speak-${doc.id}`;
-                    createLector(buttonId, contentId);
-                });
-            }
         }
       } catch (err) {
         console.error("Błąd krytyczny w Sekcja.html:", err);
