@@ -1,6 +1,7 @@
 // Plik: /js/main.js (WERSJA OSTATECZNA, CZYSTA I POPRAWIONA)
-import { db } from './firebase-config.js'; 
+import { db, auth } from './firebase-config.js'; 
 import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // --- Zmienne Globalne ---
 let sparksFromDB = [], player, playlist = [], currentIndex = 0;
@@ -11,6 +12,7 @@ async function fetchAndRenderMenu(container) {
         const snapshot = await getDocs(query(collection(db, "menu"), orderBy("order", "asc"))); 
         container.innerHTML = snapshot.docs.map(doc => {
             const data = doc.data();
+            // Poprawka: upewnij się, że URL jest poprawny
             const url = data.url.startsWith('http') || data.url.startsWith('#') ? data.url : `/${data.url}`;
             return `<li><a href="${url}">${data.text}</a></li>`;
         }).join('') || '<li><a>Brak menu</a></li>'; 
@@ -24,6 +26,7 @@ async function fetchLatarniaNadziei(container) {
     try { 
         const entriesQuery = query(collectionGroup(db, "entries"), orderBy("createdAt", "desc")); 
         const snapshot = await getDocs(entriesQuery); 
+        // Wykluczamy sekcje specjalne
         const specialSections = ['Piciorys Chudego', 'Z punktu widzenia księżniczki', 'Pomoc', 'Galeria'];
         const entries = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data(), section: doc.ref.parent.parent.id }))
@@ -70,6 +73,7 @@ function changeSpark(textElement) {
     textElement.style.opacity = 0; 
     setTimeout(() => { textElement.innerText = newSpark; textElement.style.opacity = 1; }, 300); 
 }
+
 
 // --- LOGIKA ODTWARZACZA YOUTUBE ---
 function getVideoId(url) { 
