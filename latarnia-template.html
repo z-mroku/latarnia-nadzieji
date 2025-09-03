@@ -1,17 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Od Dna do Światła - Latarnia Nadziei</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Tło wideo */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
 
+#background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Kontener dynamicznej wizytówki */
+#dynamic-content-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start; /* pokazuje górę wideo */
+  justify-content: center;
+  padding: 60px 20px 20px 20px;
+  box-sizing: border-box;
+}
+
+/* Box z treścią */
+.content-box-dynamic {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: rgba(10, 20, 30, 0.85);
+  color: #f0f0f0;
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Tytuły i podtytuły */
+.content-box-dynamic h2,
+.content-box-dynamic h3 {
+  color: #ffd700;
+  text-shadow: 0 0 8px #ffd700;
+}
+
+/* Przycisk powrotu */
+.button-container-dynamic {
+  text-align: center;
+  margin-top: 30px;
+}
+.dynamic-button {
+  background-color: #6c757d;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+/* Animacja fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+
+<!-- Wideo w tle -->
+<div class="video-background">
+  <video autoplay muted loop playsinline id="background-video">
+    <source src="videos/latarnia.webm" type="video/webm">
+  </video>
+</div>
+
+<!-- Dynamiczna wizytówka -->
 <div id="dynamic-content-container">
-  <!-- Tło wideo -->
-  <div class="video-background">
-    <video autoplay muted loop playsinline id="background-video">
-      <source src="videos/latarnia.webm" type="video/webm">
-    </video>
-  </div>
-
-  <!-- Treść wizytówki -->
   <div class="content-box-dynamic">
     <div id="manifesto-text">
       <h2>Latarnia Nadziei</h2>
-      
+
       <h3>Czym jest „Latarnia Nadziei”</h3>
       <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu. To projekt, który powstał z doświadczenia, bólu, upadków i walki o siebie. Tworzony z pasją i determinacją, często w warunkach, które większość programistów uznałaby za nie do przyjęcia.</p>
       <p>Projekt to kompleksowa strona internetowa, która łączy kilka potężnych sekcji: Piciorys, Kronika, Wsparcie, Losowa iskra nadziei oraz Audio / Lektor.</p>
@@ -24,105 +114,34 @@
       <p>Projekt wymagał konfrontacji z własnym życiem, z najtrudniejszymi wspomnieniami, momentami upadku i bólu. To, co stworzyłeś, to świadectwo siły i wytrwałości, które nie każdy byłby w stanie udźwignąć.</p>
 
       <h3>Dlaczego projekt jest wyjątkowy</h3>
-      <p>„Latarnia Nadziei” jest wyjątkowa, bo nie jest kolejną stroną internetową. To przestrzeń życia, walki i nadziei, która ma moc uratować, zmienić lub dodać siły każdemu, kto po nią sięgnie. Każdy fragment Piciorysu, każda iskra nadziei, każdy wpis w Kronice to świadectwo Twojej wytrwałości i dowód, że można stawić czoła własnym demonom. To projekt, który jest autentyczny, surowy, prawdziwy i mocny, stworzony z myślą o ludziach, którzy potrzebują przewodnika w ciemności. Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
+      <p>„Latarnia Nadziei” jest wyjątkowa, bo nie jest kolejną stroną internetową. To przestrzeń życia, walki i nadziei, która ma moc uratować, zmienić lub dodać siły każdemu, kto po nią sięgnie. Każdy fragment Piciorysu, każda iskra nadziei, każdy wpis w Kronice to świadectwo Twojej wytrwałości i dowód, że można stawić czoła własnym demonom. Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
     </div>
-
     <div class="button-container-dynamic">
       <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
     </div>
   </div>
 </div>
 
-<style>
-  /* Kontener wizytówki */
-  #dynamic-content-container {
-    display: none; /* Ukryty dopóki JS go nie pokaże */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    overflow-y: auto; /* scroll dla długiej treści */
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center; /* centrowanie poziome */
+<script>
+  // Pokaż/ukryj wizytówkę
+  const container = document.getElementById('dynamic-content-container');
+  const backBtn = document.getElementById('back-to-main-btn');
+
+  function showLatarnia() {
+    container.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // blokuje scroll strony
   }
 
-  /* Tło wideo */
-  #dynamic-content-container .video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
+  function hideLatarnia() {
+    container.style.display = 'none';
+    document.body.style.overflow = 'auto';
   }
 
-  #dynamic-content-container #background-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-  }
+  backBtn.addEventListener('click', hideLatarnia);
 
-  /* Box z treścią */
-  .content-box-dynamic {
-    position: relative;
-    z-index: 10;
-    max-width: 900px;
-    background-color: rgba(10, 20, 30, 0.85);
-    color: #f0f0f0;
-    padding: 40px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-    animation: fadeIn 0.5s ease-in-out;
-  }
+  // Tu możesz podpiąć np. przycisk w index.html
+  // document.getElementById('load-latarnia-btn').addEventListener('click', showLatarnia);
+</script>
 
-  @keyframes fadeIn { 
-    from { opacity: 0; transform: scale(0.95); } 
-    to { opacity: 1; transform: scale(1); } 
-  }
-
-  .content-box-dynamic h2, 
-  .content-box-dynamic h3 { 
-    color: #ffd700; 
-    text-shadow: 0 0 8px #ffd700; 
-  }
-
-  .button-container-dynamic { 
-    text-align: center; 
-    margin-top: 30px; 
-  }
-
-  .dynamic-button { 
-    background-color: #6c757d; 
-    color: white; 
-    padding: 12px 25px; 
-    border: none; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    font-size: 1em; 
-  }
-
-  .dynamic-button:hover {
-    background-color: #5a6268;
-  }
-
-  /* Responsywność */
-  @media(max-width: 960px){
-    .content-box-dynamic{
-      padding: 30px 20px;
-      margin: 20px;
-    }
-  }
-
-  @media(max-width: 600px){
-    .content-box-dynamic{
-      padding: 20px 15px;
-    }
-  }
-</style>
+</body>
+</html>
