@@ -1,4 +1,4 @@
-// Plik: /js/main.js (WERSJA OSTATECZNA, BEZPIECZNA I POPRAWIONA)
+// Plik: /js/main.js (WERSJA OSTATECZNA, KOMPLETNA I DZIAŁAJĄCA)
 
 import { db } from './firebase-config.js'; 
 import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -157,7 +157,6 @@ function initializeDisqus() {
 // ===================================================================
 // LOGIKA DYNAMICZNEGO KONTENTU
 // ===================================================================
-
 async function loadLatarniaContent() {
     const mainContent = document.getElementById('main-content');
     const dynamicContainer = document.getElementById('dynamic-content-container');
@@ -174,7 +173,7 @@ async function loadLatarniaContent() {
 
         mainContent.style.display = 'none';
         dynamicContainer.innerHTML = contentHTML;
-        // KLUCZOWA POPRAWKA: Zmieniamy 'block' na 'flex', aby dopasować do CSS i wyśrodkować treść
+        // KLUCZOWA POPRAWKA: Używamy 'flex' do centrowania, zgodnie z CSS
         dynamicContainer.style.display = 'flex';
 
         const backBtn = document.getElementById('back-to-main-btn');
@@ -185,13 +184,11 @@ async function loadLatarniaContent() {
                 dynamicContainer.innerHTML = '';
             });
         }
-
     } catch (err) {
         console.error("Błąd ładowania dynamicznej treści:", err);
-        mainContent.style.display = 'block';
+        mainContent.style.display = 'block'; // W razie błędu, pokaż główną treść
     }
 }
-
 
 // --- GŁÓWNY PUNKT STARTOWY APLIKACJI ---
 document.addEventListener("DOMContentLoaded", () => {
@@ -205,13 +202,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById("next-btn");
     const loadLatarniaButton = document.getElementById('load-latarnia-btn');
 
-    // Inicjalizacja funkcji (dodano ify dla bezpieczeństwa, aby uniknąć błędów krytycznych)
+    // Inicjalizacja funkcji
     if (menuContainer) fetchAndRenderMenu(menuContainer);
     if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
     if (sparkTextElement) fetchSparks(sparkTextElement);
     if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    // Podpięcie eventów (dodano ify dla bezpieczeństwa)
+    // Podpięcie eventów
     if (sparkButton) sparkButton.addEventListener("click", () => changeSpark(sparkTextElement));
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
     if (nextBtn) nextBtn.addEventListener("click", nextSong);
