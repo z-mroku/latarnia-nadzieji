@@ -517,38 +517,7 @@ footer .footer-content a:hover { color: #fff; }
     inset 0 2px 4px rgba(255,255,255,0.2);
   background: linear-gradient(145deg, #FF1A1A 0%, #CC0000 50%, #990000 100%);
 }
-/* ============================================= */
-/* === OSTATECZNE POPRAWKI NA KONIEC PLIKU === */
-/* ============================================= */
 
-/* Poprawka czytelności tekstu na tle wideo na stronie głównej */
-#main-content > .content-section, 
-#main-content > .animated-warning, 
-#main-content > .spark-container,
-#main-content > .comments-section {
-    background-color: rgba(0, 0, 0, 0.65) !important;
-}
-/* ==================== DYNAMICZNA WIZYTÓWKA ==================== */
-#dynamic-content-container {
-  display: none; /* Ukryty dopóki JS go nie pokaże */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  overflow-y: auto; /* scroll dla długiej treści */
-  padding: 20px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center; /* centrowanie poziome */
-}
-
-/* Tło wideo */
-#dynamic-content-container .video-background {
-  position: fixed; /* wideo jako tło całego kontenera */
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
@@ -623,4 +592,135 @@ footer .footer-content a:hover { color: #fff; }
   .content-box-dynamic{
     padding: 20px 15px;
   }
+}
+/* ================================================================
+   VIDEO BACKGROUND
+   ================================================================ */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+#background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6); /* lekko przyciemnia wideo, żeby tekst się wyróżniał */
+}
+
+/* ================================================================
+   DYNAMIC CONTENT CONTAINER (WIZYTÓWKA)
+   ================================================================ */
+#dynamic-content-container {
+  display: none; /* ukryty dopóki nie zostanie wywołany */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start; /* góra widoczna */
+  justify-content: center;
+  padding: 60px 20px 20px 20px;
+  box-sizing: border-box;
+}
+
+/* ================================================================
+   CONTENT BOX
+   ================================================================ */
+.content-box-dynamic {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background-color: rgba(10, 20, 30, 0.85);
+  color: #f0f0f0;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.7);
+  animation: fadeInScale 0.6s ease-in-out;
+}
+
+/* Glow na nagłówkach */
+.content-box-dynamic h2,
+.content-box-dynamic h3 {
+  color: #ffd700;
+  text-shadow: 0 0 10px #ffd700, 0 0 20px #ffea00, 0 0 30px #fff;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+/* Button powrotu */
+.button-container-dynamic {
+  text-align: center;
+  margin-top: 30px;
+}
+.dynamic-button {
+  background-color: #6c757d;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+.dynamic-button:hover {
+  background-color: #5a6268;
+  box-shadow: 0 0 15px #ffd700;
+}
+
+/* ================================================================
+   ANIMACJE
+   ================================================================ */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ================================================================
+   ANIMOWANE ISKRZĄCE SIĘ ELEMENTY (SYMBOLICZNE ISKRY)
+   ================================================================ */
+.spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #fffacd 0%, #ffd700 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatUp 3s linear infinite;
+  opacity: 0;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(0.5); opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { transform: translateY(-200px) scale(1); opacity: 0; }
+}
+
+/* ================================================================
+   SCROLLBAR DLA CONTENT BOX
+   ================================================================ */
+.content-box-dynamic::-webkit-scrollbar {
+  width: 8px;
+}
+.content-box-dynamic::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+.content-box-dynamic::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.4);
+  border-radius: 4px;
+}
+.content-box-dynamic::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 215, 0, 0.6);
 }
