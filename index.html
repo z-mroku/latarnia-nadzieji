@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Od Dna do Światła</title>
+  <link rel="stylesheet" href="/css/style.css"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    .admin-button {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 1001;
+    }
+  </style>
+</head>
+<body>
+  
+  <a href="login.html" class="admin-button back-to-home-button" style="font-size: 1em; padding: 12px 25px;">
+    <i class="fa-solid fa-satellite-dish"></i> Panel
+  </a>
+
+  <header>
+    <h1>Od Dna do Światła</h1>
+    <div class="scrolling-subtitle-container">
+      <p class="special-subtitle">To miejsce dla ubrudzonych życiem – i dla tych, którzy szukają światła</p>
+    </div>
+  </header>
+
+  <nav>
+    <ul id="main-menu"><li><a>Wczytywanie menu...</a></li></ul>
+  </nav>
+
+  <main>
+    <div class="animated-warning"><p>„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”</p></div>
+    
+    <div style="text-align: center; margin: 40px 0;">
+      <a href="sekcja.html?nazwa=Latarnia z Mroku" class="back-to-home-button main-showcase-button">O Latarni Nadziei</a>
+    </div>
+    
+    <div class="spark-container">
+      <div id="sparkText" class="spark-text">Wczytywanie iskierki nadziei...</div>
+      <button id="sparkButton" class="spark-button">💫 Daj kolejną iskrę</button>
+    </div>
+    
+    <section id="latest-entries" class="content-section">
+      <h2 class="fancy-title entries-title">Ostatnia Latarnia Nadziei</h2>
+      <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
+    </section>
+
+    <section id="comments" class="comments-section">
+      <h2>Podziel się swoją historią lub wesprzyj innych</h2>
+      <p>Twoje doświadczenie ma znaczenie. Anonimowo lub nie – każde słowo wsparcia jest bezcenne.</p>
+      <div id="disqus_thread"></div>
+    </section>
+  </main>
+
+  <div class="audio-player">
+    <div class="album-art"><i class="fas fa-music"></i></div>
+    <div class="player-info">
+        <div id="current-song-title">Wczytywanie playlisty...</div>
+        <div class="progress-container" id="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+        <div class="player-controls">
+            <button id="prev-btn" title="Poprzedni"><i class="fas fa-backward"></i></button>
+            <button id="play-pause-btn" title="Odtwarzaj"><i class="fas fa-play"></i></button>
+            <button id="next-btn" title="Następny"><i class="fas fa-forward"></i></button>
+        </div>
+    </div>
+  </div>
+  <div id="youtube-player" style="display: none;"></div>
+
+  <footer>
+    <div class="footer-content">
+        <span>Od Dna do Światła</span>
+        <span>&copy; Chudy</span>
+        <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
