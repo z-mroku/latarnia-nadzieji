@@ -528,35 +528,42 @@ footer .footer-content a:hover { color: #fff; }
 #main-content > .comments-section {
     background-color: rgba(0, 0, 0, 0.65) !important;
 }
-
 /* ========================================================== */
-/* === OSTATECZNE POPRAWKI DLA DYNAMICZNEJ SEKCJI === */
+/* === POPRAWKI DLA DYNAMICZNEJ SEKCJI "O LATARNI NADZIEI" === */
 /* ========================================================== */
 
 /* Kontener na dynamiczną treść (wizytówkę) jest domyślnie ukryty */
 #dynamic-content-container {
-  display: none;
-  position: fixed; /* Kluczowe: Nakłada się na całą stronę */
+  display: none; /* Pozostaje ukryty, dopóki JS go nie pokaże */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1000; /* Musi być wyżej niż reszta treści */
+  z-index: 1000; /* Nakłada się na całą stronę */
   overflow-y: auto; /* Pozwala przewijać, jeśli treść jest długa */
+  
+  /* Kluczowa poprawka: Używamy Flexbox do idealnego centrowania w pionie i poziomie */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: 20px; /* Dodatkowy margines od krawędzi ekranu */
+  box-sizing: border-box; /* Zapobiega problemom z paddingiem */
 }
 
-/* Tło wideo, które jest wewnątrz dynamicznego kontenera */
-.video-background {
-  position: absolute;
+/* Tło wideo, które jest częścią szablonu */
+#dynamic-content-container .video-background {
+  position: absolute; /* Jest tłem tylko dla kontenera, a nie całej strony */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Tło jest za treścią wizytówki */
+  z-index: -1; /* Chowa się za treścią wizytówki */
   overflow: hidden;
 }
 
-#background-video {
+#dynamic-content-container #background-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
