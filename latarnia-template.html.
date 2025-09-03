@@ -1,0 +1,24 @@
+<div class="content-box lighthouse-background">
+    <div id="manifesto-text">
+        <h2>Latarnia Nadziei</h2>
+        <h3>Czym jest „Latarnia Nadziei”</h3>
+        <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu...</p>
+        <h3>Dlaczego projekt jest wyjątkowy</h3>
+        <p>...Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
+    </div>
+    <div class="speak-button-container">
+        <button id="back-to-main-btn" class="speak-button" style="background-color: #6c757d;">⟵ Wróć</button>
+        <button id="speakBtnManifest" class="speak-button">🔊 Odsłuchaj Manifest</button>
+    </div>
+</div>
+<style>
+/* Style, które załadują się razem z szablonem */
+.lighthouse-background {
+    background-image: url('https://images.pexels.com/photos/163864/lighthouse-light-weather-storm-163864.jpeg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+}
+.content-box h2 { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
+</style>
