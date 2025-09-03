@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wczytywanie...</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    .back-to-home-button { position: fixed; top: 15px; right: 15px; z-index: 1001; font-size: 1em; padding: 12px 25px; }
+    .story-container { max-width: 960px; margin: 0 auto; padding: 20px; }
+    .story-item { background-color: rgba(10,10,10,0.85); margin-bottom: 20px; padding: 20px; border-radius: 12px; color: #f0f0f0; box-shadow: 0 10px 30px rgba(0,0,0,.35);}
+    .story-item h2 { margin: 0 0 8px; }
+    .entry-item-meta{ opacity:.8; font-size:.9em; margin-bottom:10px;}
+    .wpis-skrot p{ margin:0;}
+    .wpis-calosc{ margin-top:12px; }
+    .speak-button, .czytaj-dalej-btn{
+      display:inline-flex; align-items:center; gap:.5rem; margin-top:12px;
+      background:#6c757d; color:#fff; border:none; padding:10px 16px; border-radius:10px; cursor:pointer
+    }
+    .czytaj-dalej-btn{ background:#3b3f46; }
+    .speak-button[disabled]{ opacity:.5; cursor:not-allowed }
+    header.page-header{ padding:80px 20px 20px; text-align:center }
+    header.page-header h1{ margin:0; }
+    /* Pomoc */
+    .filter-bar { margin: 10px 0 20px; text-align:center }
+    .accordion { background-color: #222; color: #fff; cursor: pointer; padding: 12px 16px; width: 100%; text-align: left; border: none; outline: none; transition: .25s; border-radius: 10px; margin: 10px 0; }
+    .accordion.active { background-color: #3a3a3a; }
+    .panel { max-height: 0; overflow: hidden; transition: max-height .3s ease; padding: 0 12px; background: rgba(0,0,0,0.55); border-radius: 10px; }
+    .place-entry{ padding:14px 4px; border-bottom: 1px dashed rgba(255,255,255,.15) }
+    .place-entry:last-child{ border-bottom:none }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-to-home-button"><i class="fas fa-arrow-left"></i> Powrót</a>
+
+  <div id="dynamic-content-wrapper">
+    <p style="text-align:center; padding-top: 50px;">Ładowanie...</p>
+  </div>
+
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { collection, query, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // --- UTYLsy ---
+    const params = new URLSearchParams(location.search);
+    // Obsługujemy obie wersje: ?nazwa=Sekcja (oryginał) i ?section=Sekcja (na wszelki)
+    const sectionNameRaw = (params.get('nazwa') || params.get('section') || '').trim();
+    const sectionName = decodeURIComponent(sectionNameRaw);
+    const wrapper = document.getElementById('dynamic-content-wrapper');
+
+    // Solidny, odporny lektor
+    function createLector(buttonId, contentSelectorOrId, buttonText="Odsłuchaj") {
+      const btn = document.getElementById(buttonId);
+      if (!btn) return;
+
+      const el = contentSelectorOrId.startsWith('#')
+        ? document.querySelector(contentSelectorOrId)
+        : document.getElementById(contentSelectorOrId);
+      if (!el) { btn.disabled = true; return; }
+
+      // Pobierz czysty tekst z HTML (zachowuje przerwy)
+      const tmp = document.createElement('div');
+      tmp.innerHTML = el.innerHTML;
+      const fullText = (tmp.innerText || tmp.textContent || '').replace(/\s+\n/g, '\n').trim();
+
+      if (!fullText) { btn.disabled = true; btn.style.opacity = .5; return; }
+
+      // Segmentacja: kropki, znaki zapytania, wielokrotne nowe linie itp.
+      const sentences = fullText
+        .split(/(?:(?<=\S)[.!?…]+|\n{2,})\s+/g)
+        .map(s => s.trim()).filter(Boolean);
+
+      let currentIndex = 0;
+      let isReading = false;
+      let plVoice = null;
+
+      function pickPolishVoice() {
+        const voices = window.speechSynthesis.getVoices() || [];
+        plVoice = voices.find(v => /pl/i.test(v.lang)) || null;
+      }
+      pickPolishVoice();
+      if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
+        window.speechSynthesis.onvoiceschanged = () => pickPolishVoice();
+      }
+
+      function readSentence(i) {
+        if (!isReading || i >= sentences.length) {
+          window.speechSynthesis.cancel();
+          isReading = false;
+          btn.textContent = `▶️ ${buttonText}`;
+          currentIndex = 0;
+          return;
+        }
+        const utter = new SpeechSynthesisUtterance(sentences[i]);
+        utter.lang = "pl-PL";
+        if (plVoice) utter.voice = plVoice;
+        utter.rate = 1;
+      //...
+      }
+    //...
+  </script>
+</body>
+</html>
 
