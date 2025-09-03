@@ -1,3 +1,4 @@
+
 <div class="video-background">
   <video autoplay muted loop playsinline id="background-video">
     <source src="videos/latarnia.webm" type="video/webm">
@@ -9,10 +10,18 @@
         <h2>Latarnia Nadziei</h2>
         
         <h3>Czym jest „Latarnia Nadziei”</h3>
-        <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu...</p>
-        
+        <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu. To projekt, który powstał z doświadczenia, bólu, upadków i walki o siebie. Tworzony z pasją i determinacją, często w warunkach, które większość programistów uznałaby za nie do przyjęcia.</p>
+        <p>Projekt to kompleksowa strona internetowa, która łączy kilka potężnych sekcji: Piciorys, Kronika, Wsparcie, Losowa iskra nadziei oraz Audio / Lektor.</p>
+
+        <h3>Dla kogo jest ten projekt</h3>
+        <p>Dla osób, które czują się zagubione i opuszczone, stojące w obliczu uzależnienia lub kryzysu. Dla ludzi, którzy doświadczyli samotności, depresji lub emocjonalnego chaosu, i potrzebują prawdziwego świadectwa walki i wytrwania. Dla tych, którzy szukają autentyczności, bez lukru, poprawności politycznej czy sztucznej otoczki. Dla każdego, kto potrzebuje światła w ciemności – dowodu, że nawet po najbardziej dramatycznych doświadczeniach można zacząć od nowa i odbudować siebie.</p>
+
+        <h3>Ciężar pracy i wyzwania</h3>
+        <p>Tworzenie „Latarni Nadziei” było prawdziwą walką. Większość projektu powstała na telefonie, co jest ekstremalnie trudne. Łączenie paneli admina, edytorów, galerii, bazy danych Firebase, nagrań audio i losowych cytatów w jeden spójny system wymagało cierpliwości i wytrwałości, jakiej nie powstydziłby się najlepszy mistrz programowania.</p>
+        <p>Projekt wymagał konfrontacji z własnym życiem, z najtrudniejszymi wspomnieniami, momentami upadku i bólu. To, co stworzyłeś, to świadectwo siły i wytrwałości, które nie każdy byłby w stanie udźwignąć.</p>
+
         <h3>Dlaczego projekt jest wyjątkowy</h3>
-        <p>...Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
+        <p>„Latarnia Nadziei” jest wyjątkowa, bo nie jest kolejną stroną internetową. To przestrzeń życia, walki i nadziei, która ma moc uratować, zmienić lub dodać siły każdemu, kto po nią sięgnie. Każdy fragment Piciorysu, każda iskra nadziei, każdy wpis w Kronice to świadectwo Twojej wytrwałości i dowód, że można stawić czoła własnym demonom. To projekt, który jest autentyczny, surowy, prawdziwy i mocny, stworzony z myślą o ludziach, którzy potrzebują przewodnika w ciemności. Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
     </div>
     <div class="button-container-dynamic">
         <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
@@ -24,19 +33,16 @@
     position: relative;
     z-index: 10;
     max-width: 900px;
-    margin: 5vh auto;
+    margin: 20px; /* Usunięto 'auto' - centrowaniem zajmie się kontener nadrzędny */
     background-color: rgba(10, 20, 30, 0.85);
     color: #f0f0f0;
     padding: 40px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
   .content-box-dynamic h2, .content-box-dynamic h3 { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
   .button-container-dynamic { text-align: center; margin-top: 30px; }
   .dynamic-button { background-color: #6c757d; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
