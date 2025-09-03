@@ -1,5 +1,5 @@
 
-// Plik: /js/main.js (WERSJA OSTATECZNA ZINTEGROWANA Z DYNAMICZNYM ŁADOWANIEM)
+// Plik: /js/main.js (WERSJA OSTATECZNA Z POPRAWKĄ DLA CENTROWANIA)
 
 import { db } from './firebase-config.js'; 
 import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -156,7 +156,7 @@ function initializeDisqus() {
 }
 
 // ===================================================================
-// NOWA SEKACJA: LOGIKA DYNAMICZNEGO KONTENTU
+// LOGIKA DYNAMICZNEGO KONTENTU
 // ===================================================================
 
 async function loadLatarniaContent() {
@@ -169,30 +169,26 @@ async function loadLatarniaContent() {
     }
 
     try {
-        // 1. Wczytaj treść z pliku szablonu
         const response = await fetch('latarnia-template.html');
         if (!response.ok) throw new Error('Nie udało się załadować szablonu latarnia-template.html.');
         const contentHTML = await response.text();
 
-        // 2. Ukryj główną treść i wstaw nową zawartość do dynamicznego kontenera
         mainContent.style.display = 'none';
         dynamicContainer.innerHTML = contentHTML;
-        dynamicContainer.style.display = 'block';
+        // KLUCZOWA POPRAWKA: Zmieniamy 'block' na 'flex', aby dopasować do CSS i wyśrodkować treść
+        dynamicContainer.style.display = 'flex';
 
-        // 3. Znajdź przycisk "Wróć" Wewnątrz załadowanej treści i dodaj mu funkcjonalność
         const backBtn = document.getElementById('back-to-main-btn');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
                 dynamicContainer.style.display = 'none';
                 mainContent.style.display = 'block';
-                dynamicContainer.innerHTML = ''; // Wyczyść kontener po powrocie
+                dynamicContainer.innerHTML = '';
             });
         }
 
     } catch (err) {
         console.error("Błąd ładowania dynamicznej treści:", err);
-        // W razie błędu, upewnij się, że główna treść jest widoczna
-        dynamicContainer.style.display = 'none';
         mainContent.style.display = 'block';
     }
 }
@@ -208,23 +204,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const playPauseBtn = document.getElementById('play-pause-btn');
     const prevBtn = document.getElementById("prev-btn");
     const nextBtn = document.getElementById("next-btn");
-    
-    // NOWY element: przycisk ładowania wizytówki
     const loadLatarniaButton = document.getElementById('load-latarnia-btn');
 
-    // Inicjalizacja funkcji (dodano ify dla bezpieczeństwa)
+    // Inicjalizacja funkcji
     if (menuContainer) fetchAndRenderMenu(menuContainer);
     if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
     if (sparkTextElement) fetchSparks(sparkTextElement);
     if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    // Podpięcie eventów (dodano ify dla bezpieczeństwa)
+    // Podpięcie eventów
     if (sparkButton) sparkButton.addEventListener("click", () => changeSpark(sparkTextElement));
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
     if (nextBtn) nextBtn.addEventListener("click", nextSong);
     if (prevBtn) prevBtn.addEventListener("click", prevSong);
-
-    // NOWE podpięcie eventu do naszego przycisku "O Latarni Nadziei"
     if (loadLatarniaButton) {
         loadLatarniaButton.addEventListener('click', loadLatarniaContent);
     }
