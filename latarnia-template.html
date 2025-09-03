@@ -1,121 +1,17 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Latarnia Nadziei</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <style>
-    /* --- WIDEO W TLE --- */
-    .video-background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      z-index: 0;
-    }
-    .video-background video {
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
 
-    /* --- GŁÓWNY BOX TREŚCI --- */
-    .content-box-dynamic {
-      position: relative;
-      z-index: 10;
-      max-width: 900px;
-      margin: 50px auto;
-      background-color: rgba(10, 20, 30, 0.85);
-      color: #f0f0f0;
-      padding: 40px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
-      animation: fadeInUp 1s ease-in-out;
-    }
-
-    /* --- ANIMACJE --- */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .content-box-dynamic h2 {
-      color: #ffd700;
-      text-align: center;
-      font-size: 2.5em;
-      text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-      margin-bottom: 20px;
-      animation: glowPulse 3s infinite alternate;
-    }
-
-    .content-box-dynamic h3 {
-      color: #ffdd55;
-      margin-top: 25px;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-    }
-
-    @keyframes glowPulse {
-      from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
-      to   { text-shadow: 0 0 25px rgba(255, 215, 0, 1); }
-    }
-
-    .content-box-dynamic p {
-      line-height: 1.6;
-      margin: 10px 0;
-      font-size: 1.1em;
-      text-align: justify;
-    }
-
-    /* --- PRZYCISK WRÓĆ --- */
-    .button-container-dynamic {
-      text-align: center;
-      margin-top: 40px;
-    }
-    .dynamic-button {
-      background: linear-gradient(135deg, #ffd700, #ff9900);
-      color: #222;
-      font-weight: bold;
-      padding: 12px 30px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.1em;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-      transition: all 0.3s ease;
-    }
-    .dynamic-button:hover {
-      background: linear-gradient(135deg, #ffcc33, #ff6600);
-      box-shadow: 0 0 25px rgba(255, 180, 0, 1);
-      transform: scale(1.05);
-    }
-
-    /* --- RESPONSYWNOŚĆ --- */
-    @media (max-width: 768px) {
-      .content-box-dynamic {
-        padding: 20px;
-        margin: 20px;
-      }
-      .content-box-dynamic h2 { font-size: 2em; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Wideo w tle -->
+<div id="dynamic-content-container">
+  <!-- Tło wideo -->
   <div class="video-background">
     <video autoplay muted loop playsinline id="background-video">
       <source src="videos/latarnia.webm" type="video/webm">
-      <source src="videos/latarnia.mp4" type="video/mp4">
-      Twój przeglądarka nie obsługuje wideo w tle.
     </video>
   </div>
 
-  <!-- Główna treść -->
+  <!-- Treść wizytówki -->
   <div class="content-box-dynamic">
     <div id="manifesto-text">
       <h2>Latarnia Nadziei</h2>
-
+      
       <h3>Czym jest „Latarnia Nadziei”</h3>
       <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu. To projekt, który powstał z doświadczenia, bólu, upadków i walki o siebie. Tworzony z pasją i determinacją, często w warunkach, które większość programistów uznałaby za nie do przyjęcia.</p>
       <p>Projekt to kompleksowa strona internetowa, która łączy kilka potężnych sekcji: Piciorys, Kronika, Wsparcie, Losowa iskra nadziei oraz Audio / Lektor.</p>
@@ -132,9 +28,101 @@
     </div>
 
     <div class="button-container-dynamic">
-      <button id="back-to-main-btn" class="dynamic-button"><i class="fas fa-arrow-left"></i> Wróć</button>
+      <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
     </div>
   </div>
+</div>
 
-</body>
-</html>
+<style>
+  /* Kontener wizytówki */
+  #dynamic-content-container {
+    display: none; /* Ukryty dopóki JS go nie pokaże */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    overflow-y: auto; /* scroll dla długiej treści */
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* centrowanie poziome */
+  }
+
+  /* Tło wideo */
+  #dynamic-content-container .video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  #dynamic-content-container #background-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  /* Box z treścią */
+  .content-box-dynamic {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    background-color: rgba(10, 20, 30, 0.85);
+    color: #f0f0f0;
+    padding: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn { 
+    from { opacity: 0; transform: scale(0.95); } 
+    to { opacity: 1; transform: scale(1); } 
+  }
+
+  .content-box-dynamic h2, 
+  .content-box-dynamic h3 { 
+    color: #ffd700; 
+    text-shadow: 0 0 8px #ffd700; 
+  }
+
+  .button-container-dynamic { 
+    text-align: center; 
+    margin-top: 30px; 
+  }
+
+  .dynamic-button { 
+    background-color: #6c757d; 
+    color: white; 
+    padding: 12px 25px; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 1em; 
+  }
+
+  .dynamic-button:hover {
+    background-color: #5a6268;
+  }
+
+  /* Responsywność */
+  @media(max-width: 960px){
+    .content-box-dynamic{
+      padding: 30px 20px;
+      margin: 20px;
+    }
+  }
+
+  @media(max-width: 600px){
+    .content-box-dynamic{
+      padding: 20px 15px;
+    }
+  }
+</style>
