@@ -517,4 +517,79 @@ footer .footer-content a:hover { color: #fff; }
     inset 0 2px 4px rgba(255,255,255,0.2);
   background: linear-gradient(145deg, #FF1A1A 0%, #CC0000 50%, #990000 100%);
 }
+/* ============================================= */
+/* === MOTYW: WIZYTÓWKA (LATARNIA NADZIEI) === */
+/* ============================================= */
+
+.theme-wizytowka body {
+  background: #0d121c;
+  color: #cdd5e0;
+}
+.theme-wizytowka main {
+  padding-top: 5vh;
+  padding-bottom: 10vh;
+}
+.theme-wizytowka .video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  overflow: hidden;
+}
+.theme-wizytowka .video-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+.theme-wizytowka .lighthouse-beam {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+      farthest-side at 50% var(--beam-y, 100%),
+      rgba(255, 220, 150, 0.12) 0%,
+      rgba(255, 220, 150, 0.08) 20%,
+      rgba(255, 215, 0, 0.0) 70%
+  );
+}
+.theme-wizytowka .manifest-container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 40px 50px;
+  text-align: left;
+  line-height: 1.9;
+  font-family: 'Georgia', serif;
+  background: rgba(13, 18, 28, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+.theme-wizytowka .manifest-container h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4em;
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 5px rgba(255, 215, 0, 0.3);
+  margin-top: 40px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  padding-top: 25px;
+}
+.theme-wizytowka .page-header h1 {
+  animation: none;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  color: #ffd700;
+}
+
+
+/* Styl dla większego przycisku na stronie głównej */
+.main-showcase-button {
+  font-size: 1.5em;
+  padding: 20px 45px;
+}
 
