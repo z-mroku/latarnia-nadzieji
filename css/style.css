@@ -528,38 +528,30 @@ footer .footer-content a:hover { color: #fff; }
 #main-content > .comments-section {
     background-color: rgba(0, 0, 0, 0.65) !important;
 }
-/* ========================================================== */
-/* === POPRAWKI DLA DYNAMICZNEJ SEKCJI "O LATARNI NADZIEI" === */
-/* ========================================================== */
-
-/* Kontener na dynamiczną treść (wizytówkę) jest domyślnie ukryty */
+/* ==================== DYNAMICZNA WIZYTÓWKA ==================== */
 #dynamic-content-container {
-  display: none; /* Pozostaje ukryty, dopóki JS go nie pokaże */
+  display: none; /* Ukryty dopóki JS go nie pokaże */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1000; /* Nakłada się na całą stronę */
-  overflow-y: auto; /* Pozwala przewijać, jeśli treść jest długa */
-  
-  /* Kluczowa poprawka: Używamy Flexbox do idealnego centrowania w pionie i poziomie */
+  z-index: 1000;
+  overflow-y: auto; /* scroll dla długiej treści */
+  padding: 20px;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  padding: 20px; /* Dodatkowy margines od krawędzi ekranu */
-  box-sizing: border-box; /* Zapobiega problemom z paddingiem */
+  justify-content: center; /* centrowanie poziome */
 }
 
-/* Tło wideo, które jest częścią szablonu */
+/* Tło wideo */
 #dynamic-content-container .video-background {
-  position: absolute; /* Jest tłem tylko dla kontenera, a nie całej strony */
+  position: fixed; /* wideo jako tło całego kontenera */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Chowa się za treścią wizytówki */
+  z-index: -1;
   overflow: hidden;
 }
 
@@ -567,4 +559,68 @@ footer .footer-content a:hover { color: #fff; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center center;
+}
+
+/* Box z treścią wizytówki */
+.content-box-dynamic {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
+  background-color: rgba(10, 20, 30, 0.85);
+  color: #f0f0f0;
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animacja pojawiania się */
+@keyframes fadeIn { 
+  from { opacity: 0; transform: scale(0.95); } 
+  to { opacity: 1; transform: scale(1); } 
+}
+
+/* Nagłówki w boxie */
+.content-box-dynamic h2, 
+.content-box-dynamic h3 { 
+  color: #ffd700; 
+  text-shadow: 0 0 8px #ffd700; 
+}
+
+/* Kontener przycisku */
+.button-container-dynamic { 
+  text-align: center; 
+  margin-top: 30px; 
+}
+
+/* Przycisk powrotu */
+.dynamic-button { 
+  background-color: #6c757d; 
+  color: white; 
+  padding: 12px 25px; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-size: 1em; 
+  transition: background-color 0.3s ease;
+}
+
+.dynamic-button:hover {
+  background-color: #5a6268;
+}
+
+/* ==================== RESPONSYWNOŚĆ ==================== */
+@media(max-width: 960px){
+  .content-box-dynamic{
+    padding: 30px 20px;
+    margin: 20px;
+  }
+}
+
+@media(max-width: 600px){
+  .content-box-dynamic{
+    padding: 20px 15px;
+  }
 }
