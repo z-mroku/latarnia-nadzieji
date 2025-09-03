@@ -27,38 +27,41 @@
 
 <script type="module">
 import { db } from './js/firebase-config.js';
-import { collection, query, orderBy, getDocs, collectionGroup, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, query, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const params = new URLSearchParams(location.search);
 const sectionName = (params.get('section') || '').trim();
 const wrapper = document.getElementById('dynamic-content-wrapper');
 
-function createLector(buttonId, textElementId, buttonText="Odsłuchaj") {
-    const btn = document.getElementById(buttonId);
-    if (!btn) return;
-    const textElement = document.getElementById(textElementId);
-    if (!textElement) return;
+function createLector(button, text) {
+    if (!button || !text) return;
 
-    const fullText = (textElement.textContent || textElement.innerText || "").trim();
-    if (!fullText) { btn.disabled=true; btn.style.opacity=0.5; return; }
+    const sentences = (text.replace(/<[^>]*>?/gm,'').replace(/&[a-z]+;/g,'').trim() || "").match(/[^.!?…]+[.!?…]?/g) || [];
+    let index = 0, isReading = false;
 
-    const sentences = fullText.match(/[^.!?…]+[.!?…]?/g) || [fullText];
-    let currentIndex=0, isReading=false;
-
-    function readSentence(i){
-        if(!isReading || i>=sentences.length){
-            window.speechSynthesis.cancel(); isReading=false; btn.textContent=`▶️ ${buttonText}`; currentIndex=0; return;
+    function readSentence(i) {
+        if(!isReading || i >= sentences.length) {
+            window.speechSynthesis.cancel();
+            isReading = false;
+            button.textContent = "▶️ Odsłuchaj";
+            index = 0;
+            return;
         }
         const utterance = new SpeechSynthesisUtterance(sentences[i].trim());
         utterance.lang = "pl-PL";
-        utterance.onend = ()=>{ if(isReading){ currentIndex++; readSentence(currentIndex); } };
+        utterance.onend = () => { if(isReading){ index++; readSentence(index); } };
         window.speechSynthesis.speak(utterance);
     }
 
-    btn.addEventListener("click", ()=>{
+    button.addEventListener("click", ()=>{
         const synth = window.speechSynthesis;
-        if(isReading){ isReading=false; synth.cancel(); btn.textContent=`🔄 Wznów`; }
-        else { isReading=true; btn.textContent=`⏸️ Pauza`; readSentence(currentIndex); }
+        if(isReading){
+            isReading=false; synth.cancel();
+            button.textContent="🔄 Wznów";
+        } else {
+            isReading=true; button.textContent="⏸️ Pauza";
+            readSentence(index);
+        }
     });
 
     window.addEventListener("beforeunload",()=>window.speechSynthesis.cancel());
@@ -70,15 +73,15 @@ function createLector(buttonId, textElementId, buttonText="Odsłuchaj") {
 
         document.title=`${sectionName} — Od Dna do Światła`;
         const entriesRef = collection(db,'sekcje',sectionName,'entries');
-        let snap = await getDocs(query(entriesRef, orderBy("createdAt","desc")));
+        const snap = await getDocs(query(entriesRef, orderBy("createdAt","desc")));
 
         if(snap.empty){ wrapper.innerHTML=`<h1>${sectionName}</h1><p>Brak wpisów w tej sekcji.</p>`; return; }
 
         let entriesHTML = snap.docs.map(doc=>{
-            const e=doc.data();
-            const contentId=`content-full-${doc.id}`;
-            const buttonId=`button-speak-${doc.id}`;
-            const skrot=e.text.replace(/<[^>]*>?/gm,'').substring(0,300);
+            const e = doc.data();
+            const contentId = `content-full-${doc.id}`;
+            const buttonId = `button-speak-${doc.id}`;
+            const skrot = e.text.replace(/<[^>]*>?/gm,'').substring(0,300);
 
             return `
             <div class="story-item">
@@ -95,13 +98,15 @@ function createLector(buttonId, textElementId, buttonText="Odsłuchaj") {
 
         wrapper.innerHTML=`<header><h1>${sectionName}</h1></header><main><div class="story-container">${entriesHTML}</div></main>`;
 
-        document.querySelectorAll('.czytaj-dalej-btn').forEach(button=>{
-            button.addEventListener('click',function(){
-                const storyItem=this.closest('.story-item');
-                const skrot=storyItem.querySelector('.wpis-skrot');
-                const calosc=storyItem.querySelector('.wpis-calosc');
-                const lektorBtn=storyItem.querySelector('.speak-button');
+        document.querySelectorAll('.czytaj-dalej-btn').forEach(btn=>{
+            btn.addEventListener('click', function(){
+                const story = this.closest('.story-item');
+                const skrot = story.querySelector('.wpis-skrot');
+                const calosc = story.querySelector('.wpis-calosc');
+                const lektorBtn = story.querySelector('.speak-button');
                 const isVisible = calosc.style.display==='block';
+                const contentText = calosc.textContent || calosc.innerText || "";
+
                 if(isVisible){
                     calosc.style.display='none';
                     lektorBtn.style.display='none';
@@ -112,17 +117,15 @@ function createLector(buttonId, textElementId, buttonText="Odsłuchaj") {
                     lektorBtn.style.display='inline-flex';
                     skrot.style.display='none';
                     this.textContent='Zwiń';
+                    createLector(lektorBtn, contentText); // <-- inicjalizacja po rozwinięciu
                 }
             });
         });
 
-        snap.docs.forEach(doc=>{
-            const contentId=`content-full-${doc.id}`;
-            const buttonId=`button-speak-${doc.id}`;
-            createLector(buttonId,contentId);
-        });
-
-    } catch(err){ console.error("Błąd krytyczny:",err); wrapper.innerHTML=`<p>Błąd ładowania sekcji. Sprawdź konsolę.</p>`; }
+    } catch(err){ 
+        console.error("Błąd krytyczny:",err); 
+        wrapper.innerHTML=`<p>Błąd ładowania sekcji. Sprawdź konsolę.</p>`; 
+    }
 })();
 </script>
 </body>
