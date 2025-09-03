@@ -1,132 +1,168 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Od Dna do Światła – Sekcja</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <style>
-    .back-to-home-button { position: fixed; top: 15px; right: 15px; z-index: 1001; font-size: 1em; padding: 12px 25px; }
-    .story-container { max-width: 900px; margin: 0 auto; padding: 20px; }
-    .story-item { background-color: rgba(10,10,10,0.85); margin-bottom: 20px; padding: 20px; border-radius: 8px; color: #f0f0f0; }
-    .wpis-calosc { margin-top: 15px; }
-    .speak-button { margin-top: 10px; background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-    .czytaj-dalej-btn { margin-top: 10px; background: #444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; }
-    .accordion { background-color: #222; color: #fff; cursor: pointer; padding: 10px 15px; width: 100%; text-align: left; border: none; outline: none; transition: 0.4s; border-radius: 5px; margin-top: 10px; }
-    .accordion.active { background-color: #444; }
-    .panel { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 10px; background: rgba(0,0,0,0.6); border-radius: 5px; margin-bottom: 10px; }
-    .filter-bar { margin-bottom: 15px; text-align: center; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Od Dna do Światła – Sekcja</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Ogólne style strony */
+body, html { margin:0; padding:0; font-family: sans-serif; background:#0a0a0a; color:#f0f0f0; }
+a { color: #ffd700; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Przycisk powrotu */
+.back-to-home-button { position: fixed; top:15px; right:15px; z-index:1001; font-size:1em; padding:12px 25px; background:#444; color:white; border-radius:5px; }
+
+/* Kontener dynamiczny */
+#dynamic-content-wrapper { width:100%; min-height:100vh; position:relative; overflow-y:auto; padding:20px; box-sizing:border-box; }
+
+/* Wideo tło */
+.video-background { position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; }
+#background-video { width:100%; height:100%; object-fit:cover; }
+
+/* Latarnia Nadziei */
+.content-box-dynamic { position:relative; max-width:900px; margin:20px auto; background:rgba(10,20,30,0.85); padding:40px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 0 30px rgba(0,0,0,0.7); animation:fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn { from {opacity:0; transform:scale(0.95);} to {opacity:1; transform:scale(1);} }
+.content-box-dynamic h2, .content-box-dynamic h3 { color:#ffd700; text-shadow:0 0 8px #ffd700; }
+.button-container-dynamic { text-align:center; margin-top:30px; }
+.dynamic-button { background-color:#6c757d; color:white; padding:12px 25px; border:none; border-radius:5px; cursor:pointer; font-size:1em; }
+
+/* Wpisy i lektor */
+.story-container { max-width:900px; margin:0 auto; padding:20px; }
+.story-item { background-color: rgba(10,10,10,0.85); margin-bottom:20px; padding:20px; border-radius:8px; }
+.wpis-skrot, .wpis-calosc { margin-top:10px; }
+.speak-button, .czytaj-dalej-btn { margin-top:10px; background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:5px; cursor:pointer; }
+
+/* Sekcja Pomoc */
+.accordion { background-color:#222; color:#fff; cursor:pointer; padding:10px 15px; width:100%; text-align:left; border:none; outline:none; transition:0.4s; border-radius:5px; margin-top:10px; }
+.accordion.active { background-color:#444; }
+.panel { max-height:0; overflow:hidden; transition:max-height 0.3s ease; padding:0 10px; background:rgba(0,0,0,0.6); border-radius:5px; margin-bottom:10px; }
+.filter-bar { margin-bottom:15px; text-align:center; }
+</style>
 </head>
 <body>
-  <a href="index.html" class="back-to-home-button"><i class="fas fa-arrow-left"></i> Powrót</a>
-  <div id="dynamic-content-wrapper">
-    <p style="text-align:center; padding-top: 50px;">Ładowanie...</p>
+
+<a href="index.html" class="back-to-home-button"><i class="fas fa-arrow-left"></i> Powrót</a>
+
+<div id="dynamic-content-wrapper">
+  <div class="video-background">
+    <video autoplay muted loop playsinline id="background-video">
+      <source src="videos/latarnia.webm" type="video/webm">
+    </video>
   </div>
+
+  <div class="content-box-dynamic">
+    <div id="manifesto-text">
+      <h2>Latarnia Nadziei</h2>
+      <h3>Czym jest „Latarnia Nadziei”</h3>
+      <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu...</p>
+      <h3>Dla kogo jest ten projekt</h3>
+      <p>Dla osób zagubionych, stojących w obliczu kryzysu, uzależnienia lub emocjonalnego chaosu...</p>
+      <h3>Ciężar pracy i wyzwania</h3>
+      <p>Tworzenie „Latarni Nadziei” było prawdziwą walką...</p>
+      <h3>Dlaczego projekt jest wyjątkowy</h3>
+      <p>„Latarnia Nadziei” jest wyjątkowa, bo nie jest kolejną stroną internetową...</p>
+    </div>
+    <div class="button-container-dynamic">
+      <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { db } from './js/firebase-config.js';
-import { collection, query, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, query, orderBy, getDocs, collectionGroup, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const params = new URLSearchParams(location.search);
 const sectionName = (params.get('section') || '').trim();
 const wrapper = document.getElementById('dynamic-content-wrapper');
 
-function createLector(button, text) {
-    if (!button || !text) return;
-
-    const sentences = (text.replace(/<[^>]*>?/gm,'').replace(/&[a-z]+;/g,'').trim() || "").match(/[^.!?…]+[.!?…]?/g) || [];
-    let index = 0, isReading = false;
-
-    function readSentence(i) {
-        if(!isReading || i >= sentences.length) {
-            window.speechSynthesis.cancel();
-            isReading = false;
-            button.textContent = "▶️ Odsłuchaj";
-            index = 0;
-            return;
-        }
-        const utterance = new SpeechSynthesisUtterance(sentences[i].trim());
-        utterance.lang = "pl-PL";
-        utterance.onend = () => { if(isReading){ index++; readSentence(index); } };
-        window.speechSynthesis.speak(utterance);
-    }
-
-    button.addEventListener("click", ()=>{
-        const synth = window.speechSynthesis;
-        if(isReading){
-            isReading=false; synth.cancel();
-            button.textContent="🔄 Wznów";
-        } else {
-            isReading=true; button.textContent="⏸️ Pauza";
-            readSentence(index);
-        }
-    });
-
-    window.addEventListener("beforeunload",()=>window.speechSynthesis.cancel());
+function createLector(buttonId,textElementId,buttonText="Odsłuchaj"){
+  const btn=document.getElementById(buttonId);
+  if(!btn) return;
+  const textElement=document.getElementById(textElementId);
+  if(!textElement) return;
+  const fullText=(textElement.textContent||textElement.innerText||"").trim();
+  if(!fullText){ btn.disabled=true; btn.style.opacity=0.5; return; }
+  const sentences=fullText.match(/[^.!?…]+[.!?…]?/g)||[fullText];
+  let currentIndex=0,isReading=false;
+  function readSentence(i){
+    if(!isReading||i>=sentences.length){ window.speechSynthesis.cancel(); isReading=false; btn.textContent=`▶️ ${buttonText}`; currentIndex=0; return; }
+    const utterance=new SpeechSynthesisUtterance(sentences[i].trim());
+    utterance.lang="pl-PL";
+    utterance.onend=()=>{ if(isReading){ currentIndex++; readSentence(currentIndex); } };
+    window.speechSynthesis.speak(utterance);
+  }
+  btn.addEventListener("click",()=>{
+    const synth=window.speechSynthesis;
+    if(isReading){ isReading=false; synth.cancel(); btn.textContent=`🔄 Wznów`; }
+    else{ isReading=true; btn.textContent=`⏸️ Pauza`; readSentence(currentIndex); }
+  });
+  window.addEventListener("beforeunload",()=>window.speechSynthesis.cancel());
 }
 
 (async()=>{
-    try{
-        if(!sectionName){ wrapper.innerHTML="<p>Błąd: brak nazwy sekcji.</p>"; return; }
+  try{
+    if(!sectionName){ console.warn("Brak nazwy sekcji"); return; }
 
-        document.title=`${sectionName} — Od Dna do Światła`;
-        const entriesRef = collection(db,'sekcje',sectionName,'entries');
-        const snap = await getDocs(query(entriesRef, orderBy("createdAt","desc")));
+    document.title=`${sectionName} — Od Dna do Światła`;
+    const entriesRef=collection(db,'sekcje',sectionName,'entries');
+    let snap=await getDocs(query(entriesRef,orderBy("createdAt","desc")));
 
-        if(snap.empty){ wrapper.innerHTML=`<h1>${sectionName}</h1><p>Brak wpisów w tej sekcji.</p>`; return; }
+    if(snap.empty){ wrapper.innerHTML=`<h1>${sectionName}</h1><p>Brak wpisów w tej sekcji.</p>`; return; }
 
-        let entriesHTML = snap.docs.map(doc=>{
-            const e = doc.data();
-            const contentId = `content-full-${doc.id}`;
-            const buttonId = `button-speak-${doc.id}`;
-            const skrot = e.text.replace(/<[^>]*>?/gm,'').substring(0,300);
+    // Tworzenie wpisów
+    let entriesHTML=snap.docs.map(doc=>{
+      const e=doc.data();
+      const contentId=`content-full-${doc.id}`;
+      const buttonId=`button-speak-${doc.id}`;
+      const skrot=e.text.replace(/<[^>]*>?/gm,'').substring(0,300);
+      return `<div class="story-item">
+        <h2 class="fancy-title">${e.title||'Bez tytułu'}</h2>
+        <div class="entry-item-meta">${e.createdAt?e.createdAt.toDate().toLocaleDateString('pl-PL'):''}</div>
+        <div class="wpis-skrot"><p>${skrot}...</p></div>
+        <div id="${contentId}" class="wpis-calosc" style="display:none;">${e.text}</div>
+        <div class="speak-button-container">
+          <button class="czytaj-dalej-btn">...czytaj dalej</button>
+          <button id="${buttonId}" class="speak-button" style="display:none;">▶️ Odsłuchaj</button>
+        </div>
+      </div>`;
+    }).join('');
 
-            return `
-            <div class="story-item">
-                <h2 class="fancy-title">${e.title || 'Bez tytułu'}</h2>
-                <div class="entry-item-meta">${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : ''}</div>
-                <div class="wpis-skrot"><p>${skrot}...</p></div>
-                <div id="${contentId}" class="wpis-calosc" style="display:none;">${e.text}</div>
-                <div class="speak-button-container">
-                    <button class="czytaj-dalej-btn">...czytaj dalej</button>
-                    <button id="${buttonId}" class="speak-button" style="display:none;">▶️ Odsłuchaj</button>
-                </div>
-            </div>`;
-        }).join('');
+    wrapper.innerHTML=`<header><h1>${sectionName}</h1></header><main><div class="story-container">${entriesHTML}</div></main>`;
 
-        wrapper.innerHTML=`<header><h1>${sectionName}</h1></header><main><div class="story-container">${entriesHTML}</div></main>`;
+    document.querySelectorAll('.czytaj-dalej-btn').forEach(button=>{
+      button.addEventListener('click',function(){
+        const storyItem=this.closest('.story-item');
+        const skrot=storyItem.querySelector('.wpis-skrot');
+        const calosc=storyItem.querySelector('.wpis-calosc');
+        const lektorBtn=storyItem.querySelector('.speak-button');
+        const isVisible=calosc.style.display==='block';
+        if(isVisible){
+          calosc.style.display='none';
+          lektorBtn.style.display='none';
+          skrot.style.display='block';
+          this.textContent='...czytaj dalej';
+        }else{
+          calosc.style.display='block';
+          lektorBtn.style.display='inline-flex';
+          skrot.style.display='none';
+          this.textContent='Zwiń';
+        }
+      });
+    });
 
-        document.querySelectorAll('.czytaj-dalej-btn').forEach(btn=>{
-            btn.addEventListener('click', function(){
-                const story = this.closest('.story-item');
-                const skrot = story.querySelector('.wpis-skrot');
-                const calosc = story.querySelector('.wpis-calosc');
-                const lektorBtn = story.querySelector('.speak-button');
-                const isVisible = calosc.style.display==='block';
-                const contentText = calosc.textContent || calosc.innerText || "";
+    snap.docs.forEach(doc=>{
+      const contentId=`content-full-${doc.id}`;
+      const buttonId=`button-speak-${doc.id}`;
+      createLector(buttonId,contentId);
+    });
 
-                if(isVisible){
-                    calosc.style.display='none';
-                    lektorBtn.style.display='none';
-                    skrot.style.display='block';
-                    this.textContent='...czytaj dalej';
-                } else {
-                    calosc.style.display='block';
-                    lektorBtn.style.display='inline-flex';
-                    skrot.style.display='none';
-                    this.textContent='Zwiń';
-                    createLector(lektorBtn, contentText); // <-- inicjalizacja po rozwinięciu
-                }
-            });
-        });
-
-    } catch(err){ 
-        console.error("Błąd krytyczny:",err); 
-        wrapper.innerHTML=`<p>Błąd ładowania sekcji. Sprawdź konsolę.</p>`; 
-    }
+  }catch(err){ console.error("Błąd krytyczny:",err); wrapper.innerHTML=`<p>Błąd ładowania sekcji. Sprawdź konsolę.</p>`; }
 })();
 </script>
+
 </body>
 </html>
