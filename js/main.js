@@ -1,5 +1,4 @@
-
-// Plik: /js/main.js (WERSJA OSTATECZNA Z POPRAWKĄ DLA CENTROWANIA)
+// Plik: /js/main.js (WERSJA OSTATECZNA, BEZPIECZNA I POPRAWIONA)
 
 import { db } from './firebase-config.js'; 
 import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -206,13 +205,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById("next-btn");
     const loadLatarniaButton = document.getElementById('load-latarnia-btn');
 
-    // Inicjalizacja funkcji
+    // Inicjalizacja funkcji (dodano ify dla bezpieczeństwa, aby uniknąć błędów krytycznych)
     if (menuContainer) fetchAndRenderMenu(menuContainer);
     if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
     if (sparkTextElement) fetchSparks(sparkTextElement);
     if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    // Podpięcie eventów
+    // Podpięcie eventów (dodano ify dla bezpieczeństwa)
     if (sparkButton) sparkButton.addEventListener("click", () => changeSpark(sparkTextElement));
     if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
     if (nextBtn) nextBtn.addEventListener("click", nextSong);
