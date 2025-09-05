@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wczytywanie...</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .back-to-home-button{position:fixed;top:15px;right:15px;z-index:1001;font-size:1em;padding:10px 18px}
+    .story-container{max-width:960px;margin:0 auto;padding:20px}
+    .story-item{background:rgba(10,10,10,.85);margin-bottom:20px;padding:20px;border-radius:12px;color:#f0f0f0;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .story-item h2{margin:0 0 8px}
+    .entry-item-meta{opacity:.8;font-size:.9em;margin-bottom:10px}
+    .wpis-skrot p{margin:0}
+    .wpis-calosc{margin-top:12px}
+    .speak-button,.czytaj-dalej-btn{display:inline-flex;align-items:center;gap:.5rem;margin-top:12px;background:#6c757d;color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer}
+    .czytaj-dalej-btn{background:#3b3f46}
+    .speak-button[disabled]{opacity:.5;cursor:not-allowed}
+    header.page-header{padding:80px 20px 20px;text-align:center}
+    header.page-header h1{margin:0}
+    /* Pomoc */
+    .accordion{background:#222;color:#fff;cursor:pointer;padding:12px 16px;width:100%;text-align:left;border:none;outline:none;transition:.25s;border-radius:10px;margin:10px 0}
+    .accordion.active{background:#3a3a3a}
+    .panel{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 12px;background:rgba(0,0,0,.55);border-radius:10px}
+    .place-entry{padding:14px 4px;border-bottom:1px dashed rgba(255,255,255,.15)}
+    .place-entry:last-child{border-bottom:none}
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-to-home-button">⟵ Powrót</a>
+
+  <div id="dynamic-content-wrapper">
+    <p style="text-align:center; padding-top: 50px;">Ładowanie...</p>
+  </div>
+
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { collection, query, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const params = new URLSearchParams(location.search);
+    const sectionNameRaw = (params.get('nazwa') || params.get('section') || '').trim();
+    const sectionName = decodeURIComponent(sectionNameRaw);
+    const wrapper = document.getElementById('dynamic-content-wrapper');
+
+    // ------- UTIL -------
+    function applyTheme(name){
+      document.documentElement.className='';
+      let cls='theme-kronika';
+      if(name==='Piciorys Chudego') cls='theme-piciorys';
+      else if(name.toLowerCase().includes('księżniczki')) cls='theme-ksiezniczka';
+      else if(name==='Pomoc') cls='theme-pomoc';
+      else if(name==='Galeria') cls='theme-galeria';
+      document.documentElement.className=cls;
+    }
+    function stripHtml(html){
+      const tmp=document.createElement('div'); tmp.innerHTML=html||'';
+      return (tmp.textContent||tmp.innerText||'').replace(/\s+\n/g,'\n').trim();
+    }
+
+    // ------- LEKTOR (auto do każdego wpisu po rozwinięciu) -------
+    function attachLector(btn, contentEl, label="Odsłuchaj"){
+      if(!btn || !contentEl) return;
+      const synth=window.speechSynthesis;
+      let reading=false;
+      btn.textContent=`▶️ ${label}`;
+
+      // wybór głosu PL (gdy dostępny)
+      let plVoice=null;
+      function pickVoice(){ plVoice=(synth.getVoices()||[]).find(v=>/pl/i.test(v.lang))||null; }
+      pickVoice(); if(typeof synth.onvoiceschanged!=='undefined') synth.onvoiceschanged=pickVoice;
+
+      btn.addEventListener('click', ()=>{
+        const fullText = stripHtml(contentEl.innerHTML);
+        if(!fullText){ btn.disabled=true; return; }
+        if(reading){ reading=false; synth.cancel(); btn.textContent=`▶️ ${label}`; return; }
+        const chunks = fullText.split(/(?:(?<=\S)[.!?…]+|\n{2,})\s+/g).filter(Boolean);
+        let i=0; reading=true; btn.textContent='⏸️ Pauza';
+        const speakNext=()=>{
+          if(!reading || i>=chunks.length){ synth.cancel(); reading=false; btn.textContent=`▶️ ${label}`; return; }
+          const u=new SpeechSynthesisUtterance(chunks[i]); u.lang='pl-PL'; if(plVoice) u.voice=plVoice;
+          u.onend=()=>{ i++; speakNext(); };
+          synth.speak(u);
+        };
+        speakNext();
+      });
+      window.addEventListener('beforeunload', ()=>synth.cancel());
+    }
+
+    // ------- RENDERERY -------
+    function renderStandard(name, docs){
+      const items = docs.map(d=>{
+        const e=d.data(), id=d.id;
+        const contentId=`content-${id}`;
+        const skrot=stripHtml(e.text||'').slice(0,300);
+        return `<article class="story-item">
+          <h2>${e.title||'Bez tytułu'}</h2>
+          <div class="entry-item-meta">${e.createdAt?e.createdAt.toDate().toLocaleDateString('pl-PL'):''}</div>
+          <div class="wpis-skrot"><p>${skrot}...</p></div>
+          <div id="${contentId}" class="wpis-calosc" style="display:none">${e.text||''}</div>
+          <div class="btns"><button class="czytaj-dalej-btn">...czytaj dalej</button><button class="speak-button" style="display:none">▶️ Odsłuchaj</button></div>
+        </article>`;
+      }).join('');
+
+      wrapper.innerHTML = `<header class="page-header"><h1>${name}</h1></header><main><div class="story-container">${items||'<div class="story-item"><p>Brak wpisów w tej sekcji.</p></div>'}</div></main>`;
+
+      // toggle + auto-lektor po rozwinięciu
+      document.querySelectorAll('.story-item').forEach(item=>{
+        const btnToggle=item.querySelector('.czytaj-dalej-btn');
+        const btnSpeak=item.querySelector('.speak-button');
+        const content=item.querySelector('.wpis-calosc');
+        btnToggle.addEventListener('click', ()=>{
+          const open = content.style.display==='block';
+          content.style.display = open?'none':'block';
+          btnSpeak.style.display = open?'none':'inline-flex';
+          btnToggle.textContent = open?'...czytaj dalej':'Zwiń';
+          if(!open){ attachLector(btnSpeak, content, 'Odsłuchaj'); }
+        });
+      });
+    }
+
+    function renderPiciorys(entry){
+      const [quote,hist]=(entry.text||'').split('---PODZIAL---');
+      wrapper.innerHTML = `
+        <header class="page-header"><h1>Piciorys Chudego</h1></header>
+        <main class="story-container">
+          <article class="story-item">
+            <div id="piciorys-text">
+              <h2>${entry.title||''}</h2>
+              ${quote?`<blockquote>${quote}</blockquote>`:''}
+              <div class="wpis-calosc">${hist||''}</div>
+            </div>
+            <button class="speak-button" id="speak-piciorys">▶️ Odsłuchaj</button>
+          </article>
+        </main>`;
+      attachLector(document.getElementById('speak-piciorys'), document.getElementById('piciorys-text'), 'Odsłuchaj');
+    }
+
+    function renderKsiezniczka(entry){
+      wrapper.innerHTML = `
+        <header class="page-header"><h1>Z punktu widzenia księżniczki</h1></header>
+        <main class="story-container">
+          <article id="ks-text" class="story-item">
+            <h2>${entry.title||''}</h2>
+            ${entry.text||''}
+            <button class="speak-button" id="speak-ks">▶️ Odsłuchaj</button>
+          </article>
+        </main>`;
+      attachLector(document.getElementById('speak-ks'), document.getElementById('ks-text'), 'Odsłuchaj');
+    }
+
+    function renderPomoc(entries){
+      const grouped = entries.reduce((acc,e)=>{ const w=e.woj||'Inne'; (acc[w]||(acc[w]=[])).push(e); return acc; },{});
+      const order = ['Ogólnopolskie', ...Object.keys(grouped).filter(w=>w!=='Ogólnopolskie').sort()];
+      const html = order.filter(w=>grouped[w]).map(w=>{
+        const items = grouped[w].sort((a,b)=>(a.name||'').localeCompare(b.name||'')).map(e=>`
+          <div class="place-entry">
+            <h3>${e.name||'Brak nazwy'}</h3>
+            ${e.address?`<p><strong>Adres:</strong> ${e.address}</p>`:''}
+            ${e.phone?`<p><strong>Telefon:</strong> ${e.phone}</p>`:''}
+            ${e.desc?`<p>${e.desc}</p>`:''}
+            ${e.link?`<p><a href="${e.link}" target="_blank" rel="noopener">Przejdź do strony</a></p>`:''}
+          </div>`).join('');
+        const icon = w==='Ogólnopolskie'?'📞':'🏥';
+        return `<button class="accordion">${icon} ${w}</button><div class="panel">${items||'<p>Brak pozycji.</p>'}</div>`;
+      }).join('');
+
+      wrapper.innerHTML = `<header class="page-header"><h1>Gdzie szukać pomocy – Uzależnienia</h1></header><main><div class="story-container">${html||'<p>Brak ośrodków.</p>'}</div></main>`;
+      document.querySelectorAll('.accordion').forEach(acc=>{
+        acc.addEventListener('click', function(){
+          this.classList.toggle('active');
+          const panel=this.nextElementSibling;
+          panel.style.maxHeight = panel.style.maxHeight? null : panel.scrollHeight+'px';
+        });
+      });
+    }
+
+    // ------- START -------
+    (async()=>{
+      try{
+        if(!sectionName){
+          wrapper.innerHTML = `<header class="page-header"><h1>Błąd</h1></header><main><div class="story-container"><p>Brak nazwy sekcji w adresie URL.</p></div></main>`;
+          return;
+        }
+        applyTheme(sectionName);
+        document.title = `${sectionName} — Od Dna do Światła`;
+
+        // POMOC – czytaj z top-level 'help'; jeśli pusto, fallback do 'sekcje/Pomoc/entries'
+        if(sectionName==='Pomoc'){
+          let entries=[];
+          try{
+            const snapTop = await getDocs(query(collection(db,'help'), orderBy('woj')));
+            if(!snapTop.empty) entries = snapTop.docs.map(d=>d.data());
+          }catch(_){}
+          if(!entries.length){
+            const snap = await getDocs(query(collection(db,'sekcje','Pomoc','entries'), orderBy('woj')));
+            entries = snap.docs.map(d=>d.data());
+          }
+          renderPomoc(entries);
+          return;
+        }
+
+        // SPECJALNE
+        const entriesRef = collection(db,'sekcje',sectionName,'entries');
+        if(sectionName==='Piciorys Chudego'){
+          const snap=await getDocs(query(entriesRef, limit(1)));
+          if(snap.empty){ wrapper.innerHTML=`<header class="page-header"><h1>${sectionName}</h1></header><main class="story-container"><p>Brak wpisu.</p></main>`; return; }
+          renderPiciorys(snap.docs[0].data()); return;
+        }
+        if(sectionName.toLowerCase().includes('księżniczki')){
+          const snap=await getDocs(query(entriesRef, limit(1)));
+          if(snap.empty){ wrapper.innerHTML=`<header class="page-header"><h1>${sectionName}</h1></header><main class="story-container"><p>Brak wpisu.</p></main>`; return; }
+          renderKsiezniczka(snap.docs[0].data()); return;
+        }
+
+        // STANDARD – UWAGA: ŚCIEŻKA PO SEKCJI, ZERO collectionGroup → NIC SIĘ NIE MIESZA
+        const sortOrder = sectionName==='Kronika' ? 'asc' : 'desc';
+        const snap = await getDocs(query(entriesRef, orderBy('createdAt', sortOrder)));
+        if(snap.empty){
+          wrapper.innerHTML=`<header class="page-header"><h1>${sectionName}</h1></header><main class="story-container"><div class="story-item"><p>Brak wpisów w tej sekcji.</p></div></main>`;
+          return;
+        }
+        renderStandard(sectionName, snap.docs);
+
+      }catch(err){
+        console.error('Błąd Sekcja.html:', err);
+        wrapper.innerHTML = `<header class="page-header"><h1>Błąd krytyczny</h1></header><main class="story-container"><p>Wystąpił błąd podczas ładowania. Sprawdź konsolę (F12).</p></main>`;
+      }
+    })();
+  </script>
+</body>
+</html>
