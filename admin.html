@@ -69,7 +69,8 @@
     </header>
 
     <main class="grid">
-      <!-- Tutaj wszystkie sekcje pozostają bez zmian, w tym Wpisy, Menu, Pomoc itp. -->
+      <!-- ... reszta sekcji pozostaje bez zmian ... -->
+
       <section class="card">
         <h3 style="margin:0"><i class="fa-solid fa-pen-to-square"></i> Wpisy</h3>
         <form id="entryForm" style="margin-top:8px;">
@@ -110,21 +111,45 @@
             </div>
           </div>
         </form>
+        <div class="sep"></div>
+        <div class="grid g3">
+          <div><label for="filterSection">Filtruj</label><select id="filterSection"></select></div>
+          <div><label for="searchInput">Szukaj</label><input id="searchInput" /></div>
+          <div><label for="sortSelect">Sortuj</label>
+            <select id="sortSelect">
+              <option value="desc">Najnowsze</option>
+              <option value="asc">Najstarsze</option>
+              <option value="title">Tytuł A→Z</option>
+            </select>
+          </div>
+        </div>
+        <div id="entriesList" class="list"></div>
+        <div class="sep"></div>
+        <div class="card">
+          <div id="liveTitle"></div>
+          <div id="liveMeta" class="muted-small"></div>
+          <div id="liveContent"></div>
+        </div>
       </section>
-    </main>
 
+    </main>
     <footer><div class="muted-small">© 2025 Od Dna do Światła — Panel administracyjny</div></footer>
   </div>
 
-  <!-- CKEditor 5 Classic -->
+  <!-- Rozbudowany CKEditor 5 z ikonami -->
   <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+  <script type="module" src="/js/admin.js"></script>
+
   <script>
     ClassicEditor
-      .create( document.querySelector( '#contentInput' ) )
+      .create( document.querySelector( '#contentInput' ), {
+        toolbar: [
+          'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', 'link', 'blockQuote', '|',
+          'numberedList', 'bulletedList', '|', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+        ]
+      })
       .catch( error => { console.error( error ); } );
   </script>
-
-  <script type="module" src="/js/admin.js"></script>
 
 </body>
 </html>
