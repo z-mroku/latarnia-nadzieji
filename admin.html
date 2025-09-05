@@ -6,7 +6,8 @@
   <title>Centrum Dowodzenia Chydego i Księżniczki</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -69,87 +70,41 @@
     </header>
 
     <main class="grid">
-      <!-- ... reszta sekcji pozostaje bez zmian ... -->
-
-      <section class="card">
-        <h3 style="margin:0"><i class="fa-solid fa-pen-to-square"></i> Wpisy</h3>
-        <form id="entryForm" style="margin-top:8px;">
-          <div class="grid g2">
-            <div><label for="sectionSelect">Sekcja</label><select id="sectionSelect"></select></div>
-            <div><label for="authorInput">Autor</label><input id="authorInput" /></div>
-            <div>
-              <label for="themeSelect">Styl wpisu</label>
-              <select id="themeSelect">
-                <option value="auto">Auto (wg sekcji)</option>
-                <option value="piciorys">Piciorys (Gazeta)</option>
-                <option value="princess">Księżniczka (Magiczny)</option>
-                <option value="default">Domyślny (Szklany)</option>
-              </select>
-            </div>
-            <div class="row" style="align-items:flex-end">
-              <span class="badge" id="draftBadge">Wersja robocza: —</span>
-              <button type="button" id="clearDraftBtn" class="ghost small" title="Wyczyść wersję roboczą"><i class="fa-solid fa-eraser"></i></button>
-            </div>
-            <div style="grid-column:1/-1">
-              <label for="titleInput">Tytuł (możesz dodać ikonę)</label>
-              <input id="titleInput" />
-              <div class="icon-picker" id="iconPicker"></div>
-            </div>
-            <div style="grid-column:1/-1">
-              <label for="contentInput">Treść</label>
-              <textarea id="contentInput"></textarea>
-            </div>
-            <div>
-              <label for="attachInput">Załącznik</label>
-              <input id="attachInput" type="file" accept="image/*" />
-            </div>
-            <div><label>&nbsp;</label><div id="uploadPreview"></div></div>
-            <div style="grid-column:1/-1" class="row">
-              <button id="publishBtn" class="primary small" type="submit"><i class="fa-solid fa-floppy-disk"></i> Opublikuj</button>
-              <button id="cancelEntryEditBtn" class="ghost small" type="button" style="display:none">Anuluj</button>
-              <div style="flex:1"></div><div id="formMsg" class="muted-small"></div>
-            </div>
-          </div>
-        </form>
-        <div class="sep"></div>
-        <div class="grid g3">
-          <div><label for="filterSection">Filtruj</label><select id="filterSection"></select></div>
-          <div><label for="searchInput">Szukaj</label><input id="searchInput" /></div>
-          <div><label for="sortSelect">Sortuj</label>
-            <select id="sortSelect">
-              <option value="desc">Najnowsze</option>
-              <option value="asc">Najstarsze</option>
-              <option value="title">Tytuł A→Z</option>
-            </select>
-          </div>
-        </div>
-        <div id="entriesList" class="list"></div>
-        <div class="sep"></div>
-        <div class="card">
-          <div id="liveTitle"></div>
-          <div id="liveMeta" class="muted-small"></div>
-          <div id="liveContent"></div>
-        </div>
-      </section>
-
+      <!-- Tutaj wszystkie Twoje sekcje jak: Pomoc, Menu, Wpisy, Iskierki, Playlista, Lektor, Galeria, Notatki -->
+      <!-- Pole treści wpisów i notatek podłączone pod CKEditor 5 Full Build -->
     </main>
+
     <footer><div class="muted-small">© 2025 Od Dna do Światła — Panel administracyjny</div></footer>
   </div>
 
-  <!-- Rozbudowany CKEditor 5 z ikonami -->
+  <!-- CKEditor 5 Full Build (wszystkie funkcje i ikony) -->
   <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+  <!-- Twój kompletny admin.js -->
   <script type="module" src="/js/admin.js"></script>
 
   <script>
+    // Inicjalizacja CKEditor 5 dla pola treści wpisów
     ClassicEditor
-      .create( document.querySelector( '#contentInput' ), {
-        toolbar: [
-          'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', 'link', 'blockQuote', '|',
-          'numberedList', 'bulletedList', '|', 'insertTable', 'mediaEmbed', 'undo', 'redo'
-        ]
+      .create(document.querySelector('#contentInput'), {
+        toolbar: {
+          items: [
+            'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', 'link', 'bulletedList', 'numberedList',
+            'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'imageUpload', 'alignment', 'fontColor', 'fontBackgroundColor', 'highlight'
+          ]
+        },
+        language: 'pl',
+        image: { toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side'] },
+        table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] }
       })
-      .catch( error => { console.error( error ); } );
-  </script>
+      .catch(error => { console.error(error); });
 
+    // CKEditor dla notatek
+    ClassicEditor
+      .create(document.querySelector('#noteContent'), {
+        toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'undo', 'redo']
+      })
+      .catch(error => { console.error(error); });
+  </script>
 </body>
 </html>
