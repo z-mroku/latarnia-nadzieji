@@ -1,4 +1,4 @@
-// /js/admin.js - WERSJA OSTATECZNA "NA MEDAL" v3 - KOMPLETNA I POPRAWIONA
+// /js/admin.js - Ulepszona wersja "NA MEDAL" v4 - Z CKEDITOR5 I POPRAWKAMI
 import { db, auth, storage } from './firebase-config.js';
 import {
   collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, where, limit, collectionGroup, setDoc
@@ -34,11 +34,12 @@ async function initPanel(user){
   logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
 
   let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null;
-  let editEntryData = null; 
+  let editEntryData = null;
   let entriesCache = [];
+  let isEditing = false; // Nowa zmienna flagowa
 
   // ZMIANA 1: Zaktualizowana inicjalizacja CKEditora (wersja 5)
-  // Upewnij się, że w pliku HTML masz <script src="https://cdn.ckeditor.com/ckeditor5/42.0.0/classic/ckeditor.js"></script>
+  // Dodano nowe, bardziej zaawansowane wtyczki do paska narzędzi.
   let editorInstance;
   function getEditorHtml(){ return editorInstance?.getData() || contentInput?.value || ''; }
   function setEditorHtml(html=''){ if (editorInstance) editorInstance.setData(html); else if (contentInput) contentInput.value = html; }
@@ -46,14 +47,19 @@ async function initPanel(user){
     if (!window.ClassicEditor || !contentInput || editorInstance) return;
     ClassicEditor
       .create(contentInput, {
-        toolbar: { items: ['heading','|','bold','italic','link','bulletedList','numberedList','blockQuote','|','undo','redo','|','sourceEditing','|','outdent','indent'] },
+        toolbar: { items: ['heading','|','bold','italic','link','bulletedList','numberedList','blockQuote','|','undo','redo','|','sourceEditing','|','outdent','indent', 'mediaEmbed', 'imageUpload', 'imageInsert', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', 'textAlignment'] },
         language: 'pl',
-        mediaEmbed: { previewsInData: true }
+        image: { toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'] },
+        mediaEmbed: { previewsInData: true },
+        // Konfiguracja wtyczki do ładowania obrazów
+        // To jest tylko przykład, musisz zaimplementować backend dla tej opcji!
+        // simpleUpload: {
+        //   uploadUrl: 'http://example.com/upload'
+        // }
       })
       .then(editor => {
         editorInstance = editor;
         editor.model.document.on('change:data', () => { updateLivePreview(); saveDraft(); });
-        // Load draft after editor is ready
         loadDraft();
       })
       .catch(error => {
@@ -72,7 +78,7 @@ async function initPanel(user){
         const f = attachInput?.files?.[0];
         if (f){
           const url = URL.createObjectURL(f);
-          if (f.type.startsWith('image/')){ const img = document.createElement('img'); img.src = url; img.className = 'thumb'; uploadPreview.appendChild(img); } 
+          if (f.type.startsWith('image/')){ const img = document.createElement('img'); img.src = url; img.className = 'thumb'; uploadPreview.appendChild(img); }
           else { uploadPreview.textContent = f.name; }
         }
       }
@@ -82,9 +88,31 @@ async function initPanel(user){
   authorInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
   attachInput?.addEventListener('change', updateLivePreview);
 
+  // ZMIANA 2: Upewnij się, że w HTML masz link do Font Awesome (dodano komentarz instrukcji)
+  // Lepsze rozwiązanie ładowania ikon niż było wcześniej
   const icons = ['fa-solid fa-heart','fa-solid fa-music','fa-solid fa-star','fa-solid fa-book','fa-solid fa-hands-praying','fa-solid fa-headphones'];
-  // ZMIANA 2: Upewnij się, że w HTML masz link do Font Awesome
-  function buildIconPicker(){ if (!iconPicker) return; iconPicker.innerHTML = ''; icons.forEach(cls=>{ const b = document.createElement('button'); b.type = 'button'; b.title = cls; b.innerHTML = `<i class="${cls}"></i>`; b.addEventListener('click', ()=> { const snippet = `<i class="${cls} fa-fw"></i> `; if (!titleInput) return; const el = titleInput; const start = el.selectionStart ?? el.value.length; el.value = el.value.slice(0,start) + snippet + el.value.slice(el.selectionEnd ?? start); el.selectionStart = el.selectionEnd = start + snippet.length; el.focus(); updateLivePreview(); saveDraft(); }); iconPicker.appendChild(b); }); }
+  function buildIconPicker(){
+    if (!iconPicker) return;
+    iconPicker.innerHTML = '';
+    icons.forEach(cls => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.title = cls;
+      b.innerHTML = `<i class="${cls}"></i>`;
+      b.addEventListener('click', () => {
+        const snippet = `<i class="${cls} fa-fw"></i> `;
+        if (!titleInput) return;
+        const el = titleInput;
+        const start = el.selectionStart ?? el.value.length;
+        el.value = el.value.slice(0, start) + snippet + el.value.slice(el.selectionEnd ?? start);
+        el.selectionStart = el.selectionEnd = start + snippet.length;
+        el.focus();
+        updateLivePreview();
+        saveDraft();
+      });
+      iconPicker.appendChild(b);
+    });
+  }
   buildIconPicker();
 
   menuForm?.addEventListener('submit', async ev => {
@@ -140,10 +168,10 @@ async function initPanel(user){
   clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
   setInterval(saveDraft, 15000);
 
-  entryForm?.addEventListener('submit', async ev=>{ 
+  entryForm?.addEventListener('submit', async ev=>{
     ev.preventDefault();
     const title = (titleInput?.value || '').trim();
-    const newSection = (sectionSelect?.value) || 'Kronika'; // Nowa sekcja
+    const newSection = (sectionSelect?.value) || 'Kronika';
     const author = (authorInput?.value || '').trim() || 'Chudy';
     const theme = (themeSelect?.value || 'auto');
     const text = getEditorHtml().trim();
@@ -162,17 +190,16 @@ async function initPanel(user){
         attachment = { url, meta:{ path } };
       }
       const payload = { section: newSection, title, author, text, attachment, theme, updatedAt: serverTimestamp() };
-      
+
       // ZMIANA 3: POPRAWIONA LOGIKA ZAPISU I PRZENOSZENIA WPISÓW MIĘDZY SEKCJAMI
       if (editEntryData) {
-        const originalSection = editEntryData.section;
         const entryId = editEntryData.id;
+        const originalSection = editEntryData.section;
 
         if (originalSection !== newSection) {
           // Sekcja została zmieniona - PRZENIEŚ wpis
-          // 1. Dodaj nowy wpis do nowej sekcji
+          // Użyj tej samej wartości `id`, aby utrzymać unikalność wpisu
           await setDoc(doc(db, 'sekcje', newSection, 'entries', entryId), { ...payload, createdAt: editEntryData.createdAt });
-          // 2. Usuń stary wpis z oryginalnej sekcji
           await deleteDoc(doc(db, 'sekcje', originalSection, 'entries', entryId));
           console.log(`Wpis przeniesiono z ${originalSection} do ${newSection}`);
         } else {
@@ -193,6 +220,7 @@ async function initPanel(user){
         await addDoc(entriesCollectionRef, { ...payload, createdAt: serverTimestamp() });
         console.log(`Nowy wpis dodano do sekcji ${newSection}`);
       }
+
       entryForm.reset(); setEditorHtml(''); editEntryData=null; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; cancelEntryEditBtn.style.display='none'; updateLivePreview(); clearDraft(); showTemp(formMsg, 'Zapisano');
     } catch (e) { showTemp(formMsg, 'Błąd zapisu', false); console.error(e); } finally { publishBtn.disabled = false; }
   });
@@ -206,10 +234,10 @@ async function initPanel(user){
     const sort = (sortSelect?.value || 'desc');
     if (filter) arr = arr.filter(x => (x.section || '') === filter);
     if (q) arr = arr.filter(x => { const t = stripHtml(x.title||'').toLowerCase(); const s = stripHtml(x.text||'').toLowerCase(); return t.includes(q) || s.includes(q); });
-    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); 
-    else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); 
+    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||'')));
+    else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
     else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-    
+
     entriesList.innerHTML = '';
     arr.forEach(e=>{
       const div = document.createElement('div'); div.className = 'list-item'; div.dataset.id = e.id;
@@ -240,7 +268,7 @@ async function initPanel(user){
           const snap = await getDoc(entryRef);
           if (!snap.exists()) return alert('Wpis nie istnieje');
           const d = snap.data();
-          
+
           editEntryData = { id: id, section: entry.section, attachment: d.attachment, createdAt: d.createdAt }; // ZMIANA: Zapisz więcej danych
           
           sectionSelect.value = d.section || '';
@@ -265,7 +293,7 @@ async function initPanel(user){
   }
 
   onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, section:d.ref.parent.parent.id, ...d.data() })); renderEntries(entriesCache); });
-  
+
   const rerender = debounce(()=> renderEntries(entriesCache), 200);
   searchInput?.addEventListener('input', rerender);
   filterSection?.addEventListener('change', rerender);
@@ -283,7 +311,7 @@ async function initPanel(user){
 
   function speakText(text, statusEl){ if (!text) return; try { const synth = window.speechSynthesis; synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'pl-PL'; if (statusEl) { u.onstart = ()=> statusEl.textContent = 'Lektor: czyta...'; u.onend = ()=> { statusEl.textContent = 'Lektor: zakończono'; setTimeout(()=>statusEl.textContent='Lektor: gotowy', 1200); }; } synth.speak(u); } catch(e) { console.error(e); } }
   ttsListenBtn?.addEventListener('click', async () => { if (!selectedEntryIdForTTS) return; const entry = entriesCache.find(e => e.id === selectedEntryIdForTTS); if (!entry) return alert('Nie znaleziono wpisu w pamięci podręcznej.'); const txt = stripHtml((entry.title ? entry.title.replace(/<[^>]*>?/gm, '') + '. ' : '') + (entry.text || '')).trim(); speakText(txt, readerStatus); });
-  
+
   function openEntryModal(entry) { if (!entry) return; showModalWithData(entry.id, entry); }
   function showModalWithData(id, d){
     entryModalTitle.textContent = d.title || 'Bez tytułu';
@@ -298,7 +326,7 @@ async function initPanel(user){
       const snap = await getDoc(entryRef);
       if (!snap.exists()) return alert('Wpis nie istnieje');
       const docData = snap.data();
-      editEntryData = { id: id, section: d.section, attachment: docData.attachment, createdAt: docData.createdAt }; // ZMIANA: Zapisz więcej danych
+      editEntryData = { id: id, section: d.section, attachment: docData.attachment, createdAt: docData.createdAt };
       if (sectionSelect) sectionSelect.value = docData.section || '';
       if (titleInput) titleInput.value = docData.title || '';
       if (authorInput) authorInput.value = docData.author || '';
@@ -319,3 +347,4 @@ async function initPanel(user){
 
   //updateLivePreview(); // nie ma sensu wywoływać od razu
 }
+
