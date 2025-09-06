@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Centrum Dowodzenia — Latarnia</title>
+  <title>Centrum Dowodzenia â€” Latarnia</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,41 +59,41 @@
     <header>
       <div>
         <h1><i class="fa-solid fa-satellite-dish"></i> Centrum Dowodzenia "Latarnia"</h1>
-        <div class="muted">Zarządzaj projektem "Od Dna do Światła"</div>
+        <div class="muted">ZarzÄ…dzaj projektem "Od Dna do ĹšwiatĹ‚a"</div>
       </div>
       <div class="row">
-        <a class="chip" href="index.html" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Podgląd</a>
-        <div class="chip muted-small">Zalogowany: <span id="adminEmail">—</span></div>
+        <a class="chip" href="index.html" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> PodglÄ…d</a>
+        <div class="chip muted-small">Zalogowany: <span id="adminEmail">â€”</span></div>
         <button id="logoutBtn" class="ghost"><i class="fa-solid fa-right-from-bracket"></i> Wyloguj</button>
       </div>
     </header>
 
     <main class="grid">
       <section class="card">
-        <h3 style="margin:0"><i class="fa-solid fa-life-ring"></i> Zarządzaj Pomocą</h3>
+        <h3 style="margin:0"><i class="fa-solid fa-life-ring"></i> ZarzÄ…dzaj PomocÄ…</h3>
         <form id="helpForm" class="grid g2" style="margin-top:8px;">
-          <div><label for="helpWoj">Województwo</label>
+          <div><label for="helpWoj">WojewĂłdztwo</label>
             <select id="helpWoj" required>
-              <option value="Ogólnopolskie">Ogólnopolskie</option>
-              <option value="Dolnośląskie">Dolnośląskie</option>
+              <option value="OgĂłlnopolskie">OgĂłlnopolskie</option>
+              <option value="DolnoĹ›lÄ…skie">DolnoĹ›lÄ…skie</option>
               <option value="Kujawsko-Pomorskie">Kujawsko-Pomorskie</option>
               <option value="Lubelskie">Lubelskie</option>
               <option value="Lubuskie">Lubuskie</option>
-              <option value="Łódzkie">Łódzkie</option>
-              <option value="Małopolskie">Małopolskie</option>
+              <option value="ĹĂłdzkie">ĹĂłdzkie</option>
+              <option value="MaĹ‚opolskie">MaĹ‚opolskie</option>
               <option value="Mazowieckie">Mazowieckie</option>
               <option value="Opolskie">Opolskie</option>
               <option value="Podkarpackie">Podkarpackie</option>
               <option value="Podlaskie">Podlaskie</option>
               <option value="Pomorskie">Pomorskie</option>
-              <option value="Śląskie">Śląskie</option>
-              <option value="Świętokrzyskie">Świętokrzyskie</option>
-              <option value="Warmińsko-Mazurskie">Warmińsko-Mazurskie</option>
+              <option value="ĹšlÄ…skie">ĹšlÄ…skie</option>
+              <option value="ĹšwiÄ™tokrzyskie">ĹšwiÄ™tokrzyskie</option>
+              <option value="WarmiĹ„sko-Mazurskie">WarmiĹ„sko-Mazurskie</option>
               <option value="Wielkopolskie">Wielkopolskie</option>
               <option value="Zachodniopomorskie">Zachodniopomorskie</option>
             </select>
           </div>
-          <div><label for="helpName">Nazwa Ośrodka</label><input id="helpName" required /></div>
+          <div><label for="helpName">Nazwa OĹ›rodka</label><input id="helpName" required /></div>
           <div><label for="helpAddress">Adres</label><input id="helpAddress" /></div>
           <div><label for="helpPhone">Telefon</label><input id="helpPhone" /></div>
           <div style="grid-column:1/-1"><label for="helpDesc">Opis</label><textarea id="helpDesc" rows="2"></textarea></div>
@@ -113,7 +113,7 @@
         <form id="menuForm" class="grid g3" style="margin-top:8px;">
           <div><label for="menuText">Tekst</label><input id="menuText" required /></div>
           <div><label for="menuUrl">URL</label><input id="menuUrl" required /></div>
-          <div><label for="menuOrder">Kolejność</label><input id="menuOrder" type="number" value="0" /></div>
+          <div><label for="menuOrder">KolejnoĹ›Ä‡</label><input id="menuOrder" type="number" value="0" /></div>
           <div style="grid-column:1/-1" class="row">
             <button id="addMenuBtn" class="primary small" type="submit"><i class="fa-solid fa-plus"></i> Dodaj</button>
             <button id="cancelMenuEditBtn" class="ghost small" type="button" style="display:none">Anuluj</button>
@@ -135,16 +135,16 @@
               <select id="themeSelect">
                 <option value="auto">Auto (wg sekcji)</option>
                 <option value="piciorys">Piciorys (Gazeta)</option>
-                <option value="princess">Księżniczka (Magiczny)</option>
-                <option value="default">Domyślny (Szklany)</option>
+                <option value="princess">KsiÄ™ĹĽniczka (Magiczny)</option>
+                <option value="default">DomyĹ›lny (Szklany)</option>
               </select>
             </div>
             <div class="row" style="align-items:flex-end">
-              <span class="badge" id="draftBadge">Wersja robocza: —</span>
-              <button type="button" id="clearDraftBtn" class="ghost small" title="Wyczyść wersję roboczą"><i class="fa-solid fa-eraser"></i></button>
+              <span class="badge" id="draftBadge">Wersja robocza: â€”</span>
+              <button type="button" id="clearDraftBtn" class="ghost small" title="WyczyĹ›Ä‡ wersjÄ™ roboczÄ…"><i class="fa-solid fa-eraser"></i></button>
             </div>
             <div style="grid-column:1/-1">
-              <label for="titleInput">Tytuł (możesz dodać ikonę)</label>
+              <label for="titleInput">Tytół‚ (możesz dodać ikonę)</label>
               <input id="titleInput" />
               <div class="icon-picker" id="iconPicker"></div>
             </div>
@@ -153,7 +153,7 @@
               <textarea id="contentInput"></textarea>
             </div>
             <div>
-              <label for="attachInput">Załącznik</label>
+              <label for="attachInput">załącznik</label>
               <input id="attachInput" type="file" accept="image/*" />
             </div>
             <div><label>&nbsp;</label><div id="uploadPreview"></div></div>
@@ -172,7 +172,7 @@
             <select id="sortSelect">
               <option value="desc">Najnowsze</option>
               <option value="asc">Najstarsze</option>
-              <option value="title">Tytuł A→Z</option>
+              <option value="title">TytuĹ‚ Aâ†’Z</option>
             </select>
           </div>
         </div>
@@ -200,7 +200,7 @@
         <section class="card">
           <h3 style="margin:0"><i class="fa-solid fa-music"></i> Playlista</h3>
           <form id="playlistForm" class="grid g2" style="margin-top:8px; gap:4px;">
-            <input id="songTitle" placeholder="Tytuł" />
+            <input id="songTitle" placeholder="TytuĹ‚" />
             <input id="songLink" placeholder="URL" />
             <div style="grid-column:1/-1"><button type="submit" class="primary small" style="width:100%"><i class="fa-solid fa-plus"></i> Dodaj</button></div>
           </form>
@@ -211,29 +211,47 @@
         <section class="card">
           <h3 style="margin:0"><i class="fa-solid fa-headphones-simple"></i> Lektor</h3>
           <p class="muted-small" id="readerSelectionInfo">Zaznacz wpis na liście, by go odsłuchać.</p>
-          <div style="margin-top:8px"><button id="ttsListenBtn" class="primary small" disabled><i class="fa-solid fa-play"></i> Odsłuchaj</button></div>
+          <div style="margin-top:8px"><button id="ttsListenBtn" class="primary small" disabled><i class="fa-solid fa-play"></i> OdsĹ‚uchaj</button></div>
           <div class="sep"></div>
           <div id="readerStatus" class="muted-small">Lektor: gotowy</div>
         </section>
       </div>
 
       <section class="card">
-        <h3 style="margin:0"><i class="fa-solid fa-gear"></i> Ustawienia</h3>
-        <form id="settingsForm" class="grid g2" style="margin-top:8px;">
-          <div><label for="siteTitle">Tytuł strony</label><input id="siteTitle" /></div>
-          <div><label for="siteDesc">Opis strony</label><input id="siteDesc" /></div>
-          <div><label for="siteLogo">Logo URL</label><input id="siteLogo" /></div>
-          <div><label for="siteTheme">Motyw</label>
-            <select id="siteTheme"><option value="glass">Szklany</option><option value="light">Jasny</option></select>
-          </div>
+        <h3 style="margin:0"><i class="fa-solid fa-images"></i> Galeria</h3>
+        <form id="galleryForm" class="grid g3" style="margin-top:8px;">
+          <div><label for="galleryDesc">Opis</label><input id="galleryDesc" /></div>
+          <div><label for="galleryUpload">Plik</label><input id="galleryUpload" type="file" accept="image/*" /></div>
+          <div><label>&nbsp;</label><button id="uploadGalleryBtn" class="primary small" type="submit" style="width:100%"><i class="fa-solid fa-upload"></i> WyĹ›lij</button></div>
+        </form>
+        <label style="margin-top:8px">Postęp:</label>
+        <progress id="galleryProgressBar" value="0" max="100" style="width:100%"></progress>
+        <div class="sep"></div>
+        <div id="galleryList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h3 style="margin:0"><i class="fa-solid fa-sticky-note"></i> Notatki</h3>
+        <form id="noteForm" style="margin-top:8px;">
+          <div><label for="noteTitle">TytuĹ‚</label><input id="noteTitle" required /></div>
+          <div style="grid-column:1/-1"><label for="noteContent">TreĹ›Ä‡</label><textarea id="noteContent" rows="2" required></textarea></div>
           <div style="grid-column:1/-1" class="row">
-            <button type="submit" class="primary small"><i class="fa-solid fa-floppy-disk"></i> Zapisz</button>
-            <div style="flex:1"></div><div id="settingsMsg" class="muted-small"></div>
+            <button id="addNoteBtn" class="primary small" type="submit"><i class="fa-solid fa-plus"></i> Dodaj</button>
+            <button id="cancelNoteEditBtn" class="ghost small" type="button" style="display:none">Anuluj</button>
+            <div style="flex:1"></div><div id="noteMsg" class="muted-small"></div>
           </div>
         </form>
+        <div class="sep"></div>
+        <div id="noteListContainer" class="list"></div>
       </section>
     </main>
+
+    <footer><div class="muted-small">Â© 2025 Od Dna do ĹšwiatĹ‚a â€” Panel administracyjny</div></footer>
   </div>
-  <script src="admin.js"></script>
+
+  <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+  <script type="module" src="/js/admin.js"></script>
+
 </body>
 </html>
+
