@@ -6,6 +6,7 @@
   <title>Centrum Dowodzenia — Latarnia</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
@@ -15,7 +16,6 @@
     .wrap { max-width:1200px; margin:28px auto; padding:18px; }
     header { display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
     header h1 { margin:0; font-size:1.4rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; }
-    .muted { color:var(--muted); font-size:0.9rem; }
     .muted-small { color:var(--muted); font-size:0.85rem; }
     .muted-small.danger { color:#f5b5bb; } .muted-small.success { color:#b7f0c2; }
     .chip { background:var(--glass); padding:8px 10px; border-radius:10px; color:var(--muted); text-decoration:none; border:1px solid rgba(255,255,255,0.03); }
@@ -28,11 +28,9 @@
     .primary:disabled { background:#555; color:#999; cursor:not-allowed; }
     .ghost { background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); padding:8px 10px; border-radius:8px; cursor:pointer; }
     .danger { background:transparent; border:1px solid #ff555540; color:#ffb3b3; }
-    .danger:hover { background: #ff555520; }
     .small { padding:6px 8px; border-radius:6px; font-size:0.9rem; }
     .list { margin-top:10px; display:flex; flex-direction:column; gap:8px; max-height:520px; overflow:auto; }
     .list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.02); }
-    .list-item:hover { background: rgba(255,255,255,0.06); }
     label { display:block; font-size:0.85rem; color:var(--muted); margin-bottom:6px; }
     input, textarea, select { width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background-color: rgba(255,255,255,0.05); color:#e6eef8; box-sizing:border-box; font-family:'Lato',sans-serif; }
     select option { background-color:#0b1220; color:#e6eef8; }
@@ -87,7 +85,6 @@
           </div>
         </form>
       </section>
-
       <section class="card">
         <h3 style="margin:0"><i class="fa-solid fa-eye"></i> Podgląd na Żywo</h3>
         <div class="sep"></div>
@@ -117,11 +114,41 @@
           <div id="entriesList" class="list"></div>
       </section>
       
-      </main>
+      <div class="grid g3">
+        <section class="card">
+          <h3 style="margin:0"><i class="fa-solid fa-wand-magic-sparkles"></i> Iskierki</h3>
+          <form id="sparkForm" style="margin-top:8px;">
+            <div style="display:flex; gap:8px;">
+              <input id="sparkInput" /><button class="primary small" type="submit"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </form>
+          <div class="sep"></div>
+          <div id="sparksList" class="list"></div>
+        </section>
 
+        <section class="card">
+          <h3 style="margin:0"><i class="fa-solid fa-music"></i> Playlista</h3>
+          <form id="playlistForm" class="grid g2" style="margin-top:8px; gap:4px;">
+            <input id="songTitle" placeholder="Tytuł" />
+            <input id="songLink" placeholder="URL" />
+            <div style="grid-column:1/-1"><button type="submit" class="primary small" style="width:100%"><i class="fa-solid fa-plus"></i> Dodaj</button></div>
+          </form>
+          <div class="sep"></div>
+          <div id="playlistList" class="list"></div>
+        </section>
+
+        <section class="card">
+          <h3 style="margin:0"><i class="fa-solid fa-headphones-simple"></i> Lektor</h3>
+          <p class="muted-small" id="readerSelectionInfo">Zaznacz wpis na liście, by go odsłuchać.</p>
+          <div style="margin-top:8px"><button id="ttsListenBtn" class="primary small" disabled><i class="fa-solid fa-play"></i> Odsłuchaj</button></div>
+        </section>
+      </div>
+    </main>
     <footer><div class="muted-small">© 2025 Od Dna do Światła — Panel administracyjny</div></footer>
   </div>
+
   <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
   <script type="module" src="/js/admin.js"></script>
+
 </body>
 </html>
