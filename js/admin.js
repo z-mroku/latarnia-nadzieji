@@ -1,5 +1,4 @@
-
-// Plik: /js/admin.js (Twoja Wersja + OSTATECZNA POPRAWKA)
+// Plik: /js/admin.js (WERSJA OSTATECZNA "NA MEDAL" - KOMPLETNA)
 // CZĘŚĆ 1/5: INICJALIZACJA I DEFINICJE
 
 import { db, auth, storage } from './firebase-config.js';
@@ -16,13 +15,14 @@ const $ = id => document.getElementById(id);
 const escapeHtml = (s = '') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stripHtml  = (s = '') => String(s).replace(/<[^>]*>?/gm,'');
 const debounce = (fn, ms = 250) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), ms); }; };
-const DRAFT_KEY = 'adminEntryDraft_v1';
+const DRAFT_KEY = 'adminEntryDraft_v2';
 
-function showTemp(el, txt, ok = true){ if (!el) return; el.textContent = txt; el.className = ok ? 'muted-small success' : 'muted-small danger'; setTimeout(()=>{ el.textContent=''; el.className='muted-small'; }, 2200); }
+function showTemp(el, txt, ok = true){ if (!el) return; el.textContent = txt; el.className = ok ? 'muted-small success' : 'muted-small danger'; setTimeout(()=>{ el.textContent=''; el.className='muted-small'; }, 3000); }
 
 onAuthStateChanged(auth, user => { if (!user) { window.location.href = 'login.html'; return; } initPanel(user); });
 
 async function initPanel(user){
+  // Definicje wszystkich elementów DOM
   const adminEmail = $('adminEmail'), logoutBtn = $('logoutBtn');
   const menuForm = $('menuForm'), menuText = $('menuText'), menuUrl = $('menuUrl'), menuOrder = $('menuOrder'), addMenuBtn = $('addMenuBtn'), cancelMenuEditBtn = $('cancelMenuEditBtn'), menuListContainer = $('menuListContainer'), menuMsg = $('menuMsg');
   const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), themeSelect = $('themeSelect'), titleInput = $('titleInput'), contentInput = $('contentInput'), attachInput = $('attachInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), uploadPreview = $('uploadPreview'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
@@ -39,18 +39,21 @@ async function initPanel(user){
   logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
 
   let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null;
-  let editEntryData = null; // Zmienione z editEntryId
+  let editEntryData = null;
   let entriesCache = [];
   let editorInstance;
 
+  // POPRAWKA 1: Prawidłowa inicjalizacja CKEditora 5
   try {
-    if (window.ClassicEditor && contentInput) {
+    if (window.ClassicEditor && contentInput && !editorInstance) {
         editorInstance = await ClassicEditor.create(contentInput, {
             language: 'pl',
             toolbar: ['heading','|','bold','italic','link','bulletedList','numberedList','|','undo','redo','sourceEditing']
         });
-        editorInstance.model.document.on('change', debounce(saveDraft, 500));
-        loadDraft();
+        editorInstance.model.document.on('change', debounce(() => {
+            updateLivePreview();
+            saveDraft();
+        }, 500));
     }
   } catch(e){ console.error('Błąd inicjalizacji CKEditor 5:', e); }
 
@@ -66,10 +69,29 @@ async function initPanel(user){
   titleInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
   authorInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
 
+  // POPRAWKA 2: Działające ikony do TYTUŁU
   const icons = ['fa-solid fa-heart','fa-solid fa-music','fa-solid fa-star','fa-solid fa-book','fa-solid fa-hands-praying','fa-solid fa-headphones'];
-  function buildIconPicker(){ if (!iconPicker) return; iconPicker.innerHTML = ''; icons.forEach(cls=>{ const b = document.createElement('button'); b.type = 'button'; b.title = cls; b.innerHTML = `<i class="${cls}"></i>`; b.addEventListener('click', ()=> { const snippet = `<i class="${cls} fa-fw"></i>&nbsp;`; if (editorInstance) { editorInstance.model.change(writer => { const insertPosition = editorInstance.model.document.selection.getFirstPosition(); const viewFragment = editorInstance.data.processor.toView(snippet); const modelFragment = editorInstance.data.toModel(viewFragment); writer.insert(modelFragment, insertPosition); }); } else { contentInput.value += snippet; } updateLivePreview(); saveDraft(); }); iconPicker.appendChild(b); }); }
+  function buildIconPicker(){ 
+    if (!iconPicker) return; 
+    iconPicker.innerHTML = ''; 
+    icons.forEach(cls => { 
+      const b = document.createElement('button'); b.type = 'button'; b.title = cls; b.innerHTML = `<i class="${cls}"></i>`; 
+      b.addEventListener('click', ()=> { 
+        if (!titleInput) return;
+        const start = titleInput.selectionStart ?? titleInput.value.length;
+        const end = titleInput.selectionEnd ?? titleInput.value.length;
+        const snippet = `<i class="${cls} fa-fw"></i> `;
+        titleInput.value = titleInput.value.substring(0, start) + snippet + titleInput.value.substring(end);
+        titleInput.selectionStart = titleInput.selectionEnd = start + snippet.length;
+        titleInput.focus(); 
+        updateLivePreview(); saveDraft(); 
+      }); 
+      iconPicker.appendChild(b); 
+    }); 
+  }
   buildIconPicker();
 
+  // Kompletna logika dla Menu i Sekcji
   menuForm?.addEventListener('submit', async ev => { ev.preventDefault(); const data = { text: menuText.value.trim(), url: menuUrl.value.trim(), order: Number(menuOrder.value) || 0 }; if (!data.text || !data.url) return; try { if (editMenuId) { await updateDoc(doc(db, 'menu', editMenuId), data); } else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'menu'), data); } menuForm.reset(); editMenuId = null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; showTemp(menuMsg, 'Zapisano'); } catch (e) { showTemp(menuMsg, 'Błąd', false); console.error(e); } });
   cancelMenuEditBtn?.addEventListener('click', () => { menuForm.reset(); editMenuId=null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; });
   function renderMenu(list=[]){ if(!menuListContainer) return; menuListContainer.innerHTML = ''; list.forEach(it=>{ const div = document.createElement('div'); div.className = 'list-item'; div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(it.text)}</div><div class="muted-small">${escapeHtml(it.url)} • ${it.order}</div></div><div class="row"><button class="ghost small" data-action="edit" data-id="${it.id}"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`; menuListContainer.appendChild(div); }); menuListContainer.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async ev => { const id = ev.currentTarget.dataset.id; const act = ev.currentTarget.dataset.action; if (act === 'edit') { const d = (await getDoc(doc(db, 'menu', id))).data(); menuText.value = d.text; menuUrl.value = d.url; menuOrder.value = d.order; editMenuId = id; addMenuBtn.innerHTML = '<i class="fa-solid fa-save"></i> Zapisz'; cancelMenuEditBtn.style.display='inline-block'; } else if (act === 'del' && confirm('Na pewno usunąć?')) { await deleteDoc(doc(db, 'menu', id)); } })); }
@@ -86,7 +108,7 @@ async function initPanel(user){
   function saveDraft(){ const draft = { section: sectionSelect?.value || '', author: authorInput?.value || '', theme: themeSelect?.value || 'auto', title: titleInput?.value || '', html: getEditorHtml() || '', ts: Date.now() }; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); updateDraftBadge(); } catch(e){} }
   function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.theme)   themeSelect.value  = d.theme; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
   function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); updateDraftBadge(); } catch(e){} }
-  function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } else { draftBadge.textContent = 'Wersja robocza: —'; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
+  function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
   clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); resetForm(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
   setInterval(saveDraft, 15000);
 
@@ -112,14 +134,11 @@ async function initPanel(user){
     }
 
     try {
-      // Logika załącznika (do uzupełnienia)
-      
       if (editEntryData) {
           const entryId = editEntryData.id;
           const originalSection = editEntryData.section;
 
           if (originalSection !== newSection) {
-              // *** OSTATECZNA POPRAWKA: PRZENOSZENIE WPISU ***
               const oldDocRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
               const docToMoveData = (await getDoc(oldDocRef)).data();
               const finalPayload = { ...docToMoveData, ...payload };
@@ -199,7 +218,7 @@ async function initPanel(user){
         if (act === 'read') { openEntryModal(entry); return; }
         if (ev.currentTarget.classList.contains('listen')) { const txt = stripHtml(`${entry.title}. ${entry.text}`); speakText(txt); return; }
         if (act === 'edit') {
-          editEntryData = { id: id, section: entry.section, createdAt: entry.createdAt }; // Zapisujemy createdAt do przeniesienia
+          editEntryData = { id: id, section: entry.section, createdAt: entry.createdAt };
           sectionSelect.value = entry.section || '';
           titleInput.value = entry.title || '';
           authorInput.value = entry.author || '';
