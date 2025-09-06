@@ -1,3 +1,4 @@
+
 // Plik: /js/admin.js (WERSJA OSTATECZNA "NA MEDAL" - KOMPLETNA)
 // CZĘŚĆ 1/5: INICJALIZACJA I DEFINICJE
 
@@ -22,7 +23,6 @@ function showTemp(el, txt, ok = true){ if (!el) return; el.textContent = txt; el
 onAuthStateChanged(auth, user => { if (!user) { window.location.href = 'login.html'; return; } initPanel(user); });
 
 async function initPanel(user){
-  // Definicje wszystkich elementów DOM
   const adminEmail = $('adminEmail'), logoutBtn = $('logoutBtn');
   const menuForm = $('menuForm'), menuText = $('menuText'), menuUrl = $('menuUrl'), menuOrder = $('menuOrder'), addMenuBtn = $('addMenuBtn'), cancelMenuEditBtn = $('cancelMenuEditBtn'), menuListContainer = $('menuListContainer'), menuMsg = $('menuMsg');
   const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), themeSelect = $('themeSelect'), titleInput = $('titleInput'), contentInput = $('contentInput'), attachInput = $('attachInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), uploadPreview = $('uploadPreview'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
@@ -31,8 +31,9 @@ async function initPanel(user){
   const sparkForm = $('sparkForm'), sparkInput = $('sparkInput'), sparksList = $('sparksList');
   const playlistForm = $('playlistForm'), songTitle = $('songTitle'), songLink = $('songLink'), playlistList = $('playlistList');
   const galleryForm = $('galleryForm'), galleryDesc = $('galleryDesc'), galleryUpload = $('galleryUpload'), galleryProgressBar = $('galleryProgressBar'), galleryList = $('galleryList');
-  const readerStatus = $('readerStatus'), ttsListenBtn = $('ttsListenBtn'), readerSelectionInfo = $('readerSelectionInfo');
+  const readerStatus = $('readerStatus'), ttsListenBtn = $('ttsListenBtn'), ttsPreviewBtn = $('ttsPreviewBtn'), readerSelectionInfo = $('readerSelectionInfo');
   const helpForm = $('helpForm'), helpWoj = $('helpWoj'), helpName = $('helpName'), helpAddress = $('helpAddress'), helpPhone = $('helpPhone'), helpDesc = $('helpDesc'), helpLink = $('helpLink'), addHelpBtn = $('addHelpBtn'), cancelHelpEditBtn = $('cancelHelpEditBtn'), helpMsg = $('helpMsg'), helpListContainer = $('helpListContainer');
+  const noteForm = $('noteForm'), noteTitle = $('noteTitle'), noteContent = $('noteContent'), addNoteBtn = $('addNoteBtn'), cancelNoteEditBtn = $('cancelNoteEditBtn'), noteMsg = $('noteMsg'), noteListContainer = $('noteListContainer');
   const entryModal = $('entryModal'), entryModalTitle = $('entryModalTitle'), entryModalMeta = $('entryModalMeta'), entryModalBody = $('entryModalBody'), modalTtsBtn = $('modalTtsBtn'), modalCloseBtn = $('modalCloseBtn'), modalCloseBtn2 = $('modalCloseBtn2'), modalEditBtn = $('modalEditBtn');
 
   adminEmail.textContent = user.email || user.uid;
@@ -42,25 +43,26 @@ async function initPanel(user){
   let editEntryData = null;
   let entriesCache = [];
   let editorInstance;
+// CZĘŚĆ 2/5: CKEDITOR, IKONY, PODGLĄD, MENU, POMOC
 
-  // POPRAWKA 1: Prawidłowa inicjalizacja CKEditora 5
   try {
     if (window.ClassicEditor && contentInput && !editorInstance) {
         editorInstance = await ClassicEditor.create(contentInput, {
             language: 'pl',
-            toolbar: ['heading','|','bold','italic','link','bulletedList','numberedList','|','undo','redo','sourceEditing']
+            toolbar: {
+              items: [
+                'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing'
+              ]
+            }
         });
-        editorInstance.model.document.on('change', debounce(() => {
-            updateLivePreview();
-            saveDraft();
-        }, 500));
+        editorInstance.model.document.on('change', debounce(() => { updateLivePreview(); saveDraft(); }, 500));
     }
   } catch(e){ console.error('Błąd inicjalizacji CKEditor 5:', e); }
 
   function getEditorHtml(){ return editorInstance ? editorInstance.getData() : (contentInput?.value || ''); }
   function setEditorHtml(html=''){ if (editorInstance) editorInstance.setData(html); else if (contentInput) contentInput.value = html; }
-// CZĘŚĆ 2/5: PODGLĄD, IKONY, MENU, POMOC
-
+  
   function updateLivePreview(){
     if (liveTitle) liveTitle.innerHTML = titleInput?.value || 'Tytuł podglądu';
     if (liveMeta) { const who = authorInput?.value || 'Autor'; liveMeta.textContent = `${who} • ${new Date().toLocaleString('pl-PL')}`; }
@@ -69,7 +71,6 @@ async function initPanel(user){
   titleInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
   authorInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
 
-  // POPRAWKA 2: Działające ikony do TYTUŁU
   const icons = ['fa-solid fa-heart','fa-solid fa-music','fa-solid fa-star','fa-solid fa-book','fa-solid fa-hands-praying','fa-solid fa-headphones'];
   function buildIconPicker(){ 
     if (!iconPicker) return; 
@@ -91,7 +92,6 @@ async function initPanel(user){
   }
   buildIconPicker();
 
-  // Kompletna logika dla Menu i Sekcji
   menuForm?.addEventListener('submit', async ev => { ev.preventDefault(); const data = { text: menuText.value.trim(), url: menuUrl.value.trim(), order: Number(menuOrder.value) || 0 }; if (!data.text || !data.url) return; try { if (editMenuId) { await updateDoc(doc(db, 'menu', editMenuId), data); } else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'menu'), data); } menuForm.reset(); editMenuId = null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; showTemp(menuMsg, 'Zapisano'); } catch (e) { showTemp(menuMsg, 'Błąd', false); console.error(e); } });
   cancelMenuEditBtn?.addEventListener('click', () => { menuForm.reset(); editMenuId=null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; });
   function renderMenu(list=[]){ if(!menuListContainer) return; menuListContainer.innerHTML = ''; list.forEach(it=>{ const div = document.createElement('div'); div.className = 'list-item'; div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(it.text)}</div><div class="muted-small">${escapeHtml(it.url)} • ${it.order}</div></div><div class="row"><button class="ghost small" data-action="edit" data-id="${it.id}"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`; menuListContainer.appendChild(div); }); menuListContainer.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async ev => { const id = ev.currentTarget.dataset.id; const act = ev.currentTarget.dataset.action; if (act === 'edit') { const d = (await getDoc(doc(db, 'menu', id))).data(); menuText.value = d.text; menuUrl.value = d.url; menuOrder.value = d.order; editMenuId = id; addMenuBtn.innerHTML = '<i class="fa-solid fa-save"></i> Zapisz'; cancelMenuEditBtn.style.display='inline-block'; } else if (act === 'del' && confirm('Na pewno usunąć?')) { await deleteDoc(doc(db, 'menu', id)); } })); }
@@ -105,8 +105,8 @@ async function initPanel(user){
   onSnapshot(query(collection(db, 'help'), orderBy('createdAt','desc')), snap => renderHelp(snap.docs.map(d=>({id: d.id, ...d.data()}))));
 // CZĘŚĆ 3/5: WERSJE ROBOCZE I FORMULARZ WPISÓW Z POPRAWKĄ
 
-  function saveDraft(){ const draft = { section: sectionSelect?.value || '', author: authorInput?.value || '', theme: themeSelect?.value || 'auto', title: titleInput?.value || '', html: getEditorHtml() || '', ts: Date.now() }; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); updateDraftBadge(); } catch(e){} }
-  function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.theme)   themeSelect.value  = d.theme; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
+  function saveDraft(){ const draft = { section: sectionSelect?.value || '', author: authorInput?.value || '', title: titleInput?.value || '', html: getEditorHtml() || '', ts: Date.now() }; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); updateDraftBadge(); } catch(e){} }
+  function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
   function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); updateDraftBadge(); } catch(e){} }
   function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
   clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); resetForm(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
