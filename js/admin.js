@@ -25,7 +25,7 @@ async function initPanel(user){
   // Definicje wszystkich elementów DOM
   const adminEmail = $('adminEmail'), logoutBtn = $('logoutBtn');
   const menuForm = $('menuForm'), menuText = $('menuText'), menuUrl = $('menuUrl'), menuOrder = $('menuOrder'), addMenuBtn = $('addMenuBtn'), cancelMenuEditBtn = $('cancelMenuEditBtn'), menuListContainer = $('menuListContainer'), menuMsg = $('menuMsg');
-  const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), titleInput = $('titleInput'), contentInput = $('contentInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
+  const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), themeSelect = $('themeSelect'), titleInput = $('titleInput'), contentInput = $('contentInput'), attachInput = $('attachInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), uploadPreview = $('uploadPreview'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
   const filterSection = $('filterSection'), searchInput = $('searchInput'), sortSelect = $('sortSelect'), entriesList = $('entriesList');
   const liveTitle = $('liveTitle'), liveMeta = $('liveMeta'), liveContent = $('liveContent');
   const sparkForm = $('sparkForm'), sparkInput = $('sparkInput'), sparksList = $('sparksList');
@@ -33,13 +33,12 @@ async function initPanel(user){
   const galleryForm = $('galleryForm'), galleryDesc = $('galleryDesc'), galleryUpload = $('galleryUpload'), galleryProgressBar = $('galleryProgressBar'), galleryList = $('galleryList');
   const readerStatus = $('readerStatus'), ttsListenBtn = $('ttsListenBtn'), ttsPreviewBtn = $('ttsPreviewBtn'), readerSelectionInfo = $('readerSelectionInfo');
   const helpForm = $('helpForm'), helpWoj = $('helpWoj'), helpName = $('helpName'), helpAddress = $('helpAddress'), helpPhone = $('helpPhone'), helpDesc = $('helpDesc'), helpLink = $('helpLink'), addHelpBtn = $('addHelpBtn'), cancelHelpEditBtn = $('cancelHelpEditBtn'), helpMsg = $('helpMsg'), helpListContainer = $('helpListContainer');
-  const noteForm = $('noteForm'), noteTitle = $('noteTitle'), noteContent = $('noteContent'), addNoteBtn = $('addNoteBtn'), cancelNoteEditBtn = $('cancelNoteEditBtn'), noteMsg = $('noteMsg'), noteListContainer = $('noteListContainer');
-  const entryModal = $('entryModal'); // Dodane dla spójności
+  const entryModal = $('entryModal'), entryModalTitle = $('entryModalTitle'), entryModalMeta = $('entryModalMeta'), entryModalBody = $('entryModalBody'), modalTtsBtn = $('modalTtsBtn'), modalCloseBtn = $('modalCloseBtn'), modalCloseBtn2 = $('modalCloseBtn2'), modalEditBtn = $('modalEditBtn');
 
   adminEmail.textContent = user.email || user.uid;
   logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
 
-  let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null;
+  let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null, editGalleryId = null;
   let editEntryData = null;
   let entriesCache = [];
   let editorInstance;
@@ -50,7 +49,10 @@ async function initPanel(user){
         editorInstance = await ClassicEditor.create(contentInput, {
             language: 'pl',
             toolbar: {
-              items: [ 'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|', 'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing' ]
+              items: [
+                'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing'
+              ]
             }
         });
         editorInstance.model.document.on('change', debounce(() => { updateLivePreview(); saveDraft(); }, 500));
