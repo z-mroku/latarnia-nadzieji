@@ -1,4 +1,4 @@
-// /js/admin.js - Ulepszona wersja "NA MEDAL" v4 - Z CKEDITOR5 I POPRAWKAMI
+// /js/admin.js - Finalna wersja v5 - poprawki CKEditor i ikon
 import { db, auth, storage } from './firebase-config.js';
 import {
   collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, where, limit, collectionGroup, setDoc
@@ -38,8 +38,7 @@ async function initPanel(user){
   let entriesCache = [];
   let isEditing = false; // Nowa zmienna flagowa
 
-  // ZMIANA 1: Zaktualizowana inicjalizacja CKEditora (wersja 5)
-  // Dodano nowe, bardziej zaawansowane wtyczki do paska narzędzi.
+  // ZMIANA: Prawidłowa inicjalizacja CKEditora 5
   let editorInstance;
   function getEditorHtml(){ return editorInstance?.getData() || contentInput?.value || ''; }
   function setEditorHtml(html=''){ if (editorInstance) editorInstance.setData(html); else if (contentInput) contentInput.value = html; }
@@ -50,12 +49,7 @@ async function initPanel(user){
         toolbar: { items: ['heading','|','bold','italic','link','bulletedList','numberedList','blockQuote','|','undo','redo','|','sourceEditing','|','outdent','indent', 'mediaEmbed', 'imageUpload', 'imageInsert', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', 'textAlignment'] },
         language: 'pl',
         image: { toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'] },
-        mediaEmbed: { previewsInData: true },
-        // Konfiguracja wtyczki do ładowania obrazów
-        // To jest tylko przykład, musisz zaimplementować backend dla tej opcji!
-        // simpleUpload: {
-        //   uploadUrl: 'http://example.com/upload'
-        // }
+        mediaEmbed: { previewsInData: true }
       })
       .then(editor => {
         editorInstance = editor;
@@ -88,8 +82,7 @@ async function initPanel(user){
   authorInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
   attachInput?.addEventListener('change', updateLivePreview);
 
-  // ZMIANA 2: Upewnij się, że w HTML masz link do Font Awesome (dodano komentarz instrukcji)
-  // Lepsze rozwiązanie ładowania ikon niż było wcześniej
+  // ZMIANA: Prawidłowe ładowanie ikon, po upewnieniu się, że link Font Awesome jest w HTML
   const icons = ['fa-solid fa-heart','fa-solid fa-music','fa-solid fa-star','fa-solid fa-book','fa-solid fa-hands-praying','fa-solid fa-headphones'];
   function buildIconPicker(){
     if (!iconPicker) return;
@@ -164,7 +157,6 @@ async function initPanel(user){
   function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.theme)   themeSelect.value  = d.theme; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
   function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); updateDraftBadge(); } catch(e){} }
   function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } else { draftBadge.textContent = 'Wersja robocza: —'; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
-  //loadDraft(); // Przeniesiono do initCk
   clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
   setInterval(saveDraft, 15000);
 
@@ -191,31 +183,25 @@ async function initPanel(user){
       }
       const payload = { section: newSection, title, author, text, attachment, theme, updatedAt: serverTimestamp() };
 
-      // ZMIANA 3: POPRAWIONA LOGIKA ZAPISU I PRZENOSZENIA WPISÓW MIĘDZY SEKCJAMI
       if (editEntryData) {
         const entryId = editEntryData.id;
         const originalSection = editEntryData.section;
 
         if (originalSection !== newSection) {
-          // Sekcja została zmieniona - PRZENIEŚ wpis
-          // Użyj tej samej wartości `id`, aby utrzymać unikalność wpisu
           await setDoc(doc(db, 'sekcje', newSection, 'entries', entryId), { ...payload, createdAt: editEntryData.createdAt });
           await deleteDoc(doc(db, 'sekcje', originalSection, 'entries', entryId));
           console.log(`Wpis przeniesiono z ${originalSection} do ${newSection}`);
         } else {
-          // Sekcja bez zmian - AKTUALIZUJ wpis
           const entryRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
           await updateDoc(entryRef, payload);
           console.log(`Wpis zaktualizowano w sekcji ${originalSection}`);
         }
 
-        // Usuń stary załącznik, jeśli zmieniono plik
         if(f && editEntryData.attachment?.meta?.path) {
           await deleteObject(sref(storage, editEntryData.attachment.meta.path)).catch(console.error);
         }
 
       } else {
-        // Nowy wpis
         const entriesCollectionRef = collection(db, 'sekcje', newSection, 'entries');
         await addDoc(entriesCollectionRef, { ...payload, createdAt: serverTimestamp() });
         console.log(`Nowy wpis dodano do sekcji ${newSection}`);
@@ -263,13 +249,12 @@ async function initPanel(user){
         if (act === 'read') { openEntryModal(entry); return; }
         if (ev.currentTarget.classList.contains('listen')) { const txt = stripHtml((entry.title ? entry.title + '. ' : '') + (entry.text || '')).trim(); speakText(txt, readerStatus); return; }
         if (act === 'edit') {
-          // Pobierz świeże dane z bazy na wypadek, gdyby pamięć podręczna była nieaktualna
           const entryRef = doc(db, 'sekcje', entry.section, 'entries', id);
           const snap = await getDoc(entryRef);
           if (!snap.exists()) return alert('Wpis nie istnieje');
           const d = snap.data();
 
-          editEntryData = { id: id, section: entry.section, attachment: d.attachment, createdAt: d.createdAt }; // ZMIANA: Zapisz więcej danych
+          editEntryData = { id: id, section: entry.section, attachment: d.attachment, createdAt: d.createdAt };
           
           sectionSelect.value = d.section || '';
           titleInput.value = d.title || '';
@@ -306,7 +291,7 @@ async function initPanel(user){
   onSnapshot(query(collection(db,'playlist'), orderBy('createdAt','desc')), snap => renderPlaylist(snap.docs.map(d=>({id: d.id, ...d.data()}))));
   onSnapshot(query(collection(db,'gallery'), orderBy('createdAt','desc')), snap => renderGallery(snap.docs.map(d=>({id: d.id, ...d.data()}))));
   function renderSparks(list=[]){ if(!sparksList) return; sparksList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><i class="fa-solid fa-star"></i> ${escapeHtml(s.quote)}</div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; sparksList.appendChild(el); }); sparksList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'sparks',id)); }); }); }
-  function renderPlaylist(list=[]){ if(!playlistList) return; playlistList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><div style="font-weight:700">${escapeHtml(s.title)}</div><div class="muted-small">${escapeHtml(s.link)}</div></div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; playlistList.appendChild(el); }); playlistList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'playlist',id)); }); }); }
+  function renderPlaylist(list=[]){ if(!playlistList) return; playlistList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><div style="font-weight:700">${escapeHtml(s.title)}</div><div class="muted-small">${escapeHtml(s.link)}</div></div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; playlistList.appendChild(el); }); playlistList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'playlist',id)); }); }; }
   function renderGallery(list=[]){ if(!galleryList) return; galleryList.innerHTML = ''; list.forEach(g=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img src="${g.url}" class="thumb" alt=""><div style="font-weight:700">${escapeHtml(g.desc)}</div></div><div class="row"><button class="ghost small danger" data-id="${g.id}" data-path="${g.meta?.path}"><i class="fa-solid fa-trash"></i></button></div>`; galleryList.appendChild(el); }); galleryList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; const path = ev.currentTarget.dataset.path; if (!confirm('Usuń?')) return; try{ if (path) await deleteObject(sref(storage, path)).catch(()=>{}); await deleteDoc(doc(db,'gallery', id)); }catch(e){console.error(e);} }); }); }
 
   function speakText(text, statusEl){ if (!text) return; try { const synth = window.speechSynthesis; synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'pl-PL'; if (statusEl) { u.onstart = ()=> statusEl.textContent = 'Lektor: czyta...'; u.onend = ()=> { statusEl.textContent = 'Lektor: zakończono'; setTimeout(()=>statusEl.textContent='Lektor: gotowy', 1200); }; } synth.speak(u); } catch(e) { console.error(e); } }
@@ -344,7 +329,4 @@ async function initPanel(user){
   modalCloseBtn2?.addEventListener('click', closeEntryModal);
   entryModal?.addEventListener('click', (ev)=>{ if (ev.target === entryModal) closeEntryModal(); });
   window.addEventListener('keydown', (ev)=> { if (ev.key === 'Escape') closeEntryModal(); });
-
-  //updateLivePreview(); // nie ma sensu wywoływać od razu
-}
-
+    }
