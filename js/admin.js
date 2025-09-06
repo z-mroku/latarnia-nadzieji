@@ -33,6 +33,7 @@ async function initPanel(user){
   const galleryForm = $('galleryForm'), galleryDesc = $('galleryDesc'), galleryUpload = $('galleryUpload'), galleryProgressBar = $('galleryProgressBar'), galleryList = $('galleryList');
   const readerStatus = $('readerStatus'), ttsListenBtn = $('ttsListenBtn'), ttsPreviewBtn = $('ttsPreviewBtn'), readerSelectionInfo = $('readerSelectionInfo');
   const helpForm = $('helpForm'), helpWoj = $('helpWoj'), helpName = $('helpName'), helpAddress = $('helpAddress'), helpPhone = $('helpPhone'), helpDesc = $('helpDesc'), helpLink = $('helpLink'), addHelpBtn = $('addHelpBtn'), cancelHelpEditBtn = $('cancelHelpEditBtn'), helpMsg = $('helpMsg'), helpListContainer = $('helpListContainer');
+  const noteForm = $('noteForm'), noteTitle = $('noteTitle'), noteContent = $('noteContent'), addNoteBtn = $('addNoteBtn'), cancelNoteEditBtn = $('cancelNoteEditBtn'), noteMsg = $('noteMsg'), noteListContainer = $('noteListContainer');
   const entryModal = $('entryModal'), entryModalTitle = $('entryModalTitle'), entryModalMeta = $('entryModalMeta'), entryModalBody = $('entryModalBody'), modalTtsBtn = $('modalTtsBtn'), modalCloseBtn = $('modalCloseBtn'), modalCloseBtn2 = $('modalCloseBtn2'), modalEditBtn = $('modalEditBtn');
 
   adminEmail.textContent = user.email || user.uid;
@@ -49,10 +50,7 @@ async function initPanel(user){
         editorInstance = await ClassicEditor.create(contentInput, {
             language: 'pl',
             toolbar: {
-              items: [
-                'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-                'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing'
-              ]
+              items: [ 'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|', 'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing' ]
             }
         });
         editorInstance.model.document.on('change', debounce(() => { updateLivePreview(); saveDraft(); }, 500));
@@ -227,7 +225,6 @@ async function initPanel(user){
           sectionSelect.value = data.section || '';
           titleInput.value = data.title || '';
           authorInput.value = data.author || '';
-          themeSelect.value = data.theme || 'auto';
           setEditorHtml(data.text || '');
           
           publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Zapisz zmiany';
@@ -253,7 +250,7 @@ async function initPanel(user){
 
   sparkForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const qtxt = (sparkInput?.value || '').trim(); if (!qtxt) return; try { await addDoc(collection(db,'sparks'), { quote:qtxt, createdAt: serverTimestamp() }); sparkInput.value=''; } catch(e){ console.error(e); } });
   playlistForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const t = (songTitle?.value || '').trim(); const l = (songLink?.value || '').trim(); if (!t || !l) return; try { await addDoc(collection(db,'playlist'), { title:t, link:l, createdAt: serverTimestamp() }); songTitle.value=''; songLink.value=''; } catch(e){ console.error(e); } });
-  galleryForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); /* Twoja logika galerii */ });
+  galleryForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const file = galleryUpload?.files?.[0]; const desc = (galleryDesc?.value || '').trim(); if (!file || !desc) return; const addBtn = galleryForm.querySelector('button[type="submit"]'); addBtn.disabled = true; try { const safeName = file.name.replace(/[^\w.\-]+/g,'_'); const storagePath = `gallery/${Date.now()}_${safeName}`; const fileRef = sref(storage, storagePath); const uploadTask = uploadBytesResumable(fileRef, file); uploadTask.on('state_changed', s => { const p = (s.bytesTransferred / s.totalBytes) * 100; if(galleryProgressBar) galleryProgressBar.value = p; }, console.error, async () => { const url = await getDownloadURL(uploadTask.snapshot.ref); await addDoc(collection(db, 'gallery'), { url, desc, path: storagePath, createdAt: serverTimestamp() }); galleryForm.reset(); if(galleryProgressBar) galleryProgressBar.value = 0; addBtn.disabled = false; }); } catch(e) { console.error(e); addBtn.disabled = false; } });
   
   onSnapshot(query(collection(db,'sparks'), orderBy('createdAt','desc')), snap => renderSparks(snap.docs.map(d=>({id: d.id, ...d.data()}))));
   onSnapshot(query(collection(db,'playlist'), orderBy('createdAt','desc')), snap => renderPlaylist(snap.docs.map(d=>({id: d.id, ...d.data()}))));
@@ -261,7 +258,7 @@ async function initPanel(user){
 
   function renderSparks(list=[]){ if(!sparksList) return; sparksList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><i class="fa-solid fa-star"></i> ${escapeHtml(s.quote)}</div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; sparksList.appendChild(el); }); sparksList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'sparks',id)); }); }); }
   function renderPlaylist(list=[]){ if(!playlistList) return; playlistList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><div style="font-weight:700">${escapeHtml(s.title)}</div><div class="muted-small">${escapeHtml(s.link)}</div></div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; playlistList.appendChild(el); }); playlistList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'playlist',id)); }); }); }
-  function renderGallery(list=[]){ if(!galleryList) return; /* Twoja logika renderowania galerii */ }
+  function renderGallery(list=[]){ if(!galleryList) return; galleryList.innerHTML = ''; list.forEach(g=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img src="${g.url}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" alt="Miniaturka"><div style="font-weight:700">${escapeHtml(g.desc)}</div></div><div class="row"><button class="ghost small danger" data-id="${g.id}" data-path="${g.path}"><i class="fa-solid fa-trash"></i></button></div>`; galleryList.appendChild(el); }); galleryList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; const path = ev.currentTarget.dataset.path; if (!confirm('Usuń?')) return; try{ if (path) await deleteObject(sref(storage, path)).catch(()=>{}); await deleteDoc(doc(db,'gallery', id)); }catch(e){console.error(e);} }); }); }
 
   function speakText(text){ if (!text) return; try { const synth = window.speechSynthesis; if(synth.speaking) synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'pl-PL'; if (readerStatus) { u.onstart = ()=> readerStatus.textContent = 'Lektor: czyta...'; u.onend = ()=> { readerStatus.textContent = 'Lektor: zakończono'; setTimeout(()=>readerStatus.textContent='Lektor: gotowy', 1200); }; } synth.speak(u); } catch(e) { console.error(e); } }
   ttsListenBtn?.addEventListener('click', async () => { if (!selectedEntryIdForTTS) return; const entry = entriesCache.find(e => e.id === selectedEntryIdForTTS); if (!entry) return; const txt = stripHtml(`${entry.title}. ${entry.text}`); speakText(txt); });
