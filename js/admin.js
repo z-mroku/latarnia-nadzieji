@@ -329,4 +329,4 @@ async function initPanel(user){
   modalCloseBtn2?.addEventListener('click', closeEntryModal);
   entryModal?.addEventListener('click', (ev)=>{ if (ev.target === entryModal) closeEntryModal(); });
   window.addEventListener('keydown', (ev)=> { if (ev.key === 'Escape') closeEntryModal(); });
-    }
+                                                                                           }
