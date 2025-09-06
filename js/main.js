@@ -1,4 +1,6 @@
-// Plik: /js/main.js (WERSJA OSTATECZNA, KOMPLETNA 100%)
+
+// Plik: /js/main.js (WERSJA OSTATECZNA, KOMPLETNA)
+// CZĘŚĆ 1/3: INICJALIZACJA I GŁÓWNE FUNKCJE
 
 import { db } from './firebase-config.js'; 
 import { collection, getDocs, query, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -13,8 +15,14 @@ async function fetchAndRenderMenu(container) {
         const snapshot = await getDocs(query(collection(db, "menu"), orderBy("order", "asc"))); 
         container.innerHTML = snapshot.docs.map(doc => {
             const data = doc.data();
-            const url = `Sekcja.html?section=${encodeURIComponent(data.text)}`;
-            return `<li><a href="${url}">${data.text}</a></li>`;
+            
+            // INTELIGENTNA LOGIKA LINKÓW MENU
+            let finalUrl = data.url;
+            if (finalUrl === 'Sekcja.html') {
+                finalUrl = `${data.url}?section=${encodeURIComponent(data.text)}`;
+            }
+            
+            return `<li><a href="${finalUrl}">${data.text}</a></li>`;
         }).join('') || '<li><a>Brak menu</a></li>'; 
     } catch (err) { 
         console.error("Błąd wczytywania menu: ", err); 
@@ -57,6 +65,7 @@ async function fetchLatarniaNadziei(container) {
         }
     } 
 }
+// CZĘŚĆ 2/3: ISKIERKA I ODTWARZACZ YOUTUBE
 
 async function fetchSparks(textElement) { 
     if (!textElement) return;
@@ -98,6 +107,7 @@ tag.src = "https://www.youtube.com/iframe_api";
 document.head.appendChild(tag);
 
 window.onYouTubeIframeAPIReady = function() { 
+    if(!document.getElementById('youtube-player')) return;
     player = new YT.Player('youtube-player', { 
         height: '0', 
         width: '0', 
@@ -157,6 +167,7 @@ function prevSong() {
     currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; 
     loadCurrentSong(true); 
 }
+// CZĘŚĆ 3/3: DISQUS, WIZYTÓWKA I START APLIKACJI
 
 // --- LOGIKA DISQUS ---
 function initializeDisqus() { 
