@@ -1,7 +1,8 @@
-// /js/admin.js - WERSJA OSTATECZNA "NA MEDAL" v3 - KOMPLETNA I POPRAWIONA
+// /js/admin.js - WERSJA POPRAWIONA
 import { db, auth, storage } from './firebase-config.js';
 import {
-  collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, where, limit, collectionGroup
+  collection, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot,
+  serverTimestamp, getDocs, where, limit, collectionGroup, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { ref as sref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -17,7 +18,7 @@ function showTemp(el, txt, ok = true){ if (!el) return; el.textContent = txt; el
 onAuthStateChanged(auth, user => { if (!user) { window.location.href = 'login.html'; return; } initPanel(user); });
 
 async function initPanel(user){
-  // Definicje elementów (pełna wersja)
+  // elementy
   const adminEmail = $('adminEmail'), logoutBtn = $('logoutBtn');
   const menuForm = $('menuForm'), menuText = $('menuText'), menuUrl = $('menuUrl'), menuOrder = $('menuOrder'), addMenuBtn = $('addMenuBtn'), cancelMenuEditBtn = $('cancelMenuEditBtn'), menuListContainer = $('menuListContainer'), menuMsg = $('menuMsg');
   const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), themeSelect = $('themeSelect'), titleInput = $('titleInput'), contentInput = $('contentInput'), attachInput = $('attachInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), uploadPreview = $('uploadPreview'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
@@ -34,7 +35,8 @@ async function initPanel(user){
   logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
 
   let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null;
-  let editEntryData = null; 
+  let editEntryId = null;
+  let editGalleryId = null;
   let entriesCache = [];
 
   function getEditorHtml(){ try { if (window.CKEDITOR && CKEDITOR.instances.contentInput) return CKEDITOR.instances.contentInput.getData(); } catch(e){} return contentInput?.value || ''; }
@@ -98,6 +100,7 @@ async function initPanel(user){
     }));
   }
   onSnapshot(query(collection(db, 'menu'), orderBy('order')), snap => { const items = snap.docs.map(d=>({id:d.id, ...d.data()})); renderMenu(items); populateSectionSelect(items); });
+
   function populateSectionSelect(menuItems=[]){
     if (!sectionSelect || !filterSection) return;
     const prev = sectionSelect.value;
@@ -120,7 +123,7 @@ async function initPanel(user){
   clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
   setInterval(saveDraft, 15000);
 
-  entryForm?.addEventListener('submit', async ev=>{ 
+  entryForm?.addEventListener('submit', async ev=>{
     ev.preventDefault();
     const title = (titleInput?.value || '').trim();
     const section = (sectionSelect?.value) || 'Kronika';
@@ -128,6 +131,7 @@ async function initPanel(user){
     const theme = (themeSelect?.value || 'auto');
     const text = getEditorHtml().trim();
     if (!title || !text) return showTemp(formMsg, 'Tytuł i treść są wymagane', false);
+
     publishBtn.disabled = true; showTemp(formMsg, 'Trwa zapisywanie...');
     try {
       let attachment = null;
@@ -142,17 +146,17 @@ async function initPanel(user){
         attachment = { url, meta:{ path } };
       }
       const payload = { section, title, author, text, attachment, theme, updatedAt: serverTimestamp() };
-      if (editEntryData) {
-        const entryRef = doc(db, 'sekcje', editEntryData.section, 'entries', editEntryData.id);
+      if (editEntryId) {
+        const entryRef = doc(db, 'sekcje', editEntryId.section, 'entries', editEntryId.id);
         await updateDoc(entryRef, payload);
       } else {
         const entriesCollectionRef = collection(db, 'sekcje', section, 'entries');
         await addDoc(entriesCollectionRef, { ...payload, createdAt: serverTimestamp() });
       }
-      entryForm.reset(); setEditorHtml(''); editEntryData=null; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; cancelEntryEditBtn.style.display='none'; updateLivePreview(); clearDraft(); showTemp(formMsg, 'Zapisano');
+      entryForm.reset(); setEditorHtml(''); editEntryId=null; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; cancelEntryEditBtn.style.display='none'; updateLivePreview(); clearDraft(); showTemp(formMsg, 'Zapisano');
     } catch (e) { showTemp(formMsg, 'Błąd zapisu', false); console.error(e); } finally { publishBtn.disabled = false; }
   });
-  cancelEntryEditBtn?.addEventListener('click', ()=>{ editEntryData=null; entryForm?.reset(); setEditorHtml(''); cancelEntryEditBtn.style.display='none'; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; updateLivePreview(); });
+  cancelEntryEditBtn?.addEventListener('click', ()=>{ editEntryId=null; entryForm?.reset(); setEditorHtml(''); cancelEntryEditBtn.style.display='none'; publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; updateLivePreview(); });
 
   function renderEntries(list=[]){
     if (!entriesList) return;
@@ -162,9 +166,7 @@ async function initPanel(user){
     const sort = (sortSelect?.value || 'desc');
     if (filter) arr = arr.filter(x => (x.section || '') === filter);
     if (q) arr = arr.filter(x => { const t = stripHtml(x.title||'').toLowerCase(); const s = stripHtml(x.text||'').toLowerCase(); return t.includes(q) || s.includes(q); });
-    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); 
-    else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); 
-    else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); else if (sort==='asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
     
     entriesList.innerHTML = '';
     arr.forEach(e=>{
@@ -179,7 +181,6 @@ async function initPanel(user){
     });
 
     entriesList.querySelectorAll('.list-item').forEach(item => { item.addEventListener('click', (ev) => { if (ev.target.closest('button') || ev.target.closest('a')) return; document.querySelectorAll('.list-item.selected').forEach(el => el.classList.remove('selected')); item.classList.add('selected'); selectedEntryIdForTTS = item.dataset.id; ttsListenBtn.disabled = false; const titleEl = item.querySelector('.entry-title'); const tmp = document.createElement('div'); tmp.innerHTML = titleEl ? titleEl.innerHTML : ''; const plainTitle = tmp.textContent || tmp.innerText || ''; readerSelectionInfo.innerHTML = `Zaznaczono: "<strong>${plainTitle}</strong>"`; }); });
-
     entriesList.querySelectorAll('button').forEach(btn=>{
       btn.addEventListener('click', async ev=>{
         ev.stopPropagation();
@@ -190,23 +191,38 @@ async function initPanel(user){
 
         if (act === 'read') { openEntryModal(entry); return; }
         if (ev.currentTarget.classList.contains('listen')) { const txt = stripHtml((entry.title ? entry.title + '. ' : '') + (entry.text || '')).trim(); speakText(txt, readerStatus); return; }
+        
+        // =======================================================
+        //  TUTAJ ZNAJDUJE SIĘ POPRAWKA DO LOGIKI EDYCJI
+        // =======================================================
         if (act === 'edit') {
-          const entryRef = doc(db, 'sekcje', entry.section, 'entries', id);
-          const snap = await getDoc(entryRef);
-          if (!snap.exists()) return alert('Wpis nie istnieje');
-          const d = snap.data();
-          editEntryData = { id: id, section: entry.section }; // ZMIANA: Przechowujemy dane do edycji
-          sectionSelect.value = d.section || '';
-          titleInput.value = d.title || '';
-          authorInput.value = d.author || '';
-          themeSelect.value = d.theme || 'auto';
-          setEditorHtml(d.text || '');
-          if (d.attachment?.url && uploadPreview) uploadPreview.innerHTML = `<img src="${d.attachment.url}" class="thumb" alt="">`; else uploadPreview.innerHTML = '';
+          // Ustawiamy ID i sekcję potrzebne do zapisu zmian
+          editEntryId = { id: id, section: entry.section };
+
+          // Bezpośrednio używamy danych z `entry`, które już mamy, do wypełnienia formularza
+          sectionSelect.value = entry.section || '';
+          titleInput.value = entry.title || '';
+          authorInput.value = entry.author || '';
+          themeSelect.value = entry.theme || 'auto';
+          setEditorHtml(entry.text || '');
+          
+          // Aktualizujemy podgląd załącznika
+          if (entry.attachment?.url && uploadPreview) {
+            uploadPreview.innerHTML = `<img src="${entry.attachment.url}" class="thumb" alt="Podgląd załącznika">`;
+          } else {
+            uploadPreview.innerHTML = '';
+          }
+          
+          // Zmieniamy przycisk i przewijamy stronę do góry
           publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Zapisz zmiany';
-          cancelEntryEditBtn.style.display='inline-block';
-          window.scrollTo({top:0,behavior:'smooth'});
+          cancelEntryEditBtn.style.display = 'inline-block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           updateLivePreview();
         }
+        // =======================================================
+        //  KONIEC POPRAWKI
+        // =======================================================
+
         if (act === 'del') {
           if (!confirm('Na pewno usunąć?')) return;
           const entryRef = doc(db, 'sekcje', entry.section, 'entries', id);
@@ -217,8 +233,7 @@ async function initPanel(user){
     });
   }
 
-  onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, section:d.ref.parent.parent.id, ...d.data() })); renderEntries(entriesCache); });
-  
+  onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, ...d.data() })); renderEntries(entriesCache); });
   const rerender = debounce(()=> renderEntries(entriesCache), 200);
   searchInput?.addEventListener('input', rerender);
   filterSection?.addEventListener('change', rerender);
@@ -226,17 +241,162 @@ async function initPanel(user){
 
   sparkForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const qtxt = (sparkInput?.value || '').trim(); if (!qtxt) return; try { await addDoc(collection(db,'sparks'), { quote:qtxt, createdAt: serverTimestamp() }); sparkInput.value=''; } catch(e){ console.error(e); } });
   playlistForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const t = (songTitle?.value || '').trim(); const l = (songLink?.value || '').trim(); if (!t || !l) return; try { await addDoc(collection(db,'playlist'), { title:t, link:l, createdAt: serverTimestamp() }); songTitle.value=''; songLink.value=''; } catch(e){ console.error(e); } });
-  galleryForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const file = galleryUpload?.files?.[0]; const desc = (galleryDesc?.value || '').trim(); if (!file) return; const safe = file.name.replace(/[^\w.\-]+/g,'_'); const path = `gallery/${Date.now()}_${safe}`; const r = sref(storage, path); const task = uploadBytesResumable(r, file); task.on('state_changed', s=>{ const p = Math.round((s.bytesTransferred / s.totalBytes) * 100); if (galleryProgressBar) galleryProgressBar.value = p; }, console.error, async ()=>{ const url = await getDownloadURL(r); await addDoc(collection(db,'gallery'), { url, desc, meta:{ path }, createdAt: serverTimestamp() }); galleryForm.reset(); galleryProgressBar.value = 0; }); });
+  
+  galleryForm?.addEventListener('submit', async ev=>{
+    ev.preventDefault();
+    const file = galleryUpload?.files?.[0];
+    const desc = (galleryDesc?.value || '').trim();
+    const addGalleryBtn = galleryForm.querySelector('button[type="submit"]');
+
+    if (editGalleryId) {
+        addGalleryBtn.disabled = true;
+        showTemp(menuMsg, 'Aktualizowanie opisu...');
+        const entryRef = doc(db, 'sekcje', 'Galeria', 'entries', editGalleryId);
+        try {
+            await updateDoc(entryRef, {
+                desc: desc,
+                text: desc,
+                title: desc,
+                updatedAt: serverTimestamp()
+            });
+            galleryForm.reset();
+            editGalleryId = null;
+            galleryUpload.disabled = false;
+            addGalleryBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj zdjęcie';
+            showTemp(menuMsg, 'Opis zaktualizowany');
+        } catch (e) {
+            console.error('Błąd aktualizacji galerii:', e);
+            showTemp(menuMsg, 'Błąd aktualizacji', false);
+        } finally {
+            addGalleryBtn.disabled = false;
+        }
+        return;
+    }
+
+    if (!file) return showTemp(menuMsg, 'Wybierz plik', false);
+    addGalleryBtn.disabled = true;
+    const gallerySectionName = 'Galeria';
+
+    try {
+      galleryProgressBar && (galleryProgressBar.value = 0);
+      showTemp(menuMsg, 'Wysyłanie zdjęcia...');
+      const safe = file.name.replace(/[^\w.\-]+/g,'_');
+      const path = `sekcje_galeria/${Date.now()}_${safe}`;
+      const r = sref(storage, path);
+      const task = uploadBytesResumable(r, file);
+      
+      await new Promise((res, rej) => {
+        task.on('state_changed', s => {
+          const p = Math.round((s.bytesTransferred / s.totalBytes) * 100);
+          if (galleryProgressBar) galleryProgressBar.value = p;
+        }, rej, res);
+      });
+
+      const url = await getDownloadURL(r);
+      
+      const sectionDocRef = doc(db, 'sekcje', gallerySectionName);
+      const sectionDocSnap = await getDoc(sectionDocRef);
+      if (!sectionDocSnap.exists()) {
+          await setDoc(sectionDocRef, {
+              name: "Galeria",
+              order: 99,
+              createdAt: serverTimestamp()
+          });
+      }
+      
+      const entriesRef = collection(db, 'sekcje', gallerySectionName, 'entries');
+      await addDoc(entriesRef, { 
+          title: desc || file.name, 
+          text: desc,
+          url, 
+          desc, 
+          section: gallerySectionName, 
+          meta: { path }, 
+          storagePath: path,
+          type: file.type.startsWith('video/') ? 'video' : 'image',
+          createdAt: serverTimestamp() 
+      });
+
+      galleryForm.reset();
+      galleryProgressBar && (galleryProgressBar.value = 0);
+      showTemp(menuMsg, 'Obraz zapisany');
+
+    } catch (e) {
+      console.error('Błąd uploadu do galerii:', e);
+      showTemp(menuMsg, 'Błąd uploadu', false);
+    } finally {
+      addGalleryBtn.disabled = false;
+    }
+  });
+
+  onSnapshot(query(collection(db, 'sekcje', 'Galeria', 'entries'), orderBy('createdAt', 'desc')), snap => {
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderGallery(list);
+  });
+  
+  function renderGallery(list=[]){
+    if(!galleryList) return;
+    galleryList.innerHTML = '';
+    const addGalleryBtn = galleryForm.querySelector('button[type="submit"]');
+
+    list.forEach(g=>{
+      const el = document.createElement('div'); el.className='list-item';
+      el.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center">
+        ${g.type === 'video' 
+          ? `<div class="entry-list-thumb" style="background:#000;color:#fff;display:flex;align-items:center;justify-content:center;">🎥</div>`
+          : `<img src="${g.url}" class="thumb" alt="">`
+        }
+          <div>
+            <div style="font-weight:700">${escapeHtml(g.title || g.desc || '')}</div>
+            <div class="muted-small">${escapeHtml(g.type || 'image')}</div>
+          </div>
+        </div>
+        <div class="row">
+            <button class="ghost small" data-action="edit" data-id="${g.id}" title="Edytuj opis"><i class="fa-solid fa-pen"></i></button>
+            <button class="ghost small danger" data-action="del" data-id="${g.id}" data-path="${g.storagePath || g.meta?.path}" title="Usuń"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+      galleryList.appendChild(el);
+    });
+
+    galleryList.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', async ev=> {
+        const id = ev.currentTarget.dataset.id;
+        const path = ev.currentTarget.dataset.path;
+        const action = ev.currentTarget.dataset.action;
+
+        if (action === 'edit') {
+            const entryRef = doc(db, 'sekcje', 'Galeria', 'entries', id);
+            const docSnap = await getDoc(entryRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                galleryDesc.value = data.text || data.desc || '';
+                editGalleryId = id;
+                galleryUpload.disabled = true;
+                addGalleryBtn.innerHTML = '<i class="fa-solid fa-save"></i> Zapisz zmiany';
+                galleryDesc.focus();
+            }
+        } 
+        else if (action === 'del') {
+            if (!confirm('Na pewno usunąć ten element galerii?')) return;
+            try{
+              if (path) await deleteObject(sref(storage, path)).catch(console.error);
+              await deleteDoc(doc(db, 'sekcje', 'Galeria', 'entries', id));
+              showTemp(menuMsg, 'Usunięto z galerii');
+            } catch(e){ console.error(e); showTemp(menuMsg, 'Błąd usuwania', false); }
+        }
+      });
+    });
+  }
+
   onSnapshot(query(collection(db,'sparks'), orderBy('createdAt','desc')), snap => renderSparks(snap.docs.map(d=>({id: d.id, ...d.data()}))));
   onSnapshot(query(collection(db,'playlist'), orderBy('createdAt','desc')), snap => renderPlaylist(snap.docs.map(d=>({id: d.id, ...d.data()}))));
-  onSnapshot(query(collection(db,'gallery'), orderBy('createdAt','desc')), snap => renderGallery(snap.docs.map(d=>({id: d.id, ...d.data()}))));
   function renderSparks(list=[]){ if(!sparksList) return; sparksList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><i class="fa-solid fa-star"></i> ${escapeHtml(s.quote)}</div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; sparksList.appendChild(el); }); sparksList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'sparks',id)); }); }); }
   function renderPlaylist(list=[]){ if(!playlistList) return; playlistList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><div style="font-weight:700">${escapeHtml(s.title)}</div><div class="muted-small">${escapeHtml(s.link)}</div></div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; playlistList.appendChild(el); }); playlistList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'playlist',id)); }); }); }
-  function renderGallery(list=[]){ if(!galleryList) return; galleryList.innerHTML = ''; list.forEach(g=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img src="${g.url}" class="thumb" alt=""><div style="font-weight:700">${escapeHtml(g.desc)}</div></div><div class="row"><button class="ghost small danger" data-id="${g.id}" data-path="${g.meta?.path}"><i class="fa-solid fa-trash"></i></button></div>`; galleryList.appendChild(el); }); galleryList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; const path = ev.currentTarget.dataset.path; if (!confirm('Usuń?')) return; try{ if (path) await deleteObject(sref(storage, path)).catch(()=>{}); await deleteDoc(doc(db,'gallery', id)); }catch(e){console.error(e);} }); }); }
 
   function speakText(text, statusEl){ if (!text) return; try { const synth = window.speechSynthesis; synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'pl-PL'; if (statusEl) { u.onstart = ()=> statusEl.textContent = 'Lektor: czyta...'; u.onend = ()=> { statusEl.textContent = 'Lektor: zakończono'; setTimeout(()=>statusEl.textContent='Lektor: gotowy', 1200); }; } synth.speak(u); } catch(e) { console.error(e); } }
   ttsListenBtn?.addEventListener('click', async () => { if (!selectedEntryIdForTTS) return; const entry = entriesCache.find(e => e.id === selectedEntryIdForTTS); if (!entry) return alert('Nie znaleziono wpisu w pamięci podręcznej.'); const txt = stripHtml((entry.title ? entry.title.replace(/<[^>]*>?/gm, '') + '. ' : '') + (entry.text || '')).trim(); speakText(txt, readerStatus); });
-  
+
   function openEntryModal(entry) { if (!entry) return; showModalWithData(entry.id, entry); }
   function showModalWithData(id, d){
     entryModalTitle.textContent = d.title || 'Bez tytułu';
@@ -251,7 +411,7 @@ async function initPanel(user){
       const snap = await getDoc(entryRef);
       if (!snap.exists()) return alert('Wpis nie istnieje');
       const docData = snap.data();
-      editEntryData = { id: id, section: d.section }; // ZMIANA: Przechowujemy dane do edycji
+      editEntryId = { id: id, section: d.section };
       if (sectionSelect) sectionSelect.value = docData.section || '';
       if (titleInput) titleInput.value = docData.title || '';
       if (authorInput) authorInput.value = docData.author || '';
