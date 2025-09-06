@@ -4,14 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Centrum Dowodzenia — Latarnia</title>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     :root { --bg:#0f1724; --card:#1e293b; --muted:#94a3b8; --accent:#ff8f00; --accent-2:#ffb74d; font-family: 'Lato', sans-serif; }
     html, body { height:100%; margin:0; background:linear-gradient(180deg,#071224 0%, #081827 60%); color:#e6eef8; }
     .wrap { max-width:1400px; margin:28px auto; padding:18px; }
     .grid { display:grid; gap:20px; }
+    .g2 { grid-template-columns:1fr 1fr; }
     .g2-main { display:grid; grid-template-columns: 2fr 1fr; gap: 20px; }
     .g3 { grid-template-columns: repeat(3, 1fr); }
     .card { background:var(--card); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
@@ -20,11 +23,11 @@
     label { display:block; font-size:0.85rem; color:var(--muted); margin-bottom:6px; }
     input, textarea, select { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); color:#e6eef8; box-sizing:border-box; }
     .list { margin-top:15px; display:flex; flex-direction:column; gap:8px; max-height:400px; overflow-y:auto; padding-right: 5px; }
-    .list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.02); }
     .sep { height:1px; background:linear-gradient(90deg,transparent,#ffffff10,transparent); margin:15px 0; }
     .icon-picker { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .icon-picker button { background:transparent; border:1px solid rgba(255,255,255,0.1); padding:6px; border-radius:6px; cursor:pointer; color:var(--muted); }
     #liveContent { background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; min-height:160px; line-height: 1.6; }
+    
     .ck-editor__editable_inline { background-color: #0f1724 !important; color: #e6eef8 !important; border: 1px solid rgba(255,255,255,0.1) !important; min-height: 400px; }
     .ck-toolbar { background: #0f1724 !important; border-color: rgba(255,255,255,0.1) !important; }
     .ck.ck-button, .ck.ck-button__label { color: var(--muted) !important; }
@@ -106,7 +109,7 @@
       </section>
       <div class="g2-main">
         <section class="card">
-            <h3 style="margin:0"><i class="fa-solid fa-list-check"></i> Lista Wpisów</h3>
+            <h3><i class="fa-solid fa-list-check"></i> Lista Wpisów</h3>
             <div class="grid g3" style="margin-top:8px;">
               <div><label for="filterSection">Filtruj</label><select id="filterSection"></select></div>
               <div><label for="searchInput">Szukaj</label><input id="searchInput" /></div>
@@ -121,7 +124,7 @@
             <div id="entriesList" class="list"></div>
         </section>
         <section class="card">
-          <h3 style="margin:0"><i class="fa-solid fa-eye"></i> Podgląd na Żywo</h3>
+          <h3><i class="fa-solid fa-eye"></i> Podgląd na Żywo</h3>
           <div id="liveTitle"></div>
           <div id="liveMeta"></div>
           <div id="liveContent"></div>
