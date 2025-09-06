@@ -163,3 +163,4 @@ function openEntryModal(entry) { if (!entry) return; showModalWithData(entry.id,
 
 } // Koniec funkcji initPanel
 
+
