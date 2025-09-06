@@ -4,12 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Centrum Dowodzenia — Latarnia</title>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
     :root { --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#ff8f00; --accent-2:#ffb74d; --glass: rgba(255,255,255,0.03); --success:#d4edda; --danger:#f8d7da; font-family: 'Lato', Inter, "Segoe UI", Roboto, Arial, sans-serif; }
     html, body { height:100%; margin:0; background:linear-gradient(180deg,#071224 0%, #081827 60%); color:#e6eef8; }
@@ -57,6 +54,61 @@
     </header>
 
     <main class="grid">
+      <section class="card">
+        <h3 style="margin:0"><i class="fa-solid fa-life-ring"></i> Zarządzaj Pomocą</h3>
+        <form id="helpForm" class="grid g2" style="margin-top:8px;">
+          <div><label for="helpWoj">Województwo</label>
+            <select id="helpWoj" required>
+              <option value="Ogólnopolskie">Ogólnopolskie</option>
+              <option value="Dolnośląskie">Dolnośląskie</option>
+              <option value="Kujawsko-Pomorskie">Kujawsko-Pomorskie</option>
+              <option value="Lubelskie">Lubelskie</option>
+              <option value="Lubuskie">Lubuskie</option>
+              <option value="Łódzkie">Łódzkie</option>
+              <option value="Małopolskie">Małopolskie</option>
+              <option value="Mazowieckie">Mazowieckie</option>
+              <option value="Opolskie">Opolskie</option>
+              <option value="Podkarpackie">Podkarpackie</option>
+              <option value="Podlaskie">Podlaskie</option>
+              <option value="Pomorskie">Pomorskie</option>
+              <option value="Śląskie">Śląskie</option>
+              <option value="Świętokrzyskie">Świętokrzyskie</option>
+              <option value="Warmińsko-Mazurskie">Warmińsko-Mazurskie</option>
+              <option value="Wielkopolskie">Wielkopolskie</option>
+              <option value="Zachodniopomorskie">Zachodniopomorskie</option>
+            </select>
+          </div>
+          <div><label for="helpName">Nazwa Ośrodka</label><input id="helpName" required /></div>
+          <div><label for="helpAddress">Adres</label><input id="helpAddress" /></div>
+          <div><label for="helpPhone">Telefon</label><input id="helpPhone" /></div>
+          <div style="grid-column:1/-1"><label for="helpDesc">Opis</label><textarea id="helpDesc" rows="2"></textarea></div>
+          <div style="grid-column:1/-1"><label for="helpLink">Link (URL)</label><input id="helpLink" type="url" /></div>
+          <div style="grid-column:1/-1" class="row">
+            <button id="addHelpBtn" class="primary small" type="submit"><i class="fa-solid fa-plus"></i> Dodaj</button>
+            <button id="cancelHelpEditBtn" class="ghost small" type="button" style="display:none">Anuluj</button>
+            <div style="flex:1"></div><div id="helpMsg" class="muted-small"></div>
+          </div>
+        </form>
+        <div class="sep"></div>
+        <div id="helpListContainer" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h3 style="margin:0"><i class="fa-solid fa-bars"></i> Menu i Sekcje</h3>
+        <form id="menuForm" class="grid g3" style="margin-top:8px;">
+          <div><label for="menuText">Tekst</label><input id="menuText" required /></div>
+          <div><label for="menuUrl">URL</label><input id="menuUrl" required /></div>
+          <div><label for="menuOrder">Kolejność</label><input id="menuOrder" type="number" value="0" /></div>
+          <div style="grid-column:1/-1" class="row">
+            <button id="addMenuBtn" class="primary small" type="submit"><i class="fa-solid fa-plus"></i> Dodaj</button>
+            <button id="cancelMenuEditBtn" class="ghost small" type="button" style="display:none">Anuluj</button>
+            <div style="flex:1"></div><div id="menuMsg" class="muted-small"></div>
+          </div>
+        </form>
+        <div class="sep"></div>
+        <div id="menuListContainer" class="list"></div>
+      </section>
+      
       <section class="card" style="grid-column: 1 / -1;">
         <h3 style="margin:0"><i class="fa-solid fa-pen-to-square"></i> Edytor Wpisów</h3>
         <form id="entryForm" style="margin-top:8px;">
@@ -64,7 +116,7 @@
             <div><label for="sectionSelect">Sekcja</label><select id="sectionSelect"></select></div>
             <div><label for="authorInput">Autor</label><input id="authorInput" /></div>
             <div style="grid-column:1/-1">
-              <label for="titleInput">Tytuł (możesz dodać ikonę)</label>
+              <label for="titleInput">Tytuł (wstaw ikonę klikając poniżej)</label>
               <input id="titleInput" />
               <div class="icon-picker" id="iconPicker"></div>
             </div>
@@ -138,7 +190,7 @@
 
         <section class="card">
           <h3 style="margin:0"><i class="fa-solid fa-headphones-simple"></i> Lektor</h3>
-          <p class="muted-small" id="readerSelectionInfo">Zaznacz wpis na liście, by go odsłuchaj.</p>
+          <p class="muted-small" id="readerSelectionInfo">Zaznacz wpis na liście, by go odsłuchać.</p>
           <div style="margin-top:8px"><button id="ttsListenBtn" class="primary small" disabled><i class="fa-solid fa-play"></i> Odsłuchaj</button></div>
         </section>
       </div>
@@ -147,7 +199,6 @@
   </div>
 
   <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
-  
   <script type="module" src="/js/admin.js"></script>
 
 </body>
