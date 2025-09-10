@@ -1,10 +1,9 @@
 /* Plik: css/style.css - WERSJA OSTATECZNA, ZINTEGROWANA */
 
 /* --- 1. SETUP & GLOBALS --- */
-/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Georgia&family=Lato&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Georgia&family=Lato&display=swap');
 
 :root {
-  /* Centralna paleta kolorów dla całego projektu */
   --c-bg: #0f2027;
   --c-text: #e6eef8;
   --c-text-muted: #9aa4b2;
@@ -30,7 +29,6 @@ body {
 
 /* --- 2. REUSABLE COMPONENTS --- */
 
-/* === Komponent: Nagłówek Główny (H1 na index.html) === */
 h1 {
   font-size: 3.5em;
   text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px var(--c-accent-red), 0 0 80px var(--c-accent-red);
@@ -43,7 +41,6 @@ h1 {
   to { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px var(--c-accent-red-dark), 0 0 70px var(--c-accent-red-dark); }
 }
 
-/* === Komponent: Nagłówek Sekcji (Fancy Title) === */
 .fancy-title {
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 800;
@@ -64,7 +61,6 @@ h1 {
   text-shadow: 0 14px 30px rgba(0,0,0,0.6);
 }
 
-/* === Komponent: Panel / Kontener Treści === */
 .content-section, .story-container {
   text-align: left;
   max-width: 900px;
@@ -76,7 +72,6 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* === Komponent: Przycisk 3D (Główny) === */
 .back-to-home-button {
   display: inline-block;
   padding: 18px 40px;
@@ -106,18 +101,15 @@ h1 {
 
 /* --- 3. PAGE-SPECIFIC SECTIONS (INDEX.HTML) --- */
 
-/* Pasek z podtytułem */
 .scrolling-subtitle-container { width: 100%; overflow: hidden; background-color: rgba(0, 0, 0, 0.6); padding: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 .special-subtitle { font-size: 1.5em; font-weight: bold; color: var(--c-accent-gold); text-shadow: 1px 1px 2px #000; white-space: nowrap; display: inline-block; padding-left: 100%; animation: scroll-text 25s linear infinite; }
 @keyframes scroll-text { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-/* Menu główne */
 nav ul { list-style-type: none; padding: 10px 0; text-align: center; background: rgba(0,0,0,0.5); }
 nav ul li { display: inline-block; margin: 5px 10px; }
 nav ul li a { display: block; padding: 12px 22px; font-weight: bold; color: #fff; text-decoration: none; border-radius: 8px; background: linear-gradient(to bottom, var(--c-accent-red), var(--c-accent-red-dark)); border: 1px solid #7f0000; box-shadow: 0 4px 0 #7f0000, 0 5px 5px rgba(0,0,0,0.4); transition: all 0.1s ease-in-out; }
 nav ul li a:hover { background: linear-gradient(to bottom, #e57373, var(--c-accent-red)); }
 
-/* Kontener Przestrogi i Iskierek */
 .animated-warning, .spark-container { text-align: center; max-width: 900px; margin: 40px auto; background: rgba(0, 0, 0, 0.7); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 .animated-warning { border: 2px solid var(--c-accent-gold); animation: softPulse 6s infinite ease-in-out; }
 .animated-warning p { font-family: 'Georgia', serif; font-size: 1.4em; color: #fffacd; text-shadow: 0 0 6px rgba(255, 215, 0, 0.7); margin: 0; line-height: 1.6; }
@@ -126,17 +118,14 @@ nav ul li a:hover { background: linear-gradient(to bottom, #e57373, var(--c-acce
 .spark-button { margin-top: 20px; padding: 10px 20px; background: var(--c-accent-gold-dark); color: #fff; font-weight: bold; border: none; border-radius: 25px; cursor: pointer; }
 .spark-button:hover { background: #e65100; }
 
-/* Lista wpisów na stronie głównej */
 .story-item { background: rgba(0, 0, 0, 0.4); padding: 20px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid var(--c-accent-red); }
 .story-item h3 a { color: var(--c-accent-gold-dark); text-decoration: none; }
 .entry-item-meta { font-size: 0.9em; color: #ccc; margin-bottom: 10px; }
 
-/* Sekcja komentarzy Disqus */
 .comments-section { background: var(--c-dark-panel); border-radius: 15px; max-width: 900px; margin: 40px auto; padding: 25px 30px; }
 .comments-section h2 { color: var(--c-accent-gold-dark); font-size: 1.8em; }
 #disqus_thread { background: rgba(10, 15, 25, 0.8); border-radius: 10px; padding: 15px; }
 
-/* Odtwarzacz audio */
 .audio-player { background: rgba(10, 15, 25, 0.8); backdrop-filter: blur(8px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0,0,0,0.4); max-width: 500px; margin: 40px auto; padding: 20px; border: 1px solid rgba(255, 152, 0, 0.2); display: flex; align-items: center; gap: 20px; }
 .album-art { width: 80px; height: 80px; border-radius: 8px; background-color: var(--c-accent-gold-dark); display: flex; align-items: center; justify-content: center; font-size: 2.5em; color: #1e1e1e; flex-shrink: 0; }
 .player-info { flex-grow: 1; text-align: left; }
@@ -146,27 +135,33 @@ nav ul li a:hover { background: linear-gradient(to bottom, #e57373, var(--c-acce
 .player-controls button:hover { background: var(--c-accent-gold-dark); color: #000; }
 .player-controls button#play-pause-btn { width: 55px; height: 55px; font-size: 1.6em; background-color: var(--c-accent-gold-dark); color: #000; border: none; }
 
-/* Stopka */
 footer { margin-top: 50px; padding: 25px 15px; background: rgba(0,0,0,0.7); border-top: 1px solid #444; color: #aaa; }
 footer .footer-content { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
 footer a { color: var(--c-accent-gold-dark); text-decoration: none; font-weight: bold; }
 
 /* --- 4. THEMES (FOR SEKCJKA.HTML & WPIS.HTML) --- */
 
-/* === Motyw: Piciorys === */
+.theme-kronika .story-container, .theme-kronika .story-item { 
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-left: none; /* Reset starych stylów */
+}
+.theme-kronika .story-item h3 a { font-size: 1.5em; color: var(--c-accent-gold); }
+
 .theme-piciorys body { background-color: #e8e2d8; font-family: 'Georgia', serif; color: #333; }
 .theme-piciorys .story-container { background-color: #fdf5e6; padding: 25px; border: 1px solid #ccc; box-shadow: 3px 3px 8px rgba(0,0,0,0.2); }
 .theme-piciorys .fancy-title { border-bottom: 3px double #333; padding-bottom: 20px; margin-bottom: 20px; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 1px; color: #9d261d; background: none; -webkit-text-fill-color: initial; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); transform: none; }
-.theme-piciorys .fancy-title:hover { transform: none; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); } /* Reset hover effect */
+.theme-piciorys .fancy-title:hover { transform: none; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); }
 .theme-piciorys blockquote { text-align: center; font-style: italic; margin: 15px 0; font-size: 1.1em; line-height: 1.6; }
 .theme-piciorys .entry-content { font-size: 1.1em; line-height: 1.7; text-align: justify; }
 @media (min-width: 768px) { .theme-piciorys .entry-content { column-count: 2; column-gap: 30px; } }
 .theme-piciorys .back-to-home-button { color: #fff; background: #9d261d; border-color: #6c1a14; box-shadow: 0 6px 0 #6c1a14; text-shadow: none; }
 
-/* === Motyw: Księżniczka === */
 .theme-ksiezniczka body { background-image: url('https://i.postimg.cc/nrW10GvY/IMG-20250702-WA0000.jpg'); font-family: 'Georgia', serif; }
 .theme-ksiezniczka .story-container { background-color: rgba(0, 0, 0, 0.75); border: 1px solid rgba(255, 215, 0, 0.6); box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); }
-.theme-ksiezniczka .fancy-title { font-family: 'Playfair Display', serif; } /* Dziedziczy złoty styl z .fancy-title */
+.theme-ksiezniczka .fancy-title { font-family: 'Playfair Display', serif; }
 .theme-ksiezniczka .entry-content { font-size: 1.2em; line-height: 1.8; text-align: justify; }
 .theme-ksiezniczka .back-to-home-button { background: #ffd700; border-color: #b89b00; box-shadow: 0 6px 0 #b89b00; text-shadow: none; }
 
