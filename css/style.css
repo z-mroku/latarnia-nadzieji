@@ -178,4 +178,3 @@ footer a { color: var(--c-accent-gold-dark); text-decoration: none; font-weight:
   .content-section, .story-container { padding: 20px; }
   .audio-player { flex-direction: column; max-width: 90%; }
 }
-
