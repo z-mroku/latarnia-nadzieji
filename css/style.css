@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Georgia&family=Lato&display=swap');
 
 :root {
+  /* Centralna paleta kolorów dla całego projektu */
   --c-bg: #0f2027;
   --c-text: #e6eef8;
   --c-text-muted: #9aa4b2;
@@ -73,11 +74,13 @@ h1 {
 }
 
 .back-to-home-button {
-  display: inline-block;
-  padding: 18px 40px;
-  margin: 30px auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 25px;
+  margin: 0;
   font-family: 'Lato', sans-serif;
-  font-size: 1.25em;
+  font-size: 1em;
   font-weight: 900;
   color: #111;
   text-decoration: none;
@@ -141,21 +144,21 @@ footer a { color: var(--c-accent-gold-dark); text-decoration: none; font-weight:
 
 /* --- 4. THEMES (FOR SEKCJKA.HTML & WPIS.HTML) --- */
 
-.theme-kronika .story-container, .theme-kronika .story-item { 
+.theme-kronika .story-container, .theme-kronika .story-list > .story-item { 
     background: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(10px); 
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    border-left: none; /* Reset starych stylów */
+    border-left: none;
 }
 .theme-kronika .story-item h3 a { font-size: 1.5em; color: var(--c-accent-gold); }
 
 .theme-piciorys body { background-color: #e8e2d8; font-family: 'Georgia', serif; color: #333; }
 .theme-piciorys .story-container { background-color: #fdf5e6; padding: 25px; border: 1px solid #ccc; box-shadow: 3px 3px 8px rgba(0,0,0,0.2); }
-.theme-piciorys .fancy-title { border-bottom: 3px double #333; padding-bottom: 20px; margin-bottom: 20px; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 1px; color: #9d261d; background: none; -webkit-text-fill-color: initial; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); transform: none; }
+.theme-piciorys .fancy-title { border-bottom: 3px double #333; padding-bottom: 20px; margin-bottom: 20px; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 1px; color: #9d261d !important; background: none; -webkit-text-fill-color: initial; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); transform: none; }
 .theme-piciorys .fancy-title:hover { transform: none; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); }
 .theme-piciorys blockquote { text-align: center; font-style: italic; margin: 15px 0; font-size: 1.1em; line-height: 1.6; }
-.theme-piciorys .entry-content { font-size: 1.1em; line-height: 1.7; text-align: justify; }
+.theme-piciorys .entry-content, .theme-piciorys p { color: #333; }
 @media (min-width: 768px) { .theme-piciorys .entry-content { column-count: 2; column-gap: 30px; } }
 .theme-piciorys .back-to-home-button { color: #fff; background: #9d261d; border-color: #6c1a14; box-shadow: 0 6px 0 #6c1a14; text-shadow: none; }
 
@@ -175,3 +178,4 @@ footer a { color: var(--c-accent-gold-dark); text-decoration: none; font-weight:
   .content-section, .story-container { padding: 20px; }
   .audio-player { flex-direction: column; max-width: 90%; }
 }
+
