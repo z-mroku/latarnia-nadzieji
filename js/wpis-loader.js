@@ -183,3 +183,4 @@ const WpisApp = {
 };
 
 WpisApp.init();
+
