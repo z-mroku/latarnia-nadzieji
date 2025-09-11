@@ -1,4 +1,4 @@
-/* Plik: /css/wpis.css */
+/* Plik: /css/wpis.css - Dedykowane style dla Wpis.html */
 
 .progress-bar {
     position: fixed;
@@ -20,6 +20,7 @@
 }
 .entry-content {
     padding: clamp(20px, 5vw, 40px);
+    line-height: 1.8;
 }
 .entry-meta-bar {
     display: flex;
@@ -30,7 +31,11 @@
     color: var(--c-text-muted);
     font-size: 0.9em;
 }
-.entry-meta-bar .meta-item { display: inline-flex; align-items: center; gap: 8px; }
+.entry-meta-bar .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 .entry-actions {
     display: flex;
     gap: 15px;
@@ -47,9 +52,17 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
-#like-btn .fa-heart { transition: color 0.2s, transform 0.2s; }
-#like-btn:hover { border-color: var(--c-accent-red); color: var(--c-accent-red); }
+#like-btn .fa-heart {
+    transition: color 0.2s, transform 0.2s;
+}
+#like-btn:hover {
+    border-color: var(--c-accent-red);
+    color: var(--c-accent-red);
+}
 #like-btn.liked {
     background-color: var(--c-accent-red);
     border-color: var(--c-accent-red);
@@ -74,5 +87,13 @@
     justify-content: space-between;
     margin-top: 30px;
 }
-.nav-buttons .nav-btn { visibility: visible; }
-.nav-buttons .nav-btn.hidden { visibility: hidden; }
+.nav-buttons .nav-btn {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+.nav-buttons .nav-btn.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
