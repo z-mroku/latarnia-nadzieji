@@ -1,4 +1,4 @@
-/* Plik: /css/sekcja.css */
+/* Plik: /css/sekcja.css - Dedykowane style dla Sekcja.html */
 
 .loading-message {
     text-align: center;
@@ -21,18 +21,14 @@
     margin-bottom: 25px;
     border-radius: 12px;
 }
-.story-item h3 {
-    margin: 0 0 8px;
-}
+.story-item h3 { margin: 0 0 8px; }
 .story-item h3 a {
     font-size: 1.5em; 
     color: var(--c-accent-gold);
     text-decoration: none;
     transition: color 0.2s;
 }
-.story-item h3 a:hover {
-    color: #fff;
-}
+.story-item h3 a:hover { color: #fff; }
 .czytaj-dalej-btn {
     display: inline-block; 
     margin-top: 15px;
@@ -46,6 +42,35 @@
     cursor: pointer;
     transition: background-color 0.2s;
 }
-.czytaj-dalej-btn:hover {
-    background-color: #4a4f57;
+.czytaj-dalej-btn:hover { background-color: #4a4f57; }
+
+/* --- Style dla sekcji "Pomoc" --- */
+.filter-bar { margin: 10px 0 30px; text-align: center; }
+.accordion { 
+    background-color: rgba(0, 51, 102, 0.7);
+    color: #fff; 
+    cursor: pointer; 
+    padding: 15px; 
+    width: 100%; 
+    text-align: left; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    outline: none; 
+    transition: background-color .25s; 
+    border-radius: 10px; 
+    margin-top: 10px;
+    font-size: 1.1em;
 }
+.accordion.active, .accordion:hover { background-color: rgba(0, 63, 136, 0.9); }
+.panel { 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height .3s ease-out; 
+    padding: 0 18px; 
+    background: rgba(0,0,0,0.2); 
+    border-radius: 0 0 10px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+}
+.place-entry { padding: 15px 5px; border-bottom: 1px dashed rgba(255,255,255,.15); }
+.place-entry:last-child { border-bottom: none; }
+
