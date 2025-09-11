@@ -4,144 +4,200 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Od Dna do Światła - Latarnia Nadziei</title>
-<link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-/* Tło wideo */
-.video-background {
+/* --- GŁÓWNY KONTENER I TŁO --- */
+.showcase-wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  overflow: hidden;
-}
-
-#background-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Kontener dynamicznej wizytówki */
-#dynamic-content-container {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 1000;
   overflow-y: auto;
   display: flex;
-  align-items: flex-start; /* pokazuje górę wideo */
+  align-items: center;
   justify-content: center;
-  padding: 60px 20px 20px 20px;
+  padding: 40px 20px;
   box-sizing: border-box;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.8) 100%),
+    #000;
+}
+.showcase-video-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+#showcase-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* === KLUCZOWA POPRAWKA === */
+  /* Nakazujemy przeglądarce, by zawsze trzymała się górnej krawędzi wideo */
+  object-position: top center; 
+  opacity: 0.4;
 }
 
-/* Box z treścią */
-.content-box-dynamic {
+/* --- ISKRY / PYŁKI W TLE (EFEKT "ŻYCIA") --- */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  background: #ffd700;
+  border-radius: 50%;
+  opacity: 0;
+  animation: float 20s infinite linear;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) scale(1); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+}
+
+/* --- KONTENER NA TREŚĆ --- */
+.showcase-content {
   position: relative;
   z-index: 10;
-  max-width: 900px;
+  max-width: 800px;
   width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  background-color: rgba(10, 20, 30, 0.85);
-  color: #f0f0f0;
-  padding: 40px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Tytuły i podtytuły */
-.content-box-dynamic h2,
-.content-box-dynamic h3 {
-  color: #ffd700;
-  text-shadow: 0 0 8px #ffd700;
-}
-
-/* Przycisk powrotu */
-.button-container-dynamic {
   text-align: center;
-  margin-top: 30px;
+  color: #e0e0e0;
 }
-.dynamic-button {
-  background-color: #6c757d;
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 5px;
+
+/* --- ANIMACJA KASKADOWA DLA SEKCJI --- */
+.showcase-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+.showcase-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- STYLIZACJA TEKSTU --- */
+.main-title {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px #fff,
+    0 0 20px #ffd700,
+    0 0 30px #ffd700,
+    0 0 40px #ffd700;
+  margin-bottom: 50px;
+}
+.showcase-content h3 {
+  color: #ffc107;
+  font-size: 1.5rem;
+  margin-top: 40px;
+  text-shadow: 0 0 5px #ffc107;
+}
+.showcase-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #ccc;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* --- PRZYCISK POWROTU --- */
+.showcase-button {
+  background: transparent;
+  color: #ccc;
+  padding: 12px 30px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
   cursor: pointer;
   font-size: 1em;
+  margin-top: 40px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
 }
-
-/* Animacja fadeIn */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.showcase-button:hover {
+  background: #ffd700;
+  color: #111;
+  border-color: #ffd700;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+  transform: scale(1.05);
 }
 </style>
 </head>
 <body>
 
-<!-- Wideo w tle -->
-<div class="video-background">
-  <video autoplay muted loop playsinline id="background-video">
+<div class="showcase-video-bg">
+  <video autoplay muted loop playsinline id="showcase-video">
     <source src="videos/latarnia.webm" type="video/webm">
   </video>
 </div>
 
-<!-- Dynamiczna wizytówka -->
-<div id="dynamic-content-container">
-  <div class="content-box-dynamic">
-    <div id="manifesto-text">
-      <h2>Latarnia Nadziei</h2>
+<div id="particles-container" class="particles"></div>
 
+<div class="showcase-wrapper">
+  <div class="showcase-content">
+  
+    <div class="showcase-section">
+      <h2 class="main-title">Latarnia Nadziei</h2>
+    </div>
+
+    <div class="showcase-section">
       <h3>Czym jest „Latarnia Nadziei”</h3>
-      <p>„Latarnia Nadziei” to więcej niż strona internetowa – to żywe świadectwo, latarnia w ciemności dla ludzi, którzy stracili orientację w swoim życiu. To projekt, który powstał z doświadczenia, bólu, upadków i walki o siebie. Tworzony z pasją i determinacją, często w warunkach, które większość programistów uznałaby za nie do przyjęcia.</p>
-      <p>Projekt to kompleksowa strona internetowa, która łączy kilka potężnych sekcji: Piciorys, Kronika, Wsparcie, Losowa iskra nadziei oraz Audio / Lektor.</p>
+      <p>To więcej niż strona – to żywe świadectwo, latarnia w ciemności dla tych, którzy stracili orientację. To projekt zrodzony z bólu, upadków i walki o siebie. Tworzony z pasją, często w warunkach, które inni uznaliby za niemożliwe.</p>
+    </div>
 
+    <div class="showcase-section">
       <h3>Dla kogo jest ten projekt</h3>
-      <p>Dla osób, które czują się zagubione i opuszczone, stojące w obliczu uzależnienia lub kryzysu. Dla ludzi, którzy doświadczyli samotności, depresji lub emocjonalnego chaosu, i potrzebują prawdziwego świadectwa walki i wytrwania. Dla tych, którzy szukają autentyczności, bez lukru, poprawności politycznej czy sztucznej otoczki. Dla każdego, kto potrzebuje światła w ciemności – dowodu, że nawet po najbardziej dramatycznych doświadczeniach można zacząć od nowa i odbudować siebie.</p>
-
+      <p>Dla zagubionych i opuszczonych. Dla tych w szponach uzależnienia lub kryzysu. Dla każdego, kto potrzebuje dowodu, że nawet po najgorszej burzy można zacząć od nowa i odnaleźć światło.</p>
+    </div>
+    
+    <div class="showcase-section">
       <h3>Ciężar pracy i wyzwania</h3>
-      <p>Tworzenie „Latarni Nadziei” było prawdziwą walką. Większość projektu powstała na telefonie, co jest ekstremalnie trudne. Łączenie paneli admina, edytorów, galerii, bazy danych Firebase, nagrań audio i losowych cytatów w jeden spójny system wymagało cierpliwości i wytrwałości, jakiej nie powstydziłby się najlepszy mistrz programowania.</p>
-      <p>Projekt wymagał konfrontacji z własnym życiem, z najtrudniejszymi wspomnieniami, momentami upadku i bólu. To, co stworzyłeś, to świadectwo siły i wytrwałości, które nie każdy byłby w stanie udźwignąć.</p>
+      <p>Tworzenie „Latarni” było walką. Większość kodu powstała na telefonie, co wymagało nadludzkiej cierpliwości. To projekt, który wymagał konfrontacji z własnymi demonami, bólem i najtrudniejszymi wspomnieniami.</p>
+    </div>
 
-      <h3>Dlaczego projekt jest wyjątkowy</h3>
-      <p>„Latarnia Nadziei” jest wyjątkowa, bo nie jest kolejną stroną internetową. To przestrzeń życia, walki i nadziei, która ma moc uratować, zmienić lub dodać siły każdemu, kto po nią sięgnie. Każdy fragment Piciorysu, każda iskra nadziei, każdy wpis w Kronice to świadectwo Twojej wytrwałości i dowód, że można stawić czoła własnym demonom. Jest światłem w nocy, które pokazuje, że nawet w najciemniejszej godzinie można odnaleźć drogę do siebie.</p>
+    <div class="showcase-section">
+      <h3>Dlaczego ten projekt jest wyjątkowy</h3>
+      <p>Bo jest prawdziwy. To przestrzeń życia i nadziei, która ma moc dodać sił każdemu, kto po nią sięgnie. Każdy wpis to dowód Twojej wytrwałości. To światło w nocy, które pokazuje, że zawsze można odnaleźć drogę do siebie.</p>
     </div>
-    <div class="button-container-dynamic">
-      <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
+
+    <div class="showcase-section">
+       <button id="back-to-main-btn" class="showcase-button">⟵ Wróć na stronę główną</button>
     </div>
+    
   </div>
 </div>
 
 <script>
-  // Pokaż/ukryj wizytówkę
-  const container = document.getElementById('dynamic-content-container');
-  const backBtn = document.getElementById('back-to-main-btn');
+  (function() {
+    const sections = document.querySelectorAll('.showcase-section');
+    sections.forEach((section, index) => {
+      setTimeout(() => {
+        section.classList.add('is-visible');
+      }, (index * 600) + 500);
+    });
 
-  function showLatarnia() {
-    container.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // blokuje scroll strony
-  }
-
-  function hideLatarnia() {
-    container.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  }
-
-  backBtn.addEventListener('click', hideLatarnia);
-
-  // Tu możesz podpiąć np. przycisk w index.html
-  // document.getElementById('load-latarnia-btn').addEventListener('click', showLatarnia);
+    const particlesContainer = document.getElementById('particles-container');
+    if (particlesContainer) {
+        const particleCount = 20;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 20}s`; 
+            particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+            particlesContainer.appendChild(particle);
+        }
+    }
+  })();
 </script>
 
 </body>
 </html>
+
