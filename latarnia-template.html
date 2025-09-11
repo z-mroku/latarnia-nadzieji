@@ -1,203 +1,157 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Od Dna do Światła - Latarnia Nadziei</title>
-<style>
-/* --- GŁÓWNY KONTENER I TŁO --- */
-.showcase-wrapper {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  overflow-y: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  box-sizing: border-box;
-  background:
-    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.8) 100%),
-    #000;
-}
-.showcase-video-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-#showcase-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* === KLUCZOWA POPRAWKA === */
-  /* Nakazujemy przeglądarce, by zawsze trzymała się górnej krawędzi wideo */
-  object-position: top center; 
-  opacity: 0.4;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O Latarni Nadziei — Od Dna do Światła</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-/* --- ISKRY / PYŁKI W TLE (EFEKT "ŻYCIA") --- */
-.particles {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-.particle {
-  position: absolute;
-  background: #ffd700;
-  border-radius: 50%;
-  opacity: 0;
-  animation: float 20s infinite linear;
-}
-@keyframes float {
-  0% { transform: translateY(100vh) scale(1); opacity: 0; }
-  10% { opacity: 0.7; }
-  90% { opacity: 0.7; }
-  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
-}
+  <style>
+    /* --- RESET I PODSTAWY --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Arial', sans-serif; }
+    html, body { height:100%; width:100%; overflow-x:hidden; }
 
-/* --- KONTENER NA TREŚĆ --- */
-.showcase-content {
-  position: relative;
-  z-index: 10;
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-  color: #e0e0e0;
-}
+    /* --- TŁO WIDEO --- */
+    .video-bg {
+      position: fixed; inset:0; z-index:-2; overflow:hidden;
+    }
+    .video-bg video {
+      width:100%; height:100%; object-fit:cover; object-position:center;
+    }
 
-/* --- ANIMACJA KASKADOWA DLA SEKCJI --- */
-.showcase-section {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 1s ease-out, transform 1s ease-out;
-}
-.showcase-section.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+    /* --- PULSUJĄCE ŚWIATŁO --- */
+    .overlay-light {
+      position: fixed; inset:0;
+      background: radial-gradient(circle, rgba(255,200,50,0.2) 0%, rgba(0,0,0,0.6) 100%);
+      z-index:-1; pointer-events:none; animation: pulseLight 4s ease-in-out infinite;
+    }
+    @keyframes pulseLight {
+      0%,100%{opacity:0.2;}
+      50%{opacity:0.35;}
+    }
 
-/* --- STYLIZACJA TEKSTU --- */
-.main-title {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 5px #fff,
-    0 0 10px #fff,
-    0 0 20px #ffd700,
-    0 0 30px #ffd700,
-    0 0 40px #ffd700;
-  margin-bottom: 50px;
-}
-.showcase-content h3 {
-  color: #ffc107;
-  font-size: 1.5rem;
-  margin-top: 40px;
-  text-shadow: 0 0 5px #ffc107;
-}
-.showcase-content p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #ccc;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
+    /* --- KONTENER TREŚCI --- */
+    .wrapper {
+      position: relative; z-index:1;
+      display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+      min-height:100vh; padding:60px 20px; text-align:center;
+    }
 
-/* --- PRZYCISK POWROTU --- */
-.showcase-button {
-  background: transparent;
-  color: #ccc;
-  padding: 12px 30px;
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 1em;
-  margin-top: 40px;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-}
-.showcase-button:hover {
-  background: #ffd700;
-  color: #111;
-  border-color: #ffd700;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
-  transform: scale(1.05);
-}
-</style>
+    /* --- TYTUŁ NEONOWY --- */
+    .main-title {
+      font-size:clamp(3rem,8vw,5rem); font-weight:900; margin-bottom:40px;
+      color:#ffd700;
+      text-shadow:
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px #ffd700,
+        0 0 30px #ffd700,
+        0 0 40px #ffb800;
+      animation: neonPulse 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes neonPulse {
+      0%{ text-shadow: 0 0 5px #fff,0 0 10px #fff,0 0 20px #ffd700,0 0 30px #ffd700,0 0 40px #ffb800;}
+      100%{ text-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 30px #ffd700,0 0 40px #ffd700,0 0 50px #ffb800;}
+    }
+
+    /* --- SEKCJE TEKSTOWE --- */
+    .content-section {
+      max-width:800px; margin:40px auto; padding:20px; 
+      font-size:1.2rem; line-height:1.7; 
+      opacity:0; transform:translateY(30px); transition:opacity 1s ease-out, transform 1s ease-out;
+    }
+    .content-section.visible { opacity:1; transform:translateY(0); }
+
+    /* Nagłówki sekcji */
+    .content-section h3 {
+      font-size:clamp(1.5rem,4vw,2rem); margin-bottom:15px;
+      color:#ffc107; text-shadow:0 0 5px #ffc107;
+    }
+
+    /* Akapity - biały tekst z połyskiem */
+    .content-section p {
+      color: #fff; /* biały kolor tekstu */
+      font-weight: 500;
+      text-shadow: 
+        0 1px 2px rgba(255,255,255,0.5), 
+        0 2px 4px rgba(255,255,255,0.3), 
+        0 3px 6px rgba(255,255,255,0.2);
+    }
+
+    /* --- PRZYCISK POWROTU --- */
+    .back-button {
+      display:inline-block; margin-top:40px; padding:12px 30px;
+      border:1px solid #ffc107; border-radius:50px; color:#ffc107; font-size:1.2rem;
+      text-decoration:none; transition:all 0.3s ease;
+      position:relative; overflow:hidden;
+    }
+    .back-button::before {
+      content:''; position:absolute; top:0; left:-150%; width:100%; height:100%;
+      background: linear-gradient(100deg, transparent, rgba(255, 238, 179,0.4), transparent);
+      transform: skewX(-25deg); transition:left 0.7s ease-in-out;
+    }
+    .back-button:hover::before { left:150%; }
+    .back-button:hover { box-shadow:0 0 20px rgba(255, 215, 0,0.3); color:#fff; border-color:#fff; }
+  </style>
 </head>
+
 <body>
 
-<div class="showcase-video-bg">
-  <video autoplay muted loop playsinline id="showcase-video">
-    <source src="videos/latarnia.webm" type="video/webm">
-  </video>
-</div>
+  <!-- Tło wideo -->
+  <div class="video-bg">
+    <video autoplay muted loop playsinline>
+      <source src="videos/latarnia.webm" type="video/webm">
+    </video>
+  </div>
 
-<div id="particles-container" class="particles"></div>
+  <!-- Pulsujące światło -->
+  <div class="overlay-light"></div>
 
-<div class="showcase-wrapper">
-  <div class="showcase-content">
-  
-    <div class="showcase-section">
-      <h2 class="main-title">Latarnia Nadziei</h2>
-    </div>
+  <!-- Kontener treści -->
+  <div class="wrapper">
+    <h1 class="main-title">O Latarni Nadziei</h1>
 
-    <div class="showcase-section">
+    <section class="content-section">
       <h3>Czym jest „Latarnia Nadziei”</h3>
       <p>To więcej niż strona – to żywe świadectwo, latarnia w ciemności dla tych, którzy stracili orientację. To projekt zrodzony z bólu, upadków i walki o siebie. Tworzony z pasją, często w warunkach, które inni uznaliby za niemożliwe.</p>
-    </div>
+    </section>
 
-    <div class="showcase-section">
+    <section class="content-section">
       <h3>Dla kogo jest ten projekt</h3>
       <p>Dla zagubionych i opuszczonych. Dla tych w szponach uzależnienia lub kryzysu. Dla każdego, kto potrzebuje dowodu, że nawet po najgorszej burzy można zacząć od nowa i odnaleźć światło.</p>
-    </div>
-    
-    <div class="showcase-section">
+    </section>
+
+    <section class="content-section">
       <h3>Ciężar pracy i wyzwania</h3>
       <p>Tworzenie „Latarni” było walką. Większość kodu powstała na telefonie, co wymagało nadludzkiej cierpliwości. To projekt, który wymagał konfrontacji z własnymi demonami, bólem i najtrudniejszymi wspomnieniami.</p>
-    </div>
+    </section>
 
-    <div class="showcase-section">
+    <section class="content-section">
       <h3>Dlaczego ten projekt jest wyjątkowy</h3>
-      <p>Bo jest prawdziwy. To przestrzeń życia i nadziei, która ma moc dodać sił każdemu, kto po nią sięgnie. Każdy wpis to dowód Twojej wytrwałości. To światło w nocy, które pokazuje, że zawsze można odnaleźć drogę do siebie.</p>
-    </div>
+      <p>Bo jest prawdziwy. To przestrzeń życia i nadziei, która ma moc dodać sił każdemu, kto po nią sięgnie. Każdy wpis to dowód wytrwałości. To światło w nocy, które pokazuje, że zawsze można odnaleźć drogę do siebie.</p>
+    </section>
 
-    <div class="showcase-section">
-       <button id="back-to-main-btn" class="showcase-button">⟵ Wróć na stronę główną</button>
-    </div>
-    
+    <a href="index.html" class="back-button">⟵ Powrót</a>
   </div>
-</div>
 
-<script>
-  (function() {
-    const sections = document.querySelectorAll('.showcase-section');
-    sections.forEach((section, index) => {
-      setTimeout(() => {
-        section.classList.add('is-visible');
-      }, (index * 600) + 500);
+  <script>
+    // Animacja wejścia sekcji przy scrollu
+    const sections = document.querySelectorAll('.content-section');
+    window.addEventListener('scroll', () => {
+      sections.forEach(sec => {
+        const top = sec.getBoundingClientRect().top;
+        if(top < window.innerHeight - 100) sec.classList.add('visible');
+      });
     });
 
-    const particlesContainer = document.getElementById('particles-container');
-    if (particlesContainer) {
-        const particleCount = 20;
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            const size = Math.random() * 3 + 1;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.animationDelay = `${Math.random() * 20}s`; 
-            particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
-            particlesContainer.appendChild(particle);
-        }
-    }
-  })();
-</script>
+    // Animacja przy starcie
+    window.addEventListener('load', () => {
+      sections.forEach((sec, i) => {
+        setTimeout(() => sec.classList.add('visible'), i*400);
+      });
+    });
+  </script>
 
 </body>
 </html>
-
