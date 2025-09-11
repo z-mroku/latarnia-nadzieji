@@ -1,0 +1,51 @@
+/* Plik: /css/sekcja.css */
+
+.loading-message {
+    text-align: center;
+    padding-top: 50px;
+    font-size: 1.2em;
+    color: var(--c-text-muted);
+}
+.content-container { 
+    max-width: 960px; 
+    margin: 0 auto; 
+    padding: 20px; 
+}
+.story-list > .story-item {
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-left: none;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+}
+.story-item h3 {
+    margin: 0 0 8px;
+}
+.story-item h3 a {
+    font-size: 1.5em; 
+    color: var(--c-accent-gold);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.story-item h3 a:hover {
+    color: #fff;
+}
+.czytaj-dalej-btn {
+    display: inline-block; 
+    margin-top: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    background: #3b3f46; 
+    color: #fff; 
+    border: none; 
+    padding: 10px 16px; 
+    border-radius: 10px; 
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.czytaj-dalej-btn:hover {
+    background-color: #4a4f57;
+}

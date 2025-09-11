@@ -1,0 +1,78 @@
+/* Plik: /css/wpis.css */
+
+.progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 5px;
+    background: var(--c-accent-gold);
+    width: 0%;
+    z-index: 1002;
+    transition: width 0.1s linear;
+}
+.entry-wrapper {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.entry-wrapper.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+.entry-content {
+    padding: clamp(20px, 5vw, 40px);
+}
+.entry-meta-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    align-items: center;
+    margin: 15px 0;
+    color: var(--c-text-muted);
+    font-size: 0.9em;
+}
+.entry-meta-bar .meta-item { display: inline-flex; align-items: center; gap: 8px; }
+.entry-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+#like-btn {
+    background: none;
+    border: 1px solid var(--c-text-muted);
+    color: var(--c-text-muted);
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#like-btn .fa-heart { transition: color 0.2s, transform 0.2s; }
+#like-btn:hover { border-color: var(--c-accent-red); color: var(--c-accent-red); }
+#like-btn.liked {
+    background-color: var(--c-accent-red);
+    border-color: var(--c-accent-red);
+    color: white;
+}
+#like-btn.liked .fa-heart {
+    color: white;
+    transform: scale(1.2);
+}
+.share-buttons a {
+    color: var(--c-text-muted);
+    font-size: 1.5em;
+    margin-left: 15px;
+    transition: color 0.2s, transform 0.2s;
+}
+.share-buttons a:hover {
+    color: var(--c-accent-gold);
+    transform: scale(1.1);
+}
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+.nav-buttons .nav-btn { visibility: visible; }
+.nav-buttons .nav-btn.hidden { visibility: hidden; }
