@@ -1,4 +1,4 @@
-// Plik: /js/main.js (WERSJA OSTATECZNA, ZMODERNIZOWANA I SAMODZIELNA)
+// Plik: /js/main.js (WERSJA OSTATECZNA, ZMODERNIZOWANA I POPRAWIONA)
 
 // --- Konfiguracja i Inicjalizacja Firebase ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
   authDomain: "projekt-latarnia.firebaseapp.com",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.firebasestorage.app", // POPRAWIONA NAZWA
+  storageBucket: "projekt-latarnia.firebasestorage.app", // Poprawiona nazwa
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
   measurementId: "G-LNYWJD2YV7"
@@ -107,7 +107,6 @@ const LatarniaApp = {
                 const data = doc.data();
                 let finalUrl = this.utils.escapeHtml(data.url);
                 if (finalUrl === 'Sekcja.html') {
-                    // Generujemy nowy, poprawny format linku
                     finalUrl = `${finalUrl}?section=${encodeURIComponent(data.text)}`;
                 }
                 return `<li><a href="${finalUrl}">${this.utils.escapeHtml(data.text)}</a></li>`;
@@ -156,6 +155,7 @@ const LatarniaApp = {
             const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"), limit(6));
             const snapshot = await getDocs(q);
             if (snapshot.empty) return;
+            // ZMIANA: Link prowadzi teraz do strony galerii, a nie bezpośrednio do obrazka.
             galleryContainer.innerHTML = snapshot.docs.map(doc => {
                 const img = doc.data();
                 const url = this.utils.escapeHtml(img.url);
@@ -216,7 +216,11 @@ const LatarniaApp = {
             onApiReady() {
                 LatarniaApp.state.player = new YT.Player('youtube-player', {
                     height: '0', width: '0',
-                    playerVars: { 'playsinline': 1, 'origin': window.location.origin },
+                    playerVars: { 
+                        'playsinline': 1,
+                        // POPRAWKA: Dodanie 'origin' rozwiązuje błąd komunikacji z YouTube.
+                        'origin': window.location.origin 
+                    },
                     events: { 'onReady': this.onPlayerReady, 'onStateChange': this.onPlayerStateChange }
                 });
             },
