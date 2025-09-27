@@ -5,7 +5,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { ModalModule, lektor } from './modules.js';
+import { ModalModule } from './modules.js';
 
 // 🔑 Firebase konfiguracja
 const firebaseConfig = {
@@ -19,6 +19,145 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// ========================================
+// Lektor Arcymistrz PRO
+// ========================================
+
+export const lektor = (() => {
+    let queue = [];
+    let currentUtterance = null;
+    let isPaused = false;
+    let selectedVoice = null;
+    let mode = "normalny";
+
+    const modes = {
+        normalny: { rate: 1, pitch: 1, volume: 1 },
+        szybki: { rate: 1.4, pitch: 1, volume: 1 },
+        wolny: { rate: 0.8, pitch: 1, volume: 1 },
+        szept: { rate: 1, pitch: 1.2, volume: 0.4 },
+        lektorski: { rate: 0.9, pitch: 0.9, volume: 1 }
+    };
+
+    const stripHtml = (html = "") => {
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        return div.textContent || div.innerText || "";
+    };
+
+    const numToWords = (num) => {
+        const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"];
+        const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"];
+        const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"];
+        const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"];
+        if (num < 10) return ones[num];
+        if (num < 20) return teens[num-10];
+        if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : "");
+        if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : "");
+        if (num < 2000) return "tysiąc " + numToWords(num%1000);
+        if (num < 5000) return numToWords(Math.floor(num/1000)) + " tysiące " + (num%1000 ? numToWords(num%1000) : "");
+        return num.toString();
+    };
+
+    const parseDate = (str) => {
+        const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+        if (!match) return null;
+        const [_, d, m, y] = match.map(Number);
+        const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"];
+        return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`;
+    };
+
+    const parseTime = (str) => {
+        const match = str.match(/^(\d{1,2}):(\d{2})$/);
+        if (!match) return null;
+        const [_, h, m] = match.map(Number);
+        if (m === 0) return `${numToWords(h)} zero zero`;
+        return `${numToWords(h)} ${numToWords(m)}`;
+    };
+
+    const normalizeText = (input = "") => {
+        let text = stripHtml(input);
+        const replacements = {
+            "np.": "na przykład",
+            "itd.": "i tak dalej",
+            "itp.": "i tym podobne",
+            "m.in.": "między innymi",
+            "tj.": "to jest",
+            "dr ": "doktor ",
+            "prof.": "profesor",
+            "ul.": "ulica",
+            "mr ": "mister ",
+            "mrs ": "missis "
+        };
+        for (const [abbr, full] of Object.entries(replacements)) {
+            const regex = new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi");
+            text = text.replace(regex, full);
+        }
+
+        const emojiMap = { "🙂": "uśmiech","😀": "szeroki uśmiech","😂": "śmiech","❤️": "serce","👍": "kciuk w górę" };
+        for (const [emoji, word] of Object.entries(emojiMap)) text = text.replaceAll(emoji, " " + word + " ");
+        text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d);
+        text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t);
+        text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); });
+        return text.replace(/\s+/g, " ").trim();
+    };
+
+    const splitText = (text, maxLen = 300) => {
+        const parts = [];
+        const sentences = text.replace(/\s+/g, " ").trim().split(/([.!?]\s+)/);
+        let chunk = "";
+        for (let i = 0; i < sentences.length; i++) {
+            const s = sentences[i];
+            if ((chunk + s).length > maxLen) { parts.push(chunk.trim()); chunk = s; } 
+            else { chunk += s; }
+        }
+        if (chunk.trim().length > 0) parts.push(chunk.trim());
+        return parts;
+    };
+
+    const pickVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+        return voices.find(v => v.lang === "pl-PL") || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0];
+    };
+
+    const initVoices = () => { selectedVoice = pickVoice(); console.log("✅ Wybrany głos:", selectedVoice?.name, selectedVoice?.lang); };
+    window.speechSynthesis.onvoiceschanged = () => initVoices();
+    initVoices();
+
+    const enqueue = (rawText) => {
+        if (!rawText) return;
+        const clean = normalizeText(rawText);
+        const parts = splitText(clean);
+        queue.push(...parts);
+        if (!currentUtterance) speakNext();
+    };
+
+    const speakNext = () => {
+        if (queue.length === 0) { currentUtterance = null; return; }
+        const text = queue.shift();
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = "pl-PL";
+        if (selectedVoice) currentUtterance.voice = selectedVoice;
+        const cfg = modes[mode] || modes.normalny;
+        currentUtterance.rate = cfg.rate; currentUtterance.pitch = cfg.pitch; currentUtterance.volume = cfg.volume;
+        currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); };
+        currentUtterance.onerror = (e) => { console.error("❌ Błąd lektora:", e); currentUtterance = null; speakNext(); };
+        window.speechSynthesis.speak(currentUtterance);
+    };
+
+    const stop = () => { window.speechSynthesis.cancel(); queue = []; currentUtterance = null; isPaused = false; };
+    const pause = () => { if (currentUtterance && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } };
+    const resume = () => { if (currentUtterance && isPaused) { window.speechSynthesis.resume(); isPaused = false; } };
+    const isSpeaking = () => window.speechSynthesis.speaking;
+    const setMode = (newMode) => { if (modes[newMode]) { mode = newMode; console.log("🎙️ Tryb lektora:", newMode); } };
+
+    return { enqueue, stop, pause, resume, isSpeaking, setMode };
+})();
+
+// ========================================
+// SectionLoader – logika i renderery w całości
+// ========================================
 
 const SectionLoader = {
   state: { sectionName: '' },
@@ -34,27 +173,19 @@ const SectionLoader = {
     '__default__': { fetcher: 'fetchAllEntries', renderer: 'renderStandard', queryOptions: [orderBy('createdAt', 'desc')], theme: 'theme-kronika' }
   },
 
-  // ==============================
-  //  INICJALIZACJA
-  // ==============================
   async init() {
     try {
       const params = new URLSearchParams(window.location.search);
       const sectionNameRaw = params.get('nazwa') || '';
       this.state.sectionName = decodeURIComponent(sectionNameRaw).trim();
-
       if (!this.state.sectionName) { 
         return this.render.renderError('Błąd', 'Brak nazwy sekcji w adresie URL.'); 
       }
-
       const routeConfig = this.router[this.state.sectionName] || this.router['__default__'];
-
       document.documentElement.className = routeConfig.theme;
       document.title = `${this.utils.escapeHtml(this.state.sectionName)} — Od Dna do Światła`;
-
       const data = await this.fetch[routeConfig.fetcher](routeConfig.queryOptions);
       this.render[routeConfig.renderer](data);
-
       ModalModule.init(); 
     } catch (error) {
       console.error('Błąd krytyczny w SectionLoader:', error);
@@ -62,9 +193,6 @@ const SectionLoader = {
     }
   },
 
-  // ==============================
-  //  FETCHERY – POBIERANIE DANYCH
-  // ==============================
   fetch: {
     async fetchSingleEntry() {
       const entriesRef = collection(db, 'sekcje', SectionLoader.state.sectionName, 'entries');
@@ -86,9 +214,6 @@ const SectionLoader = {
     }
   },
 
-  // ==============================
-  //  FUNKCJE POMOCNICZE FIRESTORE
-  // ==============================
   async incrementViews(docId) {
     if (!docId) return;
     const ref = doc(db, 'sekcje', SectionLoader.state.sectionName, 'entries', docId);
@@ -101,9 +226,6 @@ const SectionLoader = {
     await updateDoc(ref, { likes: increment(1) });
   },
 
-  // ==============================
-  //  RENDERERY – WIDOKI
-  // ==============================
   render: {
     renderPiciorys(doc) {
       if (!doc || !doc.exists()) return SectionLoader.render.renderEmpty("Brak danych dla Piciorysu.");
@@ -186,7 +308,7 @@ const SectionLoader = {
           </article>
         </main>`;
       SectionLoader.elements.wrapper.innerHTML = html;
-      SectionLoader.modules.lector.init(document.getElementById("speakBtn"), entry.text || '');
+      document.getElementById("speakBtn").onclick = () => lektor.enqueue(entry.text || '');
     },
 
     renderPomoc(docs) {
@@ -229,7 +351,6 @@ const SectionLoader = {
         </div>`;
       SectionLoader.elements.wrapper.innerHTML = html;
 
-      // Toggle content
       document.querySelectorAll('.read-more-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           const content = e.target.closest('.story-item').querySelector('.full-content');
@@ -243,7 +364,6 @@ const SectionLoader = {
         });
       });
 
-      // Like buttons
       document.querySelectorAll('.like-btn').forEach(btn => {
         btn.addEventListener('click', async e => {
           const article = e.target.closest('.story-item');
@@ -255,7 +375,6 @@ const SectionLoader = {
         });
       });
 
-      // Increment views for all articles
       docs.forEach(d => SectionLoader.incrementViews(d.id));
     },
 
@@ -268,9 +387,6 @@ const SectionLoader = {
     }
   },
 
-  // ==============================
-  //  DODATKOWE MODUŁY
-  // ==============================
   modules: {
     typewriter: {
       start(element, text, speed = 30) {
