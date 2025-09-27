@@ -1,27 +1,55 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Od Dna do Światła</title>
-  <link rel="stylesheet" href="css/style.css"> 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  
-  <style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Od Dna do Światła</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+
+    <style>
     /* ============================================== */
-    /* == ULEPSZENIA WIZUALNE DLA INDEX.HTML         == */
+    /* == STYLE DLA PRZESTROGI I PANELU ADMINA     == */
     /* ============================================== */
     
-    /* 1. PRZESTROGA DLA RODZICÓW - STYL BAZOWY I KURSOR */
+    /* 1. PRZESTROGA DLA RODZICÓW */
+    .animated-warning {
+      border: 2px solid gold;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      padding: 20px;
+      margin: 20px auto 40px auto; 
+      max-width: 800px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.2);
+    }
     .animated-warning p {
       border-right: 3px solid rgba(255, 255, 255, .75);
       white-space: pre-wrap;
       overflow: hidden;
       min-height: 1.2em;
-      animation: blink-cursor .75s step-end infinite;
+      animation: blink-cursor .75s step-end infinite, gold-glow 3s ease-in-out infinite;
+      font-size: 1.3em;
+      text-align: center;
+      line-height: 1.6;
+      font-family: 'Cinzel', serif;
+      background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 5px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.4);
+      font-weight: 700;
     }
-    
+
+    @keyframes gold-glow {
+      0%, 100% { text-shadow: 0 0 5px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.4); }
+      50% { text-shadow: 0 0 15px rgba(255,215,0,0.8), 0 0 25px rgba(255,215,0,0.6); }
+    }
+
+    @keyframes blink-cursor {
+      from, to { border-color: transparent; }
+      50% { border-color: rgba(255, 255, 255, .75); }
+    }
+
     @keyframes frame-blink {
       50% { border-color: transparent; box-shadow: none; }
     }
@@ -29,183 +57,139 @@
       animation: frame-blink 0.3s 3;
     }
 
-    @keyframes blink-cursor {
-      from, to { border-color: transparent; }
-      50% { border-color: rgba(255, 255, 255, .75); }
+    /* 2. PRZYCISK PANELU ADMINA */
+    .admin-panel-button {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1001;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: 2px solid #7fffd4;
+        border-radius: 25px;
+        color: #7fffd4;
+        text-decoration: none;
+        font-weight: bold;
+        background-color: rgba(15, 32, 39, 0.8);
+        transition: all 0.3s ease-in-out;
     }
-    
-    /* 2. ZŁOTY, LŚNIĄCY PRZYCISK */
-    .main-showcase-button {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid #c9b36a;
-      transition: all 0.3s ease;
+    .admin-panel-button:hover {
+        background-color: #7fffd4;
+        color: #0f2027;
+        box-shadow: 0 0 15px rgba(127, 255, 212, 0.7);
+        transform: translateY(-2px);
     }
-    .main-showcase-button span {
-      background: linear-gradient(145deg, #fff7ad, #c9a74d, #b88a2a);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    }
-    .main-showcase-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -150%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(100deg, transparent, rgba(255, 238, 179, 0.4), transparent);
-      transform: skewX(-25deg);
-      transition: left 0.7s ease-in-out;
-    }
-    .main-showcase-button:hover::before {
-      left: 150%;
-    }
-    .main-showcase-button:hover {
-      border-color: #fff7ad;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-    }
-    
-    /* 3. ISKIERKA NADZIEI 3D */
-    .spark-text {
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      font-weight: 700;
-      color: #f0e6d2;
-      text-align: center;
-      transform: perspective(800px) rotateX(10deg);
-      transition: transform 0.3s ease;
-      text-shadow: 
-        0px 1px 0px #c8bda8,
-        0px 2px 0px #a69a84,
-        0px 3px 0px #847864,
-        0px 4px 0px #635846,
-        0px 5px 10px rgba(0, 0, 0, 0.6);
-    }
-    .spark-container:hover .spark-text {
-        transform: perspective(800px) rotateX(0deg) scale(1.02);
-    }
-    
-    .admin-button {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 1001;
-    }
-  </style>
+    </style>
 </head>
 <body>
+    <div id="preloader"><div class="spinner"></div></div>
+    <div id="app-wrapper">
+        
+        <a href="login.html" class="admin-panel-button">
+            <i class="fa-solid fa-satellite-dish"></i> <span>Panel</span>
+        </a>
 
-  <a href="login.html" class="admin-button back-to-home-button">
-    <i class="fa-solid fa-satellite-dish"></i> <span>Panel</span>
-  </a>
+        <header>
+            <h1>Od Dna do Światła</h1>
+            <div class="scrolling-subtitle-container">
+                <p class="special-subtitle">To miejsce dla ubrudzonych życiem – i dla tych, którzy szukają światła</p>
+            </div>
+        </header>
 
-  <header>
-    <h1>Od Dna do Światła</h1>
-    <div class="scrolling-subtitle-container">
-      <p class="special-subtitle">To miejsce dla ubrudzonych życiem – i dla tych, którzy szukają światła</p>
-    </div>
-  </header>
+        <nav>
+            <ul id="main-menu"><li><a>Wczytywanie menu...</a></li></ul>
+        </nav>
 
-  <nav>
-    <ul id="main-menu"><li><a>Wczytywanie menu...</a></li></ul>
-  </nav>
+        <main>
+            <div id="warning-box" class="animated-warning">
+                <p id="warning-text"></p>
+            </div>
 
-  <main>
-    <div id="warning-box" class="animated-warning">
-      <p id="warning-text"></p>
-    </div>
-    
-    <!-- PRZYCISK DO LATARNI -->
-    <div style="text-align: center; margin: 40px 0;">
-      <button id="load-latarnia-btn" class="back-to-home-button main-showcase-button">
-        <span>O Latarni Nadziei</span>
-      </button>
-    </div>
-    
-    <div id="main-content">
-      <div class="spark-container">
-        <div id="sparkText" class="spark-text">Wczytywanie iskierki nadziei...</div>
-        <button id="sparkButton" class="spark-button">💫 Daj kolejną iskrę</button>
-      </div>
-      
-      <section id="latest-entries" class="content-section">
-        <h2 class="fancy-title entries-title">Ostatnia Latarnia Nadziei</h2>
-        <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
-      </section>
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="latarnia-template.html" class="index-nav-button">
+                    <span>O Latarni Nadziei</span>
+                </a>
+            </div>
 
-      <section id="comments" class="comments-section">
-        <h2>Podziel się swoją historią lub wesprzyj innych</h2>
-        <p>Twoje doświadczenie ma znaczenie. Anonimowo lub nie – każde słowo wsparcia jest bezcenne.</p>
-        <div id="disqus_thread"></div>
-      </section>
-    </div>
+            <div class="spark-container">
+                <div id="sparkText" class="spark-text">...</div>
+                <button id="sparkButton" class="action-button">💫 Daj kolejną iskrę</button>
+            </div>
 
-    <div id="dynamic-content-container" style="display:none;"></div>
-  </main>
+            <section id="latest-entries" class="content-section">
+                <h2 class="fancy-title">Ostatnia Latarnia Nadziei</h2>
+                <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
+            </section>
 
-  <div class="audio-player">
-    <div class="album-art"><i class="fas fa-music"></i></div>
-    <div class="player-info">
-        <div id="current-song-title">Wczytywanie playlisty...</div>
-        <div class="player-controls">
-            <button id="prev-btn" title="Poprzedni"><i class="fas fa-backward"></i></button>
-            <button id="play-pause-btn" title="Odtwarzaj"><i class="fas fa-play"></i></button>
-            <button id="next-btn" title="Następny"><i class="fas fa-forward"></i></button>
+             <section id="comments" class="comments-section">
+                <h2>Podziel się swoją historią lub wesprzyj innych</h2>
+                <p>Twoje doświadczenie ma znaczenie. Anonimowo lub nie – każde słowo wsparcia jest bezcenne.</p>
+                <div id="disqus_thread"></div>
+            </section>
+        </main>
+
+        <div class="audio-player">
+            <div class="album-art"><i class="fas fa-music"></i></div>
+            <div class="player-info">
+                <div id="current-song-title">Wczytywanie playlisty...</div>
+                <div class="player-controls">
+                    <button id="prev-btn" title="Poprzedni"><i class="fas fa-backward"></i></button>
+                    <button id="play-pause-btn" title="Odtwarzaj"><i class="fas fa-play"></i></button>
+                    <button id="next-btn" title="Następny"><i class="fas fa-forward"></i></button>
+                </div>
+            </div>
         </div>
-    </div>
-  </div>
-  <div id="youtube-player" style="display: none;"></div>
+        <div id="youtube-player" style="display: none;"></div>
 
-  <footer>
-    <div class="footer-content">
-        <span>Od Dna do Światła</span>
-        <span>&copy; Chudy</span>
-        <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+        <footer>
+            <div class="footer-content">
+                <span>Od Dna do Światła</span>
+                <span>&copy; Chudy</span>
+                <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+            </div>
+        </footer>
     </div>
-  </footer>
 
-  <script type="module" src="js/main.js"></script>
-  
-  <!-- SKRYPT WARNING -->
-  <script>
+    <script type="module" src="js/main.js"></script>
+    
+    <script>
+    // SKRYPT DLA PRZESTROGI DLA RODZICÓW
     document.addEventListener('DOMContentLoaded', () => {
       const warningBox = document.getElementById('warning-box');
       const warningTextElement = document.getElementById('warning-text');
-      const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
-      const typingSpeed = 50;
-      const pauseDuration = 10000;
-      
-      function typeWriter(text, i, onComplete) {
-        if (i < text.length) {
-          warningTextElement.innerHTML = text.substring(0, i + 1);
-          setTimeout(() => typeWriter(text, i + 1, onComplete), typingSpeed);
-        } else if (onComplete) {
-          onComplete();
-        }
-      }
+      if (warningTextElement) {
+          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
+          const typingSpeed = 50; 
+          const pauseDuration = 10000;
+          
+          function typeWriter(text, i, onComplete) {
+            if (i < text.length) {
+              warningTextElement.innerHTML = text.substring(0, i + 1);
+              setTimeout(() => typeWriter(text, i + 1, onComplete), typingSpeed);
+            } else if (onComplete) {
+              onComplete();
+            }
+          }
 
-      function runAnimationCycle() {
-        typeWriter(fullText, 0, () => {
-          warningTextElement.parentElement.style.borderRight = 'none';
-          setTimeout(() => {
-            warningBox.classList.add('blinking-frame');
-            setTimeout(() => {
-              warningBox.classList.remove('blinking-frame');
-              warningTextElement.innerHTML = '';
-              warningTextElement.parentElement.style.borderRight = '';
-              setTimeout(runAnimationCycle, 500);
-            }, 900);
-          }, pauseDuration);
-        });
+          function runAnimationCycle() {
+            typeWriter(fullText, 0, () => {
+              warningTextElement.style.borderRightColor = 'transparent';
+              setTimeout(() => {
+                warningBox.classList.add('blinking-frame');
+                setTimeout(() => {
+                  warningBox.classList.remove('blinking-frame');
+                  warningTextElement.innerHTML = '';
+                  warningTextElement.style.borderRightColor = '';
+                  setTimeout(runAnimationCycle, 500);
+                }, 900);
+              }, pauseDuration);
+            });
+          }
+          runAnimationCycle();
       }
-      runAnimationCycle();
     });
-
-    // PRZEKIEROWANIE DO LATARNI
-    document.getElementById('load-latarnia-btn').addEventListener('click', () => {
-      window.location.href = 'latarnia-template.html';
-    });
-  </script>
+    </script>
 </body>
 </html>
