@@ -3,26 +3,159 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logowanie do panelu</title>
+  <title>Dostęp Zastrzeżony — Latarnia</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
   <style>
-    body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .login-box { background: #2a2a2a; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); width: 100%; max-width: 400px; }
-    h2 { text-align: center; margin-bottom: 20px; }
-    input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #555; border-radius: 5px; background: #333; color: #fff; }
-    button { width: 100%; padding: 10px; margin-top: 10px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; font-size: 16px; }
-    #googleLoginBtn { background: #db4437; margin-top: 5px; }
-    .error { color: #f87171; font-size: 14px; margin-top: 10px; text-align: center; min-height: 1em; }
+    :root {
+      /* Paleta kolorów spójna z całym projektem */
+      --bg1: #0e0f1b; --bg2: #151a2e; --bg3: #1d253e; --card: #121420;
+      --cardEdge: #2a2f4a; --accent: #ff8f00; --accent-danger: #ff4c4c;
+      --text-muted: #94a3b8;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Lato', sans-serif;
+      color: #fff;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* To samo klimatyczne tło, co w galerii */
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #22294a 0%, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, #1a1f38 0%, transparent 60%),
+        linear-gradient(160deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+    }
+
+    .login-box {
+      background: rgba(18, 20, 32, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--cardEdge);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    /* NAGŁÓWEK ZGODNY Z ROZKAZEM */
+    h2 {
+      margin: 0 0 30px;
+      font-size: 1.5em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-danger);
+      text-shadow:
+        0 0 5px var(--accent-danger),
+        0 0 10px var(--accent-danger),
+        0 0 15px rgba(255, 76, 76, 0.5);
+    }
+    h2 .fa-user-shield {
+      margin-right: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid var(--cardEdge);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(255, 143, 0, 0.3);
+    }
+
+    button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    button:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    
+    #loginBtn {
+      background: var(--accent);
+    }
+
+    #googleLoginBtn {
+      background: #db4437;
+      margin-top: 5px;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 14px;
+      margin-top: 15px;
+      min-height: 1em;
+    }
+    
+    .back-link {
+        margin-top: 25px;
+        font-size: 0.9em;
+    }
+    .back-link a {
+        color: var(--text-muted, #94a3b8);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .back-link a:hover {
+        color: var(--accent);
+    }
   </style>
 </head>
 <body>
+
   <div class="login-box">
-    <h2>Logowanie do panelu</h2>
-    <input type="email" id="email" placeholder="E-mail">
-    <input type="password" id="password" placeholder="Hasło">
-    <button id="loginBtn">Zaloguj się</button>
-    <button id="googleLoginBtn">Zaloguj się przez Google</button>
+    <h2><i class="fa-solid fa-user-shield"></i> Nieupoważnionym wstęp wzbroniony</h2>
+    
+    <input type="email" id="email" placeholder="E-mail" required>
+    <input type="password" id="password" placeholder="Hasło" required>
+    
+    <button id="loginBtn">
+      <i class="fa-solid fa-right-to-bracket"></i> Zaloguj się
+    </button>
+    <button id="googleLoginBtn">
+      <i class="fa-brands fa-google"></i> Zaloguj przez Google
+    </button>
+    
     <div id="loginError" class="error"></div>
+
+    <div class="back-link">
+        <a href="index.html">⟵ Powrót na stronę główną</a>
+    </div>
   </div>
-  <script type="module" src="./js/login.js"></script>
+
+  <script type="module" src="js/login.js"></script>
+
 </body>
 </html>
