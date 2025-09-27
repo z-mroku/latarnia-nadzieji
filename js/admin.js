@@ -1,412 +1,985 @@
-// Plik: /js/admin.js (WERSJA OSTATECZNA "NA MEDAL" - KOMPLETNA)
-// CZĘŚĆ 1/5: INICJALIZACJA I DEFINICJE
 
-import { db, auth, storage } from './firebase-config.js';
+// Plik: /js/admin.js (WERSJA OSTATECZNA Z SILNIKIEM MOTYWÓW)
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  collection, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc, 
-  query, orderBy, onSnapshot, serverTimestamp, getDocs, collectionGroup
+  getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc,
+  query, orderBy, onSnapshot, serverTimestamp, collectionGroup, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { 
-  ref as sref, uploadBytesResumable, getDownloadURL, deleteObject 
+import {
+  getStorage, ref as sref, uploadBytesResumable, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getAuth, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const $ = id => document.getElementById(id);
-const escapeHtml = (s = '') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const stripHtml  = (s = '') => String(s).replace(/<[^>]*>?/gm,'');
-const debounce = (fn, ms = 250) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,a), ms); }; };
-const DRAFT_KEY = 'adminEntryDraft_v2';
+const firebaseConfig = {
+  apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
+  authDomain: "projekt-latarnia.firebaseapp.com",
+  projectId: "projekt-latarnia",
+  storageBucket: "projekt-latarnia.firebasestorage.app",
+  messagingSenderId: "244008044225",
+  appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
+  measurementId: "G-LNYWJD2YV7"
+};
 
-function showTemp(el, txt, ok = true){ if (!el) return; el.textContent = txt; el.className = ok ? 'muted-small success' : 'muted-small danger'; setTimeout(()=>{ el.textContent=''; el.className='muted-small'; }, 3000); }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
-onAuthStateChanged(auth, user => { if (!user) { window.location.href = 'login.html'; return; } initPanel(user); });
+document.addEventListener('DOMContentLoaded', () => {
 
-async function initPanel(user){
-  // Definicje wszystkich elementów DOM
-  const adminEmail = $('adminEmail'), logoutBtn = $('logoutBtn');
-  const menuForm = $('menuForm'), menuText = $('menuText'), menuUrl = $('menuUrl'), menuOrder = $('menuOrder'), addMenuBtn = $('addMenuBtn'), cancelMenuEditBtn = $('cancelMenuEditBtn'), menuListContainer = $('menuListContainer'), menuMsg = $('menuMsg');
-  const entryForm = $('entryForm'), sectionSelect = $('sectionSelect'), authorInput = $('authorInput'), themeSelect = $('themeSelect'), titleInput = $('titleInput'), contentInput = $('contentInput'), attachInput = $('attachInput'), publishBtn = $('publishBtn'), cancelEntryEditBtn = $('cancelEntryEditBtn'), formMsg = $('formMsg'), uploadPreview = $('uploadPreview'), iconPicker = $('iconPicker'), draftBadge = $('draftBadge'), clearDraftBtn = $('clearDraftBtn');
-  const filterSection = $('filterSection'), searchInput = $('searchInput'), sortSelect = $('sortSelect'), entriesList = $('entriesList');
-  const liveTitle = $('liveTitle'), liveMeta = $('liveMeta'), liveContent = $('liveContent');
-  const sparkForm = $('sparkForm'), sparkInput = $('sparkInput'), sparksList = $('sparksList');
-  const playlistForm = $('playlistForm'), songTitle = $('songTitle'), songLink = $('songLink'), playlistList = $('playlistList');
-  const galleryForm = $('galleryForm'), galleryDesc = $('galleryDesc'), galleryUpload = $('galleryUpload'), galleryProgressBar = $('galleryProgressBar'), galleryList = $('galleryList');
-  const readerStatus = $('readerStatus'), ttsListenBtn = $('ttsListenBtn'), ttsPreviewBtn = $('ttsPreviewBtn'), readerSelectionInfo = $('readerSelectionInfo');
-  const helpForm = $('helpForm'), helpWoj = $('helpWoj'), helpName = $('helpName'), helpAddress = $('helpAddress'), helpPhone = $('helpPhone'), helpDesc = $('helpDesc'), helpLink = $('helpLink'), addHelpBtn = $('addHelpBtn'), cancelHelpEditBtn = $('cancelHelpEditBtn'), helpMsg = $('helpMsg'), helpListContainer = $('helpListContainer');
-  const noteForm = $('noteForm'), noteTitle = $('noteTitle'), noteContent = $('noteContent'), addNoteBtn = $('addNoteBtn'), cancelNoteEditBtn = $('cancelNoteEditBtn'), noteMsg = $('noteMsg'), noteListContainer = $('noteListContainer');
-  const entryModal = $('entryModal'), entryModalTitle = $('entryModalTitle'), entryModalMeta = $('entryModalMeta'), entryModalBody = $('entryModalBody'), modalTtsBtn = $('modalTtsBtn'), modalCloseBtn = $('modalCloseBtn'), modalCloseBtn2 = $('modalCloseBtn2'), modalEditBtn = $('modalEditBtn');
+    const $ = id => document.getElementById(id);
+    const DRAFT_KEY = 'adminEntryDraft_v_final_v7';
+    const THEME_KEY = 'adminTheme_v1';
+    const PAGE_SIZE = 10;
+    
+    const escapeHtml = (s = '') => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const stripHtml = (s = '') => String(s).replace(/<[^>]*>?/gm, '');
+    const debounce = (fn, ms = 300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
-  adminEmail.textContent = user.email || user.uid;
-  logoutBtn?.addEventListener('click', () => signOut(auth).catch(console.error));
+    function toast(message, ok = true, timeout = 3500) {
+        let t = $('#globalToast');
+        if (!t) {
+            t = document.createElement('div'); t.id = 'globalToast';
+            document.body.appendChild(t);
+        }
+        const el = document.createElement('div');
+        el.className = `toast-item ${ok ? 'ok' : 'error'}`;
+        el.textContent = message;
+        t.appendChild(el);
+        setTimeout(() => { el.classList.add('fade-out'); setTimeout(() => el.remove(), 500); }, timeout);
+    }
+    
+    function confirmAction({ title = 'Potwierdź działanie', text = 'Czy na pewno chcesz to zrobić?', confirmText = 'Potwierdź', confirmClass = 'danger' }) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('customConfirmModal');
+            const modalTitle = document.getElementById('customModalTitle');
+            const modalText = document.getElementById('customModalText');
+            const confirmBtn = document.getElementById('customConfirmBtn');
+            const cancelBtn = document.getElementById('customCancelBtn');
 
-  let editMenuId = null, editHelpId = null, selectedEntryIdForTTS = null, editGalleryId = null;
-  let editEntryData = null;
-  let entriesCache = [];
-  let editorInstance;
-// CZĘŚĆ 2/5: CKEDITOR, IKONY, PODGLĄD, MENU, POMOC
+            modalTitle.textContent = title;
+            modalText.textContent = text;
+            confirmBtn.textContent = confirmText;
+            confirmBtn.className = `primary ${confirmClass}`;
+            modal.classList.add('open');
 
-  try {
-    if (window.ClassicEditor && contentInput && !editorInstance) {
-        editorInstance = await ClassicEditor.create(contentInput, {
+            const close = (result) => {
+                modal.classList.remove('open');
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+                document.removeEventListener('keydown', escapeListener);
+                resolve(result);
+            };
+            const escapeListener = (e) => { if (e.key === 'Escape') close(false); };
+            confirmBtn.onclick = () => close(true);
+            cancelBtn.onclick = () => close(false);
+            document.addEventListener('keydown', escapeListener);
+        });
+    }
+
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            document.body.style.visibility = 'visible';
+            initPanel(user).catch(console.error);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    async function initPanel(user) {
+        const adminEmail = $('adminEmail');
+        if (adminEmail) adminEmail.textContent = user.email || user.uid;
+        $('logoutBtn')?.addEventListener('click', () => signOut(auth).catch(console.error));
+        const state = {
+            editors: {}, editId: { menu: null, help: null, spark: null, playlist: null, note: null },
+            entry: { data: null, cache: [], currentPage: 1, totalPages: 1 },
+            menuItems: [],
+            lazyModules: new Set(), selectedTTSId: null
+        };
+        initTheme();
+        await initEditor(state);
+        initEntryForm(state);
+        initEntryListAndFilter(state);
+        initLivePreview(state);
+        initIconPicker(state);
+        initTTS(state);
+        initEntryModal(state);
+        initLazyLoading(state);
+    }
+    
+    function initTheme() {
+        const themeToggle = $('themeToggle');
+        const root = document.documentElement;
+        const applyTheme = (theme) => {
+            root.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+            if (themeToggle) themeToggle.textContent = (theme === 'light' ? '🌞' : '🌙');
+        };
+        const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+        applyTheme(savedTheme);
+        themeToggle?.addEventListener('click', () => applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light'));
+    }
+
+    async function initEditor(state) {
+        class FirebaseUploadAdapter {
+            constructor(loader) { this.loader = loader; }
+            upload() {
+                return this.loader.file.then(file => new Promise(async (resolve, reject) => {
+                    try {
+                        const fileName = `entries_images/${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+                        const storageRef = sref(storage, fileName);
+                        const uploadTask = uploadBytesResumable(storageRef, file);
+                        uploadTask.on('state_changed', null, reject, () => getDownloadURL(uploadTask.snapshot.ref).then(url => resolve({ default: url })));
+                    } catch (e) { reject(e); }
+                }));
+            }
+            abort() {}
+        }
+        function FirebaseUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => new FirebaseUploadAdapter(loader);
+        }
+        const editorConfig = {
             language: 'pl',
-            toolbar: {
-              items: [
-                'heading', '|', 'bold', 'italic', 'underline', '|', 'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-                'bulletedList', 'numberedList', 'outdent', 'indent', '|', 'alignment', '|', 'link', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo', 'sourceEditing'
-              ]
+            extraPlugins: [FirebaseUploadAdapterPlugin],
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'imageUpload', 'undo', 'redo'],
+            image: { toolbar: ['imageTextAlternative', 'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'] },
+            table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] }
+        };
+        const simpleEditorConfig = {
+            language: 'pl',
+            toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo'],
+        };
+        try {
+            state.editors.main = await ClassicEditor.create($('contentInput'), editorConfig);
+            state.editors.main.model.document.on('change', debounce(() => { updateLivePreview(state); saveDraft(state); }, 350));
+            const helpEditorEl = $('helpDesc');
+            if (helpEditorEl) state.editors.help = await ClassicEditor.create(helpEditorEl, simpleEditorConfig);
+            const noteEditorEl = $('noteContent');
+            if (noteEditorEl) state.editors.notes = await ClassicEditor.create(noteEditorEl, simpleEditorConfig);
+        } catch (error) {
+            console.error('Błąd krytyczny inicjalizacji CKEditor:', error);
+            toast('Błąd krytyczny edytora! Odśwież stronę.', false, 10000);
+        }
+    }
+
+    function initEntryForm(state) {
+        const form = $('entryForm'), publishBtn = $('publishBtn'), cancelBtn = $('cancelEntryEditBtn'), clearDraftBtn = $('clearDraftBtn');
+        form?.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            publishBtn.disabled = true;
+            publishBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Zapisuję...';
+            const payload = {
+                section: $('sectionSelect').value || 'Kronika',
+                author: $('authorInput').value.trim() || 'Chudy',
+                title: $('titleInput').value.trim(),
+                text: state.editors.main.getData(),
+                theme: $('themeSelect').value || 'auto',
+                updatedAt: serverTimestamp()
+            };
+
+            if (!payload.title && stripHtml(payload.text).length < 10) {
+                toast('Tytuł lub treść są wymagane.', false);
+                publishBtn.disabled = false;
+                publishBtn.textContent = 'Opublikuj';
+                return;
+            }
+
+            try {
+                const file = $('attachInput').files[0];
+                if (file) {
+                    const progress = $('entryUploadProgress');
+                    progress.style.display = 'block';
+                    progress.value = 0;
+                    const filePath = `entries_attachments/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+                    const fileRef = sref(storage, filePath);
+                    const uploadTask = uploadBytesResumable(fileRef, file);
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed', (snap) => { progress.value = (snap.bytesTransferred / snap.totalBytes) * 100; }, (err) => reject(err), async () => {
+                            payload.attachment = { url: await getDownloadURL(uploadTask.snapshot.ref), meta: { path: filePath, name: file.name, type: file.type } };
+                            progress.style.display = 'none';
+                            resolve();
+                        });
+                    });
+                }
+
+                const sectionName = payload.section;
+                const sectionRef = doc(db, 'sekcje', sectionName);
+                const sectionSnap = await getDoc(sectionRef);
+
+                if (!sectionSnap.exists()) {
+                    await setDoc(sectionRef, {
+                        name: sectionName,
+                        createdAt: serverTimestamp()
+                    });
+                    toast(`Utworzono nową sekcję: ${sectionName}`, true);
+                }
+
+                if (state.entry.data) {
+                    const oldSection = state.entry.data.section;
+                    const newSection = payload.section;
+                    const entryId = state.entry.data.id;
+                    if (oldSection !== newSection) {
+                        const oldDocRef = doc(db, 'sekcje', oldSection, 'entries', entryId);
+                        const oldDocSnap = await getDoc(oldDocRef);
+                        if (oldDocSnap.exists()) {
+                            const existingData = oldDocSnap.data();
+                            const newDocRef = doc(db, 'sekcje', newSection, 'entries', entryId);
+                            await setDoc(newDocRef, { ...existingData, ...payload });
+                            await deleteDoc(oldDocRef);
+                            toast('Wpis przeniesiony i zaktualizowany');
+                        }
+                    } else {
+                        await updateDoc(doc(db, 'sekcje', oldSection, 'entries', entryId), payload);
+                        toast('Wpis zaktualizowany');
+                    }
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    await addDoc(collection(sectionRef, 'entries'), payload);
+                    toast('Wpis opublikowany');
+                }
+                resetEntryForm(state);
+            } catch (e) {
+                console.error('Błąd podczas publikacji:', e);
+                toast(`Błąd publikacji: ${e.message}`, false, 10000);
+            } finally {
+                publishBtn.disabled = false;
+                publishBtn.textContent = 'Opublikuj';
             }
         });
-        editorInstance.model.document.on('change', debounce(() => { updateLivePreview(); saveDraft(); }, 500));
-    }
-  } catch(e){ console.error('Błąd inicjalizacji CKEditor 5:', e); }
 
-  function getEditorHtml(){ return editorInstance ? editorInstance.getData() : (contentInput?.value || ''); }
-  function setEditorHtml(html=''){ if (editorInstance) editorInstance.setData(html); else if (contentInput) contentInput.value = html; }
-  
-  function updateLivePreview(){
-    if (liveTitle) liveTitle.innerHTML = titleInput?.value || 'Tytuł podglądu';
-    if (liveMeta) { const who = authorInput?.value || 'Autor'; liveMeta.textContent = `${who} • ${new Date().toLocaleString('pl-PL')}`; }
-    if (liveContent) liveContent.innerHTML = getEditorHtml() || '<em>Treść podglądu...</em>';
-  }
-  titleInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
-  authorInput?.addEventListener('input', () => { updateLivePreview(); saveDraft(); });
-
-  const icons = ['fa-solid fa-heart','fa-solid fa-music','fa-solid fa-star','fa-solid fa-book','fa-solid fa-hands-praying','fa-solid fa-headphones'];
-  function buildIconPicker(){ 
-    if (!iconPicker) return; 
-    iconPicker.innerHTML = ''; 
-    icons.forEach(cls => { 
-      const b = document.createElement('button'); b.type = 'button'; b.title = cls; b.innerHTML = `<i class="${cls}"></i>`; 
-      b.addEventListener('click', ()=> { 
-        if (!titleInput) return;
-        const start = titleInput.selectionStart ?? titleInput.value.length;
-        const end = titleInput.selectionEnd ?? titleInput.value.length;
-        const snippet = `<i class="${cls} fa-fw"></i> `;
-        titleInput.value = titleInput.value.substring(0, start) + snippet + titleInput.value.substring(end);
-        titleInput.selectionStart = titleInput.selectionEnd = start + snippet.length;
-        titleInput.focus(); 
-        updateLivePreview(); saveDraft(); 
-      }); 
-      iconPicker.appendChild(b); 
-    }); 
-  }
-  buildIconPicker();
-
-  menuForm?.addEventListener('submit', async ev => { ev.preventDefault(); const data = { text: menuText.value.trim(), url: menuUrl.value.trim(), order: Number(menuOrder.value) || 0 }; if (!data.text || !data.url) return; try { if (editMenuId) { await updateDoc(doc(db, 'menu', editMenuId), data); } else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'menu'), data); } menuForm.reset(); editMenuId = null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; showTemp(menuMsg, 'Zapisano'); } catch (e) { showTemp(menuMsg, 'Błąd', false); console.error(e); } });
-  cancelMenuEditBtn?.addEventListener('click', () => { menuForm.reset(); editMenuId=null; addMenuBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Dodaj'; cancelMenuEditBtn.style.display='none'; });
-  function renderMenu(list=[]){ if(!menuListContainer) return; menuListContainer.innerHTML = ''; list.forEach(it=>{ const div = document.createElement('div'); div.className = 'list-item'; div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(it.text)}</div><div class="muted-small">${escapeHtml(it.url)} • ${it.order}</div></div><div class="row"><button class="ghost small" data-action="edit" data-id="${it.id}"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`; menuListContainer.appendChild(div); }); menuListContainer.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async ev => { const id = ev.currentTarget.dataset.id; const act = ev.currentTarget.dataset.action; if (act === 'edit') { const d = (await getDoc(doc(db, 'menu', id))).data(); menuText.value = d.text; menuUrl.value = d.url; menuOrder.value = d.order; editMenuId = id; addMenuBtn.innerHTML = '<i class="fa-solid fa-save"></i> Zapisz'; cancelMenuEditBtn.style.display='inline-block'; } else if (act === 'del' && confirm('Na pewno usunąć?')) { await deleteDoc(doc(db, 'menu', id)); } })); }
-  onSnapshot(query(collection(db, 'menu'), orderBy('order')), snap => { const items = snap.docs.map(d=>({id:d.id, ...d.data()})); renderMenu(items); populateSectionSelect(items); });
-
-  function populateSectionSelect(menuItems=[]){ if (!sectionSelect || !filterSection) return; const prev = sectionSelect.value; sectionSelect.innerHTML = ''; filterSection.innerHTML = '<option value="">Wszystkie sekcje</option>'; menuItems.forEach(m=>{ const opt = document.createElement('option'); opt.value = m.text; opt.textContent = m.text; sectionSelect.appendChild(opt); if(filterSection) filterSection.appendChild(opt.cloneNode(true)); }); sectionSelect.value = prev || 'Kronika'; }
-
-  helpForm?.addEventListener('submit', async ev => { ev.preventDefault(); const data = { woj: helpWoj.value, name: helpName.value.trim(), address: helpAddress.value.trim(), phone: helpPhone.value.trim(), desc: helpDesc.value.trim(), link: helpLink.value.trim() }; if(!data.name) return; try { if (editHelpId) { await updateDoc(doc(db, 'help', editHelpId), data); } else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'help'), data); } helpForm.reset(); editHelpId = null; addHelpBtn.innerHTML='<i class="fa-solid fa-plus"></i> Dodaj Ośrodek'; cancelHelpEditBtn.style.display='none'; showTemp(helpMsg, 'Zapisano'); } catch (e) { showTemp(helpMsg, 'Błąd', false); console.error(e); } });
-  cancelHelpEditBtn?.addEventListener('click', () => { helpForm.reset(); editHelpId = null; addHelpBtn.innerHTML='<i class="fa-solid fa-plus"></i> Dodaj Ośrodek'; cancelHelpEditBtn.style.display='none'; });
-  function renderHelp(list=[]){ if(!helpListContainer) return; helpListContainer.innerHTML = ''; list.forEach(it=>{ const div = document.createElement('div'); div.className = 'list-item'; div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(it.name)}</div><div class="muted-small">${escapeHtml(it.woj)} | ${escapeHtml(it.address)}</div></div><div class="row"><button class="ghost small" data-action="edit" data-id="${it.id}"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`; helpListContainer.appendChild(div); }); helpListContainer.querySelectorAll('button').forEach(btn => btn.addEventListener('click', async ev => { const id = ev.currentTarget.dataset.id; if (ev.currentTarget.dataset.action === 'edit') { const d = (await getDoc(doc(db, 'help', id))).data(); helpWoj.value=d.woj; helpName.value=d.name; helpAddress.value=d.address; helpPhone.value=d.phone; helpDesc.value=d.desc; helpLink.value=d.link; editHelpId = id; addHelpBtn.innerHTML='<i class="fa-solid fa-save"></i> Zapisz Zmiany'; cancelHelpEditBtn.style.display='inline-block'; } else if (confirm('Na pewno usunąć?')) { await deleteDoc(doc(db, 'help', id)); } })); }
-  onSnapshot(query(collection(db, 'help'), orderBy('createdAt','desc')), snap => renderHelp(snap.docs.map(d=>({id: d.id, ...d.data()}))));
-// CZĘŚĆ 3/5: WERSJE ROBOCZE I FORMULARZ WPISÓW Z POPRAWKĄ
-
-  function saveDraft(){ const draft = { section: sectionSelect?.value || '', author: authorInput?.value || '', title: titleInput?.value || '', html: getEditorHtml() || '', ts: Date.now() }; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); updateDraftBadge(); } catch(e){} }
-  function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
-  function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); updateDraftBadge(); } catch(e){} }
-  function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
-  clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); resetForm(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
-  setInterval(saveDraft, 15000);
-
-  entryForm?.addEventListener('submit', async ev=>{ 
-    ev.preventDefault();
-    publishBtn.disabled = true;
-    publishBtn.textContent = 'Zapisywanie...';
-
-    const newSection = sectionSelect.value;
-    const payload = {
-        section: newSection,
-        author: authorInput.value.trim() || 'Chudy',
-        title: titleInput.value.trim(),
-        text: getEditorHtml(),
-        theme: themeSelect.value || 'auto',
-        updatedAt: serverTimestamp()
-    };
-    
-    if (!payload.title && !payload.text) {
-        showTemp(formMsg, 'Tytuł i treść są wymagane.', false);
-        publishBtn.disabled = false;
-        return;
-    }
-
-    try {
-      if (editEntryData) {
-          const entryId = editEntryData.id;
-          const originalSection = editEntryData.section;
-
-          if (originalSection !== newSection) {
-              const oldDocRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
-              const docToMoveData = (await getDoc(oldDocRef)).data();
-              const finalPayload = { ...docToMoveData, ...payload };
-              
-              const newDocRef = doc(db, 'sekcje', newSection, 'entries', entryId);
-              await setDoc(newDocRef, finalPayload);
-              await deleteDoc(oldDocRef);
-              
-              showTemp(formMsg, `Wpis przeniesiony z '${originalSection}' do '${newSection}'.`);
-          } else {
-              const entryRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
-              await updateDoc(entryRef, payload);
-              showTemp(formMsg, 'Wpis zaktualizowany.');
-          }
-      } else {
-          payload.createdAt = serverTimestamp();
-          await addDoc(collection(db, 'sekcje', newSection, 'entries'), payload);
-          showTemp(formMsg, 'Wpis opublikowany.');
-      }
-      resetForm();
-
-    } catch (e) {
-      console.error("Błąd zapisu:", e);
-      showTemp(formMsg, 'Błąd zapisu.', false);
-    } finally {
-      publishBtn.disabled = false;
-      publishBtn.textContent = 'Opublikuj';
-    }
-  });
-
-  function resetForm(){
-    entryForm?.reset(); 
-    setEditorHtml(''); 
-    editEntryData=null; 
-    cancelEntryEditBtn.style.display='none'; 
-    publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; 
-    updateLivePreview();
-    clearDraft();
-  }
-  cancelEntryEditBtn?.addEventListener('click', resetForm);
-// CZĘŚĆ 3/5: WERSJE ROBOCZE I FORMULARZ WPISÓW Z POPRAWKĄ
-
-  function saveDraft(){ const draft = { section: sectionSelect?.value || '', author: authorInput?.value || '', title: titleInput?.value || '', html: getEditorHtml() || '', ts: Date.now() }; try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); updateDraftBadge(); } catch(e){} }
-  function loadDraft(){ try { const raw = localStorage.getItem(DRAFT_KEY); if (!raw) return; const d = JSON.parse(raw); if (d.section) sectionSelect.value = d.section; if (d.author)  authorInput.value  = d.author; if (d.title)   titleInput.value   = d.title; if (d.html)    setEditorHtml(d.html); updateLivePreview(); updateDraftBadge(); } catch(e){} }
-  function clearDraft(){ try { localStorage.removeItem(DRAFT_KEY); updateDraftBadge(); } catch(e){} }
-  function updateDraftBadge(){ if (!draftBadge) return; const raw = localStorage.getItem(DRAFT_KEY); if (!raw) { draftBadge.textContent = 'Wersja robocza: —'; return; } try { const { ts } = JSON.parse(raw); if (ts) { const dt = new Date(ts).toLocaleString('pl-PL'); draftBadge.textContent = `Wersja robocza: ${dt}`; } } catch(e){ draftBadge.textContent = 'Wersja robocza: —'; } }
-  clearDraftBtn?.addEventListener('click', ()=> { clearDraft(); resetForm(); showTemp(formMsg, 'Wyczyszczono wersję roboczą'); });
-  setInterval(saveDraft, 15000);
-
-  entryForm?.addEventListener('submit', async ev=>{ 
-    ev.preventDefault();
-    publishBtn.disabled = true;
-    publishBtn.textContent = 'Zapisywanie...';
-
-    const newSection = sectionSelect.value;
-    const payload = {
-        section: newSection,
-        author: authorInput.value.trim() || 'Chudy',
-        title: titleInput.value.trim(),
-        text: getEditorHtml(),
-        theme: themeSelect.value || 'auto',
-        updatedAt: serverTimestamp()
-    };
-    
-    if (!payload.title && !payload.text) {
-        showTemp(formMsg, 'Tytuł i treść są wymagane.', false);
-        publishBtn.disabled = false;
-        return;
-    }
-
-    try {
-      if (editEntryData) {
-          const entryId = editEntryData.id;
-          const originalSection = editEntryData.section;
-
-          if (originalSection !== newSection) {
-              const oldDocRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
-              const docToMoveData = (await getDoc(oldDocRef)).data();
-              const finalPayload = { ...docToMoveData, ...payload };
-              
-              const newDocRef = doc(db, 'sekcje', newSection, 'entries', entryId);
-              await setDoc(newDocRef, finalPayload);
-              await deleteDoc(oldDocRef);
-              
-              showTemp(formMsg, `Wpis przeniesiony z '${originalSection}' do '${newSection}'.`);
-          } else {
-              const entryRef = doc(db, 'sekcje', originalSection, 'entries', entryId);
-              await updateDoc(entryRef, payload);
-              showTemp(formMsg, 'Wpis zaktualizowany.');
-          }
-      } else {
-          payload.createdAt = serverTimestamp();
-          await addDoc(collection(db, 'sekcje', newSection, 'entries'), payload);
-          showTemp(formMsg, 'Wpis opublikowany.');
-      }
-      resetForm();
-
-    } catch (e) {
-      console.error("Błąd zapisu:", e);
-      showTemp(formMsg, 'Błąd zapisu.', false);
-    } finally {
-      publishBtn.disabled = false;
-      publishBtn.textContent = 'Opublikuj';
-    }
-  });
-
-  function resetForm(){
-    entryForm?.reset(); 
-    setEditorHtml(''); 
-    editEntryData=null; 
-    cancelEntryEditBtn.style.display='none'; 
-    publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Opublikuj'; 
-    updateLivePreview();
-    clearDraft();
-  }
-  cancelEntryEditBtn?.// CZĘŚĆ 4/5: LISTA WPISÓW I AKCJE
-
-  function renderEntries(list=[]){
-    if (!entriesList) return;
-    const filter = (filterSection?.value) || '';
-    const q = (searchInput?.value || '').toLowerCase();
-    const sort = (sortSelect?.value || 'desc');
-    let arr = [...list];
-
-    if (filter) arr = arr.filter(x => x.section === filter);
-    if (q) arr = arr.filter(x => (stripHtml(x.title||'').toLowerCase().includes(q) || stripHtml(x.text||'').toLowerCase().includes(q)));
-    
-    if (sort === 'title') arr.sort((a,b)=>(stripHtml(a.title||'')).localeCompare(stripHtml(b.title||''))); 
-    else if (sort === 'asc') arr.sort((a,b)=>(a.createdAt?.seconds||0) - (b.createdAt?.seconds||0)); 
-    else arr.sort((a,b)=>(b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-    
-    entriesList.innerHTML = '';
-    arr.forEach(e=>{
-      const div = document.createElement('div'); div.className = 'list-item'; div.dataset.id = e.id;
-      const date = (e.updatedAt || e.createdAt)?.toDate()?.toLocaleString('pl-PL') || '';
-      const excerpt = stripHtml(e.text||'').slice(0,150) + '...';
-      const attHtml = e.attachment?.url ? `<img src="${e.attachment.url}" class="entry-list-thumb" alt="Miniaturka">` : '';
-      div.innerHTML = `<div class="list-item-content">${attHtml}<div><div class="entry-title" style="font-weight:700">${e.title || 'Bez tytułu'}</div><div class="muted-small">${e.section||''} • ${e.author||''} • ${date}</div><div style="margin-top:8px;color:#cfe4ff">${excerpt}</div><div style="margin-top:6px"><button class="btn-link" data-action="read" data-id="${e.id}">Czytaj dalej</button></div></div></div><div class="row" style="gap:6px"><button class="ghost small listen" data-id="${e.id}" title="Odsłuchaj"><i class="fa-solid fa-headphones-simple"></i></button><button class="ghost small" data-action="edit" data-id="${e.id}"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" data-id="${e.id}"><i class="fa-solid fa-trash"></i></button></div>`;
-      entriesList.appendChild(div);
-    });
-
-    entriesList.querySelectorAll('.list-item').forEach(item => { item.addEventListener('click', (ev) => { if (ev.target.closest('button')) return; document.querySelectorAll('.list-item.selected').forEach(el => el.classList.remove('selected')); item.classList.add('selected'); selectedEntryIdForTTS = item.dataset.id; if(ttsListenBtn) ttsListenBtn.disabled = false; const titleEl = item.querySelector('.entry-title'); if(readerSelectionInfo) readerSelectionInfo.innerHTML = `Zaznaczono: "<strong>${titleEl.textContent}</strong>"`; }); });
-    
-    entriesList.querySelectorAll('button').forEach(btn=>{
-      btn.addEventListener('click', async ev=>{
-        ev.stopPropagation();
-        const id = ev.currentTarget.dataset.id;
-        const act = ev.currentTarget.dataset.action;
-        const entry = entriesCache.find(e => e.id === id);
-        if (!entry) return;
-
-        if (act === 'read') { openEntryModal(entry); return; }
-        if (ev.currentTarget.classList.contains('listen')) { const txt = stripHtml(`${entry.title}. ${entry.text}`); speakText(txt); return; }
-        if (act === 'edit') {
-          const entryRef = doc(db, 'sekcje', entry.section, 'entries', id);
-          const snap = await getDoc(entryRef);
-          if (!snap.exists()) return alert('Wpis nie istnieje w bazie danych!');
-          const data = snap.data();
-          
-          editEntryData = { id: id, section: entry.section, createdAt: data.createdAt };
-          
-          sectionSelect.value = data.section || '';
-          titleInput.value = data.title || '';
-          authorInput.value = data.author || '';
-          setEditorHtml(data.text || '');
-          
-          publishBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Zapisz zmiany';
-          cancelEntryEditBtn.style.display='inline-block';
-          window.scrollTo({top:0,behavior:'smooth'});
-        }
-        if (act === 'del') {
-          if (!confirm('Na pewno usunąć?')) return;
-          const entryRef = doc(db, 'sekcje', entry.section, 'entries', id);
-          if (entry.attachment?.meta?.path) await deleteObject(sref(storage, entry.attachment.meta.path)).catch(()=>{});
-          await deleteDoc(entryRef);
-        }
-      });
-    });
-  }
-
-  onSnapshot(query(collectionGroup(db,'entries'), orderBy('createdAt','desc')), snap=>{ entriesCache = snap.docs.map(d=>({ id:d.id, section:d.ref.parent.parent.id, ...d.data() })); renderEntries(entriesCache); });
-  const rerender = debounce(()=> renderEntries(entriesCache), 200);
-  searchInput?.addEventListener('input', rerender);
-  filterSection?.addEventListener('change', rerender);
-  sortSelect?.addEventListener('change', rerender);
-addEventListener('click', resetForm);
-// CZĘŚĆ 5/5: MAŁE MODUŁY, MODAL I ZAKOŃCZENIE
-
-  sparkForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const qtxt = (sparkInput?.value || '').trim(); if (!qtxt) return; try { await addDoc(collection(db,'sparks'), { quote:qtxt, createdAt: serverTimestamp() }); sparkInput.value=''; } catch(e){ console.error(e); } });
-  playlistForm?.addEventListener('submit', async ev=>{ ev.preventDefault(); const t = (songTitle?.value || '').trim(); const l = (songLink?.value || '').trim(); if (!t || !l) return; try { await addDoc(collection(db,'playlist'), { title:t, link:l, createdAt: serverTimestamp() }); songTitle.value=''; songLink.value=''; } catch(e){ console.error(e); } });
-  
-  galleryForm?.addEventListener('submit', async ev => {
-    ev.preventDefault();
-    const file = galleryUpload?.files?.[0];
-    const desc = galleryDesc.value.trim();
-    const addBtn = galleryForm.querySelector('button[type="submit"]');
-    if (!file) { return showTemp(formMsg, 'Wybierz plik dla galerii.', false); }
-    if (!desc) { return showTemp(formMsg, 'Opis w galerii jest wymagany.', false); }
-    addBtn.disabled = true;
-    if (galleryProgressBar) galleryProgressBar.style.display = 'block';
-    try {
-        const safeName = file.name.replace(/[^\w.\-]+/g, '_');
-        const storagePath = `gallery/${Date.now()}_${safeName}`;
-        const fileRef = sref(storage, storagePath);
-        const uploadTask = uploadBytesResumable(fileRef, file);
-        uploadTask.on('state_changed', 
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                if (galleryProgressBar) galleryProgressBar.value = progress;
-            }, 
-            (error) => {
-                console.error("Błąd wysyłania do galerii:", error);
-                showTemp(formMsg, 'Błąd wysyłania pliku.', false);
-                addBtn.disabled = false;
-            }, 
-            async () => {
-                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                await addDoc(collection(db, 'gallery'), {
-                    url: downloadURL,
-                    desc: desc,
-                    path: storagePath,
-                    createdAt: serverTimestamp()
-                });
-                showTemp(formMsg, 'Zdjęcie dodane do galerii.');
-                galleryForm.reset();
-                if (galleryProgressBar) galleryProgressBar.style.display = 'none';
-                addBtn.disabled = false;
+        cancelBtn?.addEventListener('click', () => resetEntryForm(state));
+        clearDraftBtn?.addEventListener('click', async () => {
+            if (await confirmAction({title: "Wyczyścić szkic?", text: "Spowoduje to usunięcie niezapisanej treści z edytora."})) {
+                localStorage.removeItem(DRAFT_KEY);
+                resetEntryForm(state);
+                toast('Szkic usunięty');
             }
-        );
-    } catch (e) {
-        console.error(e);
-        showTemp(formMsg, 'Błąd krytyczny galerii.', false);
-        addBtn.disabled = false;
+        });
+        loadDraft(state);
+        setInterval(() => saveDraft(state), 15000);
     }
-  });
 
-  onSnapshot(query(collection(db,'sparks'), orderBy('createdAt','desc')), snap => renderSparks(snap.docs.map(d=>({id: d.id, ...d.data()}))));
-  onSnapshot(query(collection(db,'playlist'), orderBy('createdAt','desc')), snap => renderPlaylist(snap.docs.map(d=>({id: d.id, ...d.data()}))));
-  onSnapshot(query(collection(db,'gallery'), orderBy('createdAt','desc')), snap => renderGallery(snap.docs.map(d=>({id: d.id, ...d.data()}))));
+    function resetEntryForm(state) {
+        $('entryForm')?.reset();
+        state.editors.main?.setData('');
+        state.entry.data = null;
+        $('cancelEntryEditBtn').style.display = 'none';
+        $('publishBtn').textContent = 'Opublikuj';
+        $('uploadPreview').innerHTML = '';
+        localStorage.removeItem(DRAFT_KEY);
+        updateDraftBadge();
+        updateLivePreview(state);
+    }
+    function saveDraft(state) {
+        if (!state.editors.main || state.entry.data) return;
+        const draft = {
+            section: $('sectionSelect').value, author: $('authorInput').value, title: $('titleInput').value,
+            html: state.editors.main.getData(), ts: Date.now()
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        updateDraftBadge();
+    }
+    function loadDraft(state) {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return;
+        const draft = JSON.parse(raw);
+        if (confirm(`Znaleziono niezapisany szkic z ${new Date(draft.ts).toLocaleString('pl-PL')}. Czy chcesz go wczytać?`)) {
+            $('sectionSelect').value = draft.section;
+            $('authorInput').value = draft.author;
+            $('titleInput').value = draft.title;
+            state.editors.main?.setData(draft.html || '');
+            updateLivePreview(state);
+        } else {
+            localStorage.removeItem(DRAFT_KEY);
+        }
+        updateDraftBadge();
+    }
+    function updateDraftBadge() {
+        const badge = $('draftBadge');
+        if (!badge) return;
+        const raw = localStorage.getItem(DRAFT_KEY);
+        badge.style.display = raw ? 'inline-flex' : 'none';
+        if (!raw) return;
+        const { ts } = JSON.parse(raw);
+        badge.textContent = ts ? `Szkic: ${new Date(ts).toLocaleTimeString('pl-PL')}` : 'Szkic';
+    }
+    
+    function initEntryListAndFilter(state) {
+        const rerender = debounce(() => renderEntries(state), 200);
+        $('filterSection').addEventListener('change', rerender);
+        $('searchInput').addEventListener('input', rerender);
+        $('sortSelect').addEventListener('change', rerender);
+        const listEl = $('entriesList');
+        if (!listEl) return;
+        listEl.addEventListener('click', async (e) => {
+            const item = e.target.closest('.list-item');
+            if (!item) return;
+            const button = e.target.closest('button[data-action]');
+            if (button) {
+                e.stopPropagation();
+                const id = item.dataset.id;
+                const entry = state.entry.cache.find(en => en.id === id);
+                if (!entry) return toast('Nie znaleziono wpisu.', false);
+                const action = button.dataset.action;
+                switch (action) {
+                    case 'read': openEntryModal(entry); break;
+                    case 'listen': speakText(entry); break;
+                    case 'edit':
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        state.entry.data = entry;
+                        $('sectionSelect').value = entry.section;
+                        $('authorInput').value = entry.author;
+                        $('titleInput').value = entry.title;
+                        $('themeSelect').value = entry.theme;
+                        state.editors.main.setData(entry.text || '');
+                        $('uploadPreview').innerHTML = entry.attachment ? `<a href="${entry.attachment.url}" target="_blank">${entry.attachment.meta.name}</a>` : '';
+                        $('publishBtn').textContent = 'Zapisz zmiany';
+                        $('cancelEntryEditBtn').style.display = 'inline-block';
+                        break;
+                    case 'del':
+                        if (await confirmAction({ title: 'Potwierdź usunięcie', text: `Czy na pewno chcesz usunąć wpis "${entry.title}"?`, confirmText: 'Usuń' })) {
+                            try {
+                                if (entry.attachment?.meta.path) await deleteObject(sref(storage, entry.attachment.meta.path));
+                                await deleteDoc(doc(db, 'sekcje', entry.section, 'entries', id));
+                                toast('Wpis usunięty.');
+                            } catch (err) { toast('Błąd podczas usuwania.', false); console.error(err); }
+                        }
+                        break;
+                }
+            } else {
+                document.querySelectorAll('.list-item.selected').forEach(el => el.classList.remove('selected'));
+                item.classList.add('selected');
+                state.selectedTTSId = item.dataset.id;
+                $('ttsListenBtn').disabled = false;
+                $('readerSelectionInfo').innerHTML = `Zaznaczono: <strong>${escapeHtml(item.querySelector('.entry-title').textContent)}</strong>`;
+            }
+        });
+        onSnapshot(query(collectionGroup(db, 'entries'), orderBy('createdAt', 'desc')), (snapshot) => {
+            state.entry.cache = snapshot.docs.map(d => {
+                const pathParts = d.ref.path.split('/');
+                const section = pathParts.length > 2 ? pathParts[1] : 'Nieznana';
+                return { id: d.id, section, ...d.data() };
+            });
+            renderEntries(state);
+            populateSectionSelect(state.entry.cache, state.menuItems);
+        });
+        onSnapshot(query(collection(db, 'menu'), orderBy('order')), (snapshot) => {
+            state.menuItems = snapshot.docs.map(d => d.data());
+            populateSectionSelect(state.entry.cache, state.menuItems);
+        });
+    }
 
-  function renderSparks(list=[]){ if(!sparksList) return; sparksList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><i class="fa-solid fa-star"></i> ${escapeHtml(s.quote)}</div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; sparksList.appendChild(el); }); sparksList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'sparks',id)); }); }); }
-  function renderPlaylist(list=[]){ if(!playlistList) return; playlistList.innerHTML = ''; list.forEach(s=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div><div style="font-weight:700">${escapeHtml(s.title)}</div><div class="muted-small">${escapeHtml(s.link)}</div></div><div class="row"><button class="ghost small danger" data-id="${s.id}"><i class="fa-solid fa-trash"></i></button></div>`; playlistList.appendChild(el); }); playlistList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; if (confirm('Usuń?')) await deleteDoc(doc(db,'playlist',id)); }); }); }
-  function renderGallery(list=[]){ if(!galleryList) return; galleryList.innerHTML = ''; list.forEach(g=>{ const el = document.createElement('div'); el.className='list-item'; el.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><img src="${g.url}" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" alt="Miniaturka"><div style="font-weight:700">${escapeHtml(g.desc)}</div></div><div class="row"><button class="ghost small danger" data-id="${g.id}" data-path="${g.path}"><i class="fa-solid fa-trash"></i></button></div>`; galleryList.appendChild(el); }); galleryList.querySelectorAll('button').forEach(btn=>{ btn.addEventListener('click', async ev=> { const id = ev.currentTarget.dataset.id; const path = ev.currentTarget.dataset.path; if (!confirm('Na pewno usunąć?')) return; try{ if (path) await deleteObject(sref(storage, path)).catch(console.error); await deleteDoc(doc(db, 'gallery', id)); showTemp(formMsg, 'Usunięto z galerii.'); }catch(e){console.error(e);} }); }); }
+    function renderEntries(state, page = state.entry.currentPage) {
+        const listEl = $('entriesList');
+        if (!listEl) return;
+        let filtered = [...state.entry.cache];
+        const section = $('filterSection').value, search = $('searchInput').value.toLowerCase(), sort = $('sortSelect').value;
+        if (section) filtered = filtered.filter(e => e.section === section);
+        if (search) filtered = filtered.filter(e => (e.title?.toLowerCase() || '').includes(search) || stripHtml(e.text || '').toLowerCase().includes(search));
+        filtered.sort((a, b) => {
+            const timeA = a.createdAt?.seconds || 0, timeB = b.createdAt?.seconds || 0;
+            if (sort === 'asc') return timeA - timeB;
+            if (sort === 'title') return (a.title || '').localeCompare(b.title || '');
+            return timeB - timeA;
+        });
+        state.entry.totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        state.entry.currentPage = Math.min(Math.max(1, page), state.entry.totalPages);
+        const start = (state.entry.currentPage - 1) * PAGE_SIZE, pageItems = filtered.slice(start, start + PAGE_SIZE);
+        listEl.innerHTML = pageItems.length > 0 ? '' : '<div class="list-empty-state">Brak wpisów spełniających kryteria.</div>';
+        pageItems.forEach(e => {
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.dataset.id = e.id;
+            const date = (e.updatedAt || e.createdAt)?.toDate().toLocaleString('pl-PL') || '',
+                  excerpt = stripHtml(e.text || '').slice(0, 150) + '...',
+                  thumbUrl = e.text?.match(/<img[^>]+src="([^">]+)"/)?.[1] || e.attachment?.url,
+                  thumb = thumbUrl ? `<img src="${thumbUrl}" class="entry-list-thumb">` : `<div class="entry-list-thumb-placeholder"><i class="fa-solid fa-image"></i></div>`;
+            div.innerHTML = `
+                <div class="entry-list-main">
+                    ${thumb}
+                    <div class="entry-list-content">
+                        <div class="entry-title">${escapeHtml(e.title) || '<em>Bez tytułu</em>'}</div>
+                        <div class="muted-small">${escapeHtml(e.section)} • ${escapeHtml(e.author)} • ${date}</div>
+                        <div class="excerpt">${escapeHtml(excerpt)}</div>
+                    </div>
+                </div>
+                <div class="entry-actions-corner">
+                    <button class="ghost small" data-action="read" title="Czytaj"><i class="fa-solid fa-eye"></i></button>
+                    <button class="ghost small" data-action="listen" title="Odsłuchaj"><i class="fa-solid fa-headphones-simple"></i></button>
+                    <button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button>
+                    <button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            listEl.appendChild(div);
+        });
+        renderPagination(state, filtered.length);
+    }
 
-  function speakText(text){ if (!text) return; try { const synth = window.speechSynthesis; if(synth.speaking) synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'pl-PL'; if (readerStatus) { u.onstart = ()=> readerStatus.textContent = 'Lektor: czyta...'; u.onend = ()=> { readerStatus.textContent = 'Lektor: zakończono'; setTimeout(()=>readerStatus.textContent='Lektor: gotowy', 1200); }; } synth.speak(u); } catch(e) { console.error(e); } }
-  ttsListenBtn?.addEventListener('click', async () => { if (!selectedEntryIdForTTS) return; const entry = entriesCache.find(e => e.id === selectedEntryIdForTTS); if (!entry) return; const txt = stripHtml(`${entry.title}. ${entry.text}`); speakText(txt); });
-  ttsPreviewBtn?.addEventListener('click', () => { const txt = stripHtml(`${titleInput.value}. ${getEditorHtml()}`); speakText(txt); });
-  
-  function openEntryModal(entry) { if (!entry) return; showModalWithData(entry.id, entry); }
-  function showModalWithData(id, d){
-    if(!entryModal) return;
-    const entryModalTitle = $('entryModalTitle'), entryModalMeta = $('entryModalMeta'), entryModalBody = $('entryModalBody'), modalTtsBtn = $('modalTtsBtn'), modalEditBtn = $('modalEditBtn');
-    entryModalTitle.textContent = d.title || 'Bez tytułu';
-    const date = (d.updatedAt || d.createdAt)?.toDate()?.toLocaleString('pl-PL') || '';
-    entryModalMeta.textContent = `${d.section || ''} • ${d.author || ''} • ${date}`;
-    entryModalBody.innerHTML = (d.attachment?.url ? `<p><img src="${d.attachment.url}" style="max-width:100%"></p>` : '') + (d.text || '');
-    entryModal.classList.add('open');
-    modalTtsBtn.onclick = () => { speakText(stripHtml(`${d.title}. ${d.text}`)); };
-    modalEditBtn.onclick = () => {
-      closeEntryModal();
-      const editButton = entriesList.querySelector(`.list-item[data-id="${id}"] button[data-action="edit"]`);
-      if(editButton) editButton.click();
-    };
-  }
-  function closeEntryModal(){ if(entryModal) entryModal.classList.remove('open'); window.speechSynthesis?.cancel(); }
-  modalCloseBtn?.addEventListener('click', closeEntryModal);
-  modalCloseBtn2?.addEventListener('click', closeEntryModal);
-  entryModal?.addEventListener('click', (ev)=>{ if (ev.target === entryModal) closeEntryModal(); });
-  window.addEventListener('keydown', (ev)=> { if (ev.key === 'Escape') closeEntryModal(); });
+    function renderPagination(state, totalItems) {
+        const controls = $('paginationControls');
+        controls.innerHTML = '';
+        if (state.entry.totalPages <= 1) return;
+        const info = document.createElement('div');
+        info.className = 'pagination-info';
+        info.textContent = `Strona ${state.entry.currentPage}/${state.entry.totalPages} (${totalItems} wpisów)`;
+        controls.appendChild(info);
+        const buttons = document.createElement('div');
+        buttons.className = 'row';
+        const prev = document.createElement('button');
+        prev.textContent = '‹';
+        prev.disabled = state.entry.currentPage <= 1;
+        prev.onclick = () => renderEntries(state, state.entry.currentPage - 1);
+        const next = document.createElement('button');
+        next.textContent = '›';
+        next.disabled = state.entry.currentPage >= state.entry.totalPages;
+        next.onclick = () => renderEntries(state, state.entry.currentPage + 1);
+        buttons.appendChild(prev);
+        buttons.appendChild(next);
+        controls.appendChild(buttons);
+    }
+    
+    function populateSectionSelect(entries, menuItems) {
+        const sectionsFromEntries = entries.map(e => e.section);
+        const sectionsFromMenu = menuItems.map(item => item.text);
+        const allSections = [...new Set([...sectionsFromEntries, ...sectionsFromMenu])].sort();
+        const select = $('sectionSelect'), filter = $('filterSection');
+        if (!select || !filter) return;
+        const currentValSelect = select.value;
+        const currentValFilter = filter.value;
+        select.innerHTML = '';
+        filter.innerHTML = '<option value="">Wszystkie sekcje</option>';
+        allSections.forEach(s => {
+            if (!s || s === 'undefined') return;
+            const option = new Option(s, s);
+            select.add(option.cloneNode(true));
+            filter.add(option);
+        });
+        select.value = currentValSelect;
+        filter.value = currentValFilter;
+    }
+    
+    function initLivePreview(state) {
+        const inputs = ['titleInput', 'authorInput', 'sectionSelect'];
+        inputs.forEach(id => {
+            $(id)?.addEventListener('input', debounce(() => updateLivePreview(state), 200));
+        });
+    }
+    function updateLivePreview(state) {
+        $('liveTitle').innerHTML = $('titleInput').value || 'Tytuł podglądu';
+        $('liveMeta').textContent = `${$('authorInput').value || 'Autor'} • ${new Date().toLocaleString('pl-PL')} • Sekcja: ${$('sectionSelect').value}`;
+        $('liveContent').innerHTML = state.editors.main?.getData() || '<em>Treść podglądu...</em>';
+    }
+    function initIconPicker() {
+        const picker = $('iconPicker');
+        if (!picker) return;
+        const icons = ['fa-solid fa-heart', 'fa-solid fa-music', 'fa-solid fa-star', 'fa-solid fa-book', 'fa-solid fa-hands-praying', 'fa-solid fa-headphones'];
+        picker.innerHTML = '';
+        icons.forEach(cls => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.title = cls;
+            btn.innerHTML = `<i class="${cls}"></i>`;
+            btn.addEventListener('click', () => {
+                const input = $('titleInput'), snippet = `<i class="${cls} fa-fw"></i> `;
+                const start = input.selectionStart, end = input.selectionEnd;
+                input.value = input.value.substring(0, start) + snippet + input.value.substring(end);
+                input.selectionStart = input.selectionEnd = start + snippet.length;
+                input.focus();
+                input.dispatchEvent(new Event('input'));
+            });
+            picker.appendChild(btn);
+        });
+    }
 
-} // Koniec funkcji initPanel
+    function initTTS(state) {
+        if ('speechSynthesis' in window) {
+            const populateVoices = () => {
+                const select = $('ttsVoiceSelect');
+                if (!select) return;
+                const currentVoice = select.value;
+                select.innerHTML = '';
+                speechSynthesis.getVoices().filter(v => v.lang.startsWith('pl')).forEach(v => {
+                    select.add(new Option(`${v.name} (${v.lang})`, v.name));
+                });
+                if (currentVoice) select.value = currentVoice;
+            };
+            populateVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+              speechSynthesis.onvoiceschanged = populateVoices;
+            }
+        }
+        $('ttsPreviewBtn')?.addEventListener('click', () => {
+            speakText({ title: $('titleInput').value, text: state.editors.main?.getData() });
+        });
+        $('ttsListenBtn')?.addEventListener('click', () => {
+            if (!state.selectedTTSId) return toast('Zaznacz wpis z listy.', false);
+            const entry = state.entry.cache.find(e => e.id === state.selectedTTSId);
+            if (entry) speakText(entry);
+        });
+    }
+    
+    function speakText(entry) {
+        if (!('speechSynthesis' in window)) return toast('Lektor nie jest dostępny.', false);
+        const textToSpeak = stripHtml(`${entry.title || ''}. ${entry.text || ''}`).trim();
+        if (!textToSpeak) return toast('Brak tekstu do odczytania.', false);
+        
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = 'pl-PL';
+        
+        const selectedVoiceName = document.getElementById('ttsVoiceSelect').value;
+        const voice = speechSynthesis.getVoices().find(v => v.name === selectedVoiceName);
+        if (voice) utterance.voice = voice;
+        
+        const statusEl = document.getElementById('readerStatus');
+        
+        utterance.onstart = () => statusEl.textContent = 'Lektor: czyta...';
+        utterance.onend = () => statusEl.textContent = 'Lektor: gotowy';
+        utterance.onerror = (e) => {
+            statusEl.textContent = 'Błąd lektora';
+            console.error("SpeechSynthesis Error:", e);
+            toast("Błąd silnika mowy przeglądarki. Spróbuj wybrać inny głos.", false);
+        };
+        
+        setTimeout(() => {
+            try {
+                speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.error("SpeechSynthesis speak error:", e);
+                toast("Wystąpił błąd podczas próby odczytania tekstu.", false);
+                statusEl.textContent = 'Błąd lektora';
+            }
+        }, 100);
+    }
+
+    function initEntryModal() {
+        const modal = document.getElementById('entryModal');
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.closest('#modalCloseBtn, #modalCloseBtn2')) {
+                closeEntryModal();
+            }
+        });
+        window.addEventListener('keydown', (e) => e.key === 'Escape' && closeEntryModal());
+    }
+    
+    function openEntryModal(entry) {
+        document.getElementById('entryModalTitle').innerHTML = entry.title || 'Brak tytułu';
+        document.getElementById('entryModalMeta').textContent = `${entry.section} • ${entry.author} • ${entry.createdAt?.toDate().toLocaleString('pl-PL')}`;
+        const attachmentHTML = entry.attachment ? `<div class="modal-attachment"><a href="${entry.attachment.url}" target="_blank">Pobierz załącznik: ${entry.attachment.meta.name}</a></div>` : '';
+        document.getElementById('entryModalBody').innerHTML = attachmentHTML + (entry.text || '');
+        document.getElementById('entryModal').classList.add('open');
+        document.getElementById('modalTtsBtn').onclick = () => speakText(entry);
+        document.getElementById('modalEditBtn').onclick = () => {
+            closeEntryModal();
+            const editBtn = document.querySelector(`.list-item[data-id="${entry.id}"] button[data-action="edit"]`);
+            editBtn?.click();
+        };
+    }
+
+    function closeEntryModal() {
+        document.getElementById('entryModal')?.classList.remove('open');
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
+    }
+
+    function initLazyLoading(state) {
+        const lazySections = document.querySelectorAll('.lazy-load-section');
+        if (!('IntersectionObserver' in window)) {
+            lazySections.forEach(section => loadModule(section.dataset.module, section, state));
+            return;
+        }
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const moduleName = entry.target.dataset.module;
+                    if (!state.lazyModules.has(moduleName)) {
+                        state.lazyModules.add(moduleName);
+                        loadModule(moduleName, entry.target, state);
+                        obs.unobserve(entry.target);
+                    }
+                }
+            });
+        }, { rootMargin: '200px' });
+        lazySections.forEach(section => observer.observe(section));
+    }
+    function loadModule(name, element, state) {
+        element.classList.remove('lazy-load-section');
+        const content = element.querySelector('.module-content');
+        if (content) content.style.display = 'block';
+        const moduleInitializers = {
+            sparks: initSparks, playlist: initPlaylist, gallery: initGallery,
+            menu: initMenu, help: initHelp, notes: initNotes,
+        };
+        if (moduleInitializers[name]) {
+            moduleInitializers[name](state);
+        }
+    }
+
+    function genericFormReset(form, state, stateKey, btnText = 'Dodaj') {
+        state.editId[stateKey] = null;
+        if (form) form.reset();
+        form?.classList.remove('is-editing');
+        const cancelBtn = $(`cancel${stateKey.charAt(0).toUpperCase() + stateKey.slice(1)}EditBtn`);
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        const submitBtn = form?.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.textContent = btnText;
+    }
+
+    function initSparks(state) {
+        const form = $('sparkForm'), input = $('sparkInput'), cancelBtn = $('cancelSparkEditBtn');
+        const listContainer = $('sparksList');
+        let sparkCache = [];
+        onSnapshot(query(collection(db, 'sparks'), orderBy('createdAt', 'desc')), (snapshot) => {
+            sparkCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = sparkCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            sparkCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                div.innerHTML = `<div><i class="fa-solid fa-star"></i> ${escapeHtml(item.quote)}</div><div class="row"><button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button></div>`;
+                listContainer.appendChild(div);
+            });
+        });
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = sparkCache.find(i => i.id === itemId);
+            if (!item) return;
+            const action = button.dataset.action;
+            if (action === 'edit') {
+                state.editId.spark = item.id;
+                input.value = item.quote;
+                form.classList.add('is-editing');
+                cancelBtn.style.display = 'inline-block';
+                form.querySelector('button[type="submit"]').textContent = 'Zapisz';
+                input.focus();
+            } else if (action === 'del') {
+                if (await confirmAction({ text: `Usunąć iskierkę: "${item.quote.slice(0,30)}..."?` })) {
+                    await deleteDoc(doc(db, 'sparks', item.id));
+                    toast('Iskierka usunięta');
+                }
+            }
+        });
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const quote = input.value.trim();
+            if (!quote) return;
+            try {
+                if (state.editId.spark) {
+                    await updateDoc(doc(db, 'sparks', state.editId.spark), { quote });
+                    toast('Iskierka zaktualizowana');
+                } else {
+                    await addDoc(collection(db, 'sparks'), { quote, createdAt: serverTimestamp() });
+                    toast('Dodano iskierkę');
+                }
+                genericFormReset(form, state, 'spark');
+            } catch (err) { toast('Błąd', false); console.error(err); }
+        });
+        cancelBtn.addEventListener('click', () => genericFormReset(form, state, 'spark'));
+    }
+
+    function initPlaylist(state) {
+        const form = $('playlistForm'), titleInput = $('songTitle'), linkInput = $('songLink'), cancelBtn = $('cancelPlaylistEditBtn');
+        const listContainer = $('playlistList');
+        let playlistCache = [];
+        onSnapshot(query(collection(db, 'playlist'), orderBy('createdAt', 'desc')), (snapshot) => {
+            playlistCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = playlistCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            playlistCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(item.title)}</div><div class="muted-small">${escapeHtml(item.link)}</div></div><div class="row"><button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button></div>`;
+                listContainer.appendChild(div);
+            });
+        });
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = playlistCache.find(i => i.id === itemId);
+            if (!item) return;
+            const action = button.dataset.action;
+            if (action === 'edit') {
+                state.editId.playlist = item.id;
+                titleInput.value = item.title;
+                linkInput.value = item.link;
+                form.classList.add('is-editing');
+                cancelBtn.style.display = 'inline-block';
+                form.querySelector('button[type="submit"]').textContent = 'Zapisz';
+                titleInput.focus();
+            } else if (action === 'del') {
+                 if (await confirmAction({ text: `Usunąć piosenkę "${item.title}"?` })) {
+                    await deleteDoc(doc(db, 'playlist', item.id));
+                    toast('Piosenka usunięta');
+                }
+            }
+        });
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const title = titleInput.value.trim(), link = linkInput.value.trim();
+            if (!title || !link) return;
+            try {
+                if (state.editId.playlist) {
+                    await updateDoc(doc(db, 'playlist', state.editId.playlist), { title, link });
+                    toast('Playlista zaktualizowana');
+                } else {
+                    await addDoc(collection(db, 'playlist'), { title, link, createdAt: serverTimestamp() });
+                    toast('Dodano do playlisty');
+                }
+                genericFormReset(form, state, 'playlist');
+            } catch (err) { toast('Błąd', false); console.error(err); }
+        });
+        cancelBtn.addEventListener('click', () => genericFormReset(form, state, 'playlist'));
+    }
+    
+    function initGallery(state) {
+        const form = $('galleryForm'), uploadInput = $('galleryUpload'), descInput = $('galleryDesc'), progress = $('galleryProgressBar');
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const file = uploadInput.files[0];
+            const desc = descInput.value.trim();
+            if (!file || !desc) return toast('Wybierz plik i dodaj opis.', false);
+            progress.style.display = 'block';
+            progress.value = 0;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            try {
+                const filePath = `gallery/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+                const fileRef = sref(storage, filePath);
+                const uploadTask = uploadBytesResumable(fileRef, file);
+                await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed', 
+                        (snap) => { progress.value = (snap.bytesTransferred / snap.totalBytes) * 100; }, 
+                        (err) => reject(err), 
+                        async () => {
+                            const url = await getDownloadURL(uploadTask.snapshot.ref);
+                            const payload = {
+                                section: 'Galeria',
+                                author: $('authorInput').value.trim() || 'System',
+                                title: desc,
+                                text: `<figure class="image"><img src="${url}"></figure>`,
+                                theme: 'auto',
+                                createdAt: serverTimestamp(),
+                                attachment: { url: url, meta: { path: filePath, name: file.name, type: file.type } }
+                            };
+                            await addDoc(collection(db, 'sekcje', 'Galeria', 'entries'), payload);
+                            resolve();
+                        }
+                    );
+                });
+                toast(`Dodano zdjęcie do galerii.`);
+            } catch(err) {
+                toast('Błąd wysyłania pliku.', false);
+                console.error(err);
+            } finally {
+                form.reset();
+                progress.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    function initMenu(state) {
+        const form = $('menuForm'), textInput = $('menuText'), urlInput = $('menuUrl'), orderInput = $('menuOrder'), themeSelect = $('menuTheme'), cancelBtn = $('cancelMenuEditBtn');
+        const listContainer = $('menuListContainer');
+        let menuCache = [];
+
+        const populateThemeSelect = async () => {
+            try {
+                const snap = await getDocs(query(collection(db, 'themes'), orderBy('name')));
+                themeSelect.innerHTML = '';
+                snap.docs.forEach(doc => {
+                    const themeName = doc.data().name;
+                    themeSelect.add(new Option(themeName, themeName));
+                });
+            } catch (e) {
+                console.error("Błąd ładowania motywów", e);
+                toast("Błąd ładowania listy motywów", false);
+            }
+        };
+        populateThemeSelect();
+
+        onSnapshot(query(collection(db, 'menu'), orderBy('order')), (snapshot) => {
+            menuCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = menuCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            menuCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(item.text)}</div><div class="muted-small">${escapeHtml(item.url)} • ${item.order} • Motyw: ${escapeHtml(item.theme || 'Domyślny')}</div></div><div class="row"><button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button></div>`;
+                listContainer.appendChild(div);
+            });
+        });
+
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = menuCache.find(i => i.id === itemId);
+            if (!item) return;
+            const action = button.dataset.action;
+            if (action === 'edit') {
+                state.editId.menu = item.id;
+                textInput.value = item.text;
+                urlInput.value = item.url;
+                orderInput.value = item.order;
+                themeSelect.value = item.theme || '';
+                form.classList.add('is-editing');
+                cancelBtn.style.display = 'inline-block';
+                form.querySelector('button[type="submit"]').textContent = 'Zapisz';
+                textInput.focus();
+            } else if (action === 'del') {
+                if (await confirmAction({ text: `Usunąć element menu "${item.text}"?` })) {
+                    await deleteDoc(doc(db, 'menu', item.id));
+                    toast('Element menu usunięty');
+                }
+            }
+        });
+        
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const sectionName = textInput.value.trim();
+            const data = {
+                text: sectionName,
+                url: urlInput.value.trim(),
+                order: Number(orderInput.value) || 0,
+                theme: themeSelect.value
+            };
+            if (!data.text || !data.url) return;
+            try {
+                // Używamy nazwy sekcji jako ID dokumentu, aby zapewnić spójność
+                await setDoc(doc(db, 'menu', sectionName), data, { merge: true });
+                if (state.editId.menu && state.editId.menu !== sectionName) {
+                    // Jeśli zmieniono nazwę (ID), usuń stary dokument
+                    await deleteDoc(doc(db, 'menu', state.editId.menu));
+                }
+                toast('Zapisano zmiany w menu');
+                genericFormReset(form, state, 'menu', 'Zapisz');
+            } catch (err) { toast('Błąd', false); console.error(err); }
+        });
+        cancelBtn.addEventListener('click', () => genericFormReset(form, state, 'menu', 'Zapisz'));
+    }
+
+    function initHelp(state) {
+        const form = $('helpForm'), cancelBtn = $('cancelHelpEditBtn');
+        const listContainer = $('helpListContainer');
+        const fields = {
+            woj: $('helpWoj'), name: $('helpName'), address: $('helpAddress'),
+            phone: $('helpPhone'), link: $('helpLink')
+        };
+        let helpCache = [];
+        onSnapshot(query(collection(db, 'help'), orderBy('name')), (snapshot) => {
+            helpCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = helpCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            helpCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(item.name)}</div><div class="muted-small">${escapeHtml(item.woj)} | ${escapeHtml(item.address)}</div></div><div class="row"><button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button><button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button></div>`;
+                listContainer.appendChild(div);
+            });
+        });
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = helpCache.find(i => i.id === itemId);
+            if (!item) return;
+            const action = button.dataset.action;
+            if (action === 'edit') {
+                state.editId.help = item.id;
+                for (const key in fields) {
+                    fields[key].value = item[key] || '';
+                }
+                state.editors.help.setData(item.desc || '');
+                form.classList.add('is-editing');
+                cancelBtn.style.display = 'inline-block';
+                form.querySelector('button[type="submit"]').textContent = 'Zapisz zmiany';
+                fields.name.focus();
+            } else if (action === 'del') {
+                if (await confirmAction({ text: `Usunąć pomoc "${item.name}"?` })) {
+                    await deleteDoc(doc(db, 'help', item.id));
+                    toast('Usunięto pomoc');
+                }
+            }
+        });
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {};
+            for(const key in fields) {
+                data[key] = fields[key].value;
+            }
+            data.desc = state.editors.help.getData();
+            if(!data.name) return toast("Nazwa jest wymagana.", false);
+            try {
+                if(state.editId.help) {
+                    await updateDoc(doc(db, 'help', state.editId.help), data);
+                    toast("Pomoc zaktualizowana");
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'help'), data);
+                    toast("Dodano nową pomoc");
+                }
+                genericFormReset(form, state, 'help', 'Zapisz');
+                state.editors.help.setData('');
+            } catch(err) { toast('Błąd', false); console.error(err); }
+        });
+        cancelBtn.addEventListener('click', () => {
+            genericFormReset(form, state, 'help', 'Zapisz');
+            state.editors.help.setData('');
+        });
+    }
+
+    function initNotes(state) {
+        const form = $('noteForm'), titleInput = $('noteTitle');
+        const listContainer = $('noteListContainer');
+        let notesCache = [];
+        onSnapshot(query(collection(db, 'notes'), orderBy('createdAt', 'desc')), (snapshot) => {
+            notesCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = notesCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            notesCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                div.innerHTML = `<div><div style="font-weight:700">${escapeHtml(item.title)}</div><div class="muted-small">${stripHtml(item.content).slice(0, 100)}...</div></div><div class="row"><button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button></div>`;
+                listContainer.appendChild(div);
+            });
+        });
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action="del"]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = notesCache.find(i => i.id === itemId);
+            if (!item) return;
+            if (await confirmAction({ text: `Usunąć notatkę "${item.title}"?` })) {
+                await deleteDoc(doc(db, 'notes', item.id));
+                toast('Notatka usunięta');
+            }
+        });
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {
+                title: titleInput.value.trim(),
+                content: state.editors.notes.getData()
+            };
+            if(!data.title || !data.content) return toast("Tytuł i treść są wymagane.", false);
+            try {
+                data.createdAt = serverTimestamp();
+                await addDoc(collection(db, 'notes'), data);
+                toast("Dodano notatkę");
+                form.reset();
+                state.editors.notes.setData('');
+            } catch(err) { toast('Błąd', false); console.error(err); }
+        });
+    }
+});
+
