@@ -1,194 +1,216 @@
+
+
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
   <title>Centrum Dowodzenia — Latarnia</title>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/admin.css">
   <style>
-    :root { --bg:#0f1724; --card:#1e293b; --muted:#94a3b8; --accent:#ff8f00; --accent-2:#ffb74d; font-family: 'Lato', sans-serif; }
-    html, body { height:100%; margin:0; background:linear-gradient(180deg,#071224 0%, #081827 60%); color:#e6eef8; }
-    .wrap { max-width:1400px; margin:28px auto; padding:18px; }
-    .grid { display:grid; gap:20px; }
-    .g2-main { display:grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-    .g3 { grid-template-columns: repeat(3, 1fr); }
-    .card { background:var(--card); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
-    .row { display:flex; gap:10px; align-items:center; }
-    h3 { margin-top: 0; color: var(--accent-2); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;}
-    label { display:block; font-size:0.85rem; color:var(--muted); margin-bottom:6px; }
-    input, textarea, select { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); color:#e6eef8; box-sizing:border-box; }
-    .list { margin-top:15px; display:flex; flex-direction:column; gap:8px; max-height:400px; overflow-y:auto; padding-right: 5px; }
-    .sep { height:1px; background:linear-gradient(90deg,transparent,#ffffff10,transparent); margin:15px 0; }
-    .icon-picker { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .icon-picker button { background:transparent; border:1px solid rgba(255,255,255,0.1); padding:6px; border-radius:6px; cursor:pointer; color:var(--muted); }
-    #liveContent { background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; min-height:160px; line-height: 1.6; }
-    
-    .ck-editor__editable_inline { background-color: #0f1724 !important; color: #e6eef8 !important; border: 1px solid rgba(255,255,255,0.1) !important; min-height: 400px; }
-    .ck-toolbar { background: #0f1724 !important; border-color: rgba(255,255,255,0.1) !important; }
-    .ck.ck-button, .ck.ck-button__label { color: var(--muted) !important; }
-    .ck.ck-button:hover { background-color: rgba(255,255,255,0.05) !important; }
-    .ck.ck-button.ck-on { background: var(--accent-2) !important; color: #0f1724 !important; }
-    .ck.ck-dropdown__panel { background: var(--card) !important; border-color: rgba(255,255,255,0.1) !important; }
-    .ck.ck-editor__editable.ck-focused { border-color: var(--accent) !important; box-shadow: none !important; }
+    body { visibility: hidden; } 
+    .lazy-load-section { min-height: 150px; display: flex; align-items: center; justify-content: center; opacity: 0.5; transition: opacity 0.3s; }
+    .form.is-editing { background-color: rgba(255, 255, 0, 0.05); border: 1px solid rgba(255, 255, 0, 0.2); border-radius: 8px; padding: 5px; margin: -5px; }
+    .custom-modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .custom-modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .custom-modal-content { background: var(--bg-card); padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; transform: scale(0.9); transition: transform 0.2s; max-width: 400px; width: 90%; }
+    .custom-modal-backdrop.open .custom-modal-content { transform: scale(1); }
+    #customModalText { margin-bottom: 20px; color: var(--text-muted); }
+    .editor-error-overlay { border: 2px dashed var(--border); background: var(--bg-input); padding: 40px; text-align: center; color: var(--text-muted); border-radius: 8px; }
+    #draftBadge { display: none; }
+    #globalToast { position: fixed; right: 20px; bottom: 20px; z-index: 9999; pointer-events: none;}
+    .toast-item { background: #0f5132; color: #fff; padding: 10px 14px; margin-top: 8px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.4); transition: opacity 0.4s, transform 0.4s; transform: translateX(20px); opacity: 0; animation: toast-in 0.5s forwards; }
+    .toast-item.error { background: #6b0f0f; }
+    .toast-item.fade-out { opacity: 0 !important; }
+    @keyframes toast-in { to { transform: translateX(0); opacity: 1; } }
+    .entry-list-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; margin-right: 12px; background-color: var(--bg-input); flex-shrink: 0; }
+    .entry-list-thumb-placeholder { width: 56px; height: 56px; border-radius: 6px; margin-right: 12px; background-color: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); flex-shrink: 0; }
+    .list-item { display: flex; justify-content: space-between; align-items: flex-start; }
+    .entry-list-main { display: flex; align-items: flex-start; flex-grow: 1; min-width: 0; }
+    .entry-list-content { display: flex; flex-direction: column; flex-grow: 1; min-width: 0; }
+    .entry-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .entry-actions-corner { display: flex; flex-shrink: 0; }
+    .list-empty-state { text-align: center; padding: 20px; color: var(--text-muted); }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1><i class="fa-solid fa-satellite-dish"></i> Centrum Dowodzenia "Latarnia"</h1>
+      <h1><i class="fa-solid fa-satellite-dish"></i> Centrum Dowodzenia</h1>
       <div class="row">
-        <a href="index.html" target="_blank" rel="noopener">Podgląd</a>
-        <span id="adminEmail">—</span>
-        <button id="logoutBtn">Wyloguj</button>
+        <a class="chip" href="index.html" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Podgląd</a>
+        <div class="chip muted-small">Zalogowany: <span id="adminEmail">—</span></div>
+        <button id="logoutBtn" class="ghost small" title="Wyloguj"><i class="fa-solid fa-right-from-bracket"></i></button>
+        <button id="themeToggle" class="ghost small" title="Zmień motyw">🌙</button>
       </div>
     </header>
 
-    <main class="grid" style="margin-top:20px;">
-      <section class="card">
-        <h3><i class="fa-solid fa-life-ring"></i> Zarządzaj Pomocą</h3>
-        <form id="helpForm" class="grid g2" style="margin-top:8px;">
-          <div><label for="helpWoj">Województwo</label><select id="helpWoj" required></select></div>
-          <div><label for="helpName">Nazwa Ośrodka</label><input id="helpName" required /></div>
-          <div><label for="helpAddress">Adres</label><input id="helpAddress" /></div>
-          <div><label for="helpPhone">Telefon</label><input id="helpPhone" /></div>
-          <div style="grid-column:1/-1"><label for="helpDesc">Opis</label><textarea id="helpDesc" rows="2"></textarea></div>
-          <div style="grid-column:1/-1"><label for="helpLink">Link (URL)</label><input id="helpLink" type="url" /></div>
-          <div style="grid-column:1/-1" class="row">
-            <button id="addHelpBtn" type="submit">Dodaj</button>
-            <button id="cancelHelpEditBtn" type="button" style="display:none">Anuluj</button>
-            <span id="helpMsg"></span>
-          </div>
-        </form>
-        <div class="sep"></div>
-        <div id="helpListContainer" class="list"></div>
-      </section>
-
-      <section class="card">
-        <h3><i class="fa-solid fa-bars"></i> Menu i Sekcje</h3>
-        <form id="menuForm" class="grid g3" style="margin-top:8px;">
-          <div><label for="menuText">Tekst</label><input id="menuText" required /></div>
-          <div><label for="menuUrl">URL</label><input id="menuUrl" required /></div>
-          <div><label for="menuOrder">Kolejność</label><input id="menuOrder" type="number" value="0" /></div>
-          <div style="grid-column:1/-1" class="row">
-            <button id="addMenuBtn" type="submit">Dodaj</button>
-            <button id="cancelMenuEditBtn" type="button" style="display:none">Anuluj</button>
-            <span id="menuMsg"></span>
-          </div>
-        </form>
-        <div class="sep"></div>
-        <div id="menuListContainer" class="list"></div>
-      </section>
-
-      <section class="card" style="grid-column: 1 / -1;">
-        <h3><i class="fa-solid fa-pen-to-square"></i> Edytor Wpisów</h3>
-        <form id="entryForm" style="margin-top:8px;">
-          <div class="grid g2">
-            <div><label for="sectionSelect">Sekcja</label><select id="sectionSelect"></select></div>
-            <div><label for="authorInput">Autor</label><input id="authorInput" /></div>
-            <div style="grid-column:1/-1">
-              <label for="titleInput">Tytuł (wstaw ikonę klikając poniżej)</label>
-              <input id="titleInput" />
-              <div class="icon-picker" id="iconPicker"></div>
-            </div>
-            <div style="grid-column:1/-1">
-              <label for="contentInput">Treść</label>
-              <textarea id="contentInput"></textarea>
-            </div>
-            <div class="row">
-              <button id="publishBtn" type="submit">Opublikuj</button>
-              <button id="cancelEntryEditBtn" type="button" style="display:none">Anuluj</button>
-              <span id="formMsg"></span>
-            </div>
-          </div>
-        </form>
-      </section>
-      
-      <div class="g2-main">
+    <main class="grid-main">
+      <div class="col-left">
         <section class="card">
-            <h3><i class="fa-solid fa-list-check"></i> Lista Wpisów</h3>
-            <div class="grid g3" style="margin-top:8px;">
-              <div><label for="filterSection">Filtruj</label><select id="filterSection"></select></div>
-              <div><label for="searchInput">Szukaj</label><input id="searchInput" /></div>
-              <div><label for="sortSelect">Sortuj</label>
-                <select id="sortSelect">
-                  <option value="desc">Najnowsze</option>
-                  <option value="asc">Najstarsze</option>
-                  <option value="title">Tytuł A→Z</option>
-                </select>
+          <h3><i class="fa-solid fa-pen-to-square"></i> Edytor Wpisów</h3>
+          <form id="entryForm" class="form">
+            <div class="grid g4">
+              <div class="span-2"><label for="sectionSelect">Sekcja</label><select id="sectionSelect"></select></div>
+              <div><label for="authorInput">Autor</label><input id="authorInput" placeholder="np. Chudy" /></div>
+              <div><label for="themeSelect">Styl wpisu (dla starych sekcji)</label><select id="themeSelect"><option value="auto">Auto</option><option value="piciorys">Piciorys</option><option value="princess">Księżniczka</option><option value="default">Domyślny</option></select></div>
+              <div class="span-4"><label for="titleInput">Tytuł (wstaw ikonę klikając poniżej)</label><input id="titleInput" /><div class="icon-picker" id="iconPicker"></div></div>
+              <div class="span-4"><label for="contentInput">Treść (przeciągnij obrazek, aby go dodać)</label><div id="contentInputWrapper"><textarea id="contentInput" rows="10"></textarea></div></div>
+              <div class="span-4"><label for="attachInput">Główny załącznik (opcjonalnie, np. plik audio)</label><input id="attachInput" type="file" /></div>
+              <progress id="entryUploadProgress" value="0" max="100" style="width:100%; margin-top: 10px; display: none;"></progress>
+              <div class="span-4"><div id="uploadPreview"></div></div>
+              <div class="span-4 row">
+                <button id="publishBtn" type="submit" class="primary">Opublikuj</button>
+                <button id="cancelEntryEditBtn" type="button" class="ghost" style="display:none">Anuluj</button>
+                <div style="flex-grow: 1;"></div>
+                <span class="badge" id="draftBadge">Szkic: —</span>
+                <button type="button" id="clearDraftBtn" class="ghost small" title="Wyczyść wersję roboczą"><i class="fa-solid fa-eraser"></i></button>
               </div>
             </div>
-            <div id="entriesList" class="list"></div>
+          </form>
         </section>
+
+        <section class="card">
+          <h3><i class="fa-solid fa-list-check"></i> Lista Wpisów</h3>
+          <div class="grid g3">
+            <div><label for="filterSection">Filtruj</label><select id="filterSection"></select></div>
+            <div><label for="searchInput">Szukaj</label><input id="searchInput" placeholder="Tytuł lub treść..." /></div>
+            <div><label for="sortSelect">Sortuj</label><select id="sortSelect"><option value="desc">Najnowsze</option><option value="asc">Najstarsze</option><option value="title">Tytuł A→Z</option></select></div>
+          </div>
+          <div id="entriesList" class="list"></div>
+          <div id="paginationControls" class="pagination"></div>
+        </section>
+      </div>
+
+      <div class="col-right">
         <section class="card">
           <h3><i class="fa-solid fa-eye"></i> Podgląd na Żywo</h3>
-          <div id="liveTitle"></div>
-          <div id="liveMeta"></div>
-          <div id="liveContent"></div>
-          <button id="ttsPreviewBtn">Odsłuchaj Podgląd</button>
-          <div id="readerStatus">Lektor: gotowy</div>
+          <h4 id="liveTitle">Tytuł podglądu</h4>
+          <div id="liveMeta" class="muted-small"></div>
+          <article id="liveContent" class="prose"></article>
+          <div class="sep"></div>
+          <div class="row"><button id="ttsPreviewBtn" class="ghost small"><i class="fa-solid fa-play"></i> Odsłuchaj podgląd</button></div>
         </section>
-      </div>
 
-      <div class="grid g3">
-        <section class="card">
-          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Iskierki</h3>
-          <form id="sparkForm">
-            <input id="sparkInput" /><button type="submit">Dodaj</button>
-          </form>
-          <div id="sparksList" class="list"></div>
-        </section>
-        <section class="card">
-          <h3><i class="fa-solid fa-music"></i> Playlista</h3>
-          <form id="playlistForm" class="grid g2">
-            <input id="songTitle" placeholder="Tytuł" />
-            <input id="songLink" placeholder="URL" />
-            <button type="submit">Dodaj</button>
-          </form>
-          <div id="playlistList" class="list"></div>
-        </section>
         <section class="card">
           <h3><i class="fa-solid fa-headphones-simple"></i> Lektor</h3>
-          <p id="readerSelectionInfo">Zaznacz wpis na liście, by go odsłuchać.</p>
-          <button id="ttsListenBtn" disabled>Odsłuchaj</button>
+          <p id="readerSelectionInfo" class="muted-small">Zaznacz wpis na liście, by go odsłuchać.</p>
+          <label for="ttsVoiceSelect" class="muted-small">Wybierz głos:</label>
+          <select id="ttsVoiceSelect"></select>
+          <button id="ttsListenBtn" class="primary small" disabled><i class="fa-solid fa-headphones-simple"></i> Odsłuchaj</button>
+          <div id="readerStatus" class="muted-small">Lektor: gotowy</div>
+        </section>
+
+        <section id="sparksSection" class="card lazy-load-section" data-module="sparks">
+          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Iskierki</h3>
+          <div class="module-content" style="display:none;">
+            <form id="sparkForm" class="form row">
+              <input id="sparkInput" style="flex-grow:1;" placeholder="Wpisz nową Iskierkę..." required />
+              <button type="submit" class="primary small">Dodaj</button>
+              <button type="button" id="cancelSparkEditBtn" class="ghost small" style="display:none;">Anuluj</button>
+            </form>
+            <div class="sep"></div><div id="sparksList" class="list"></div>
+          </div>
+        </section>
+        
+        <section id="playlistSection" class="card lazy-load-section" data-module="playlist">
+          <h3><i class="fa-solid fa-music"></i> Playlista</h3>
+          <div class="module-content" style="display:none;">
+            <form id="playlistForm" class="form grid" style="grid-template-columns: 1fr 1fr auto; align-items:flex-end; gap: 5px;">
+              <div><label for="songTitle">Tytuł</label><input id="songTitle" required /></div>
+              <div><label for="songLink">Link</label><input id="songLink" required /></div>
+              <button type="submit" class="primary small">Dodaj</button>
+            </form>
+            <button type="button" id="cancelPlaylistEditBtn" class="ghost small" style="display:none; margin-top: 5px;">Anuluj edycję</button>
+            <div class="sep"></div><div id="playlistList" class="list"></div>
+          </div>
+        </section>
+        
+        <section id="gallerySection" class="card lazy-load-section" data-module="gallery">
+          <h3><i class="fa-solid fa-images"></i> Galeria</h3>
+          <div class="module-content" style="display:none;">
+            <form id="galleryForm" class="form grid g2" style="align-items: flex-end;">
+                <div><label for="galleryDesc">Opis</label><input id="galleryDesc" required /></div>
+                <div><label for="galleryUpload">Plik</label><input id="galleryUpload" type="file" accept="image/*" required /></div>
+                <div class="span-2"><button type="submit" class="primary small" style="width:100%">Wyślij</button></div>
+            </form>
+            <progress id="galleryProgressBar" value="0" max="100" style="width:100%; margin-top: 10px; display: none;"></progress>
+            <div class="sep"></div><div id="galleryList" class="list"></div>
+          </div>
+        </section>
+        
+        <section id="menuSection" class="card lazy-load-section" data-module="menu">
+          <h3><i class="fa-solid fa-bars"></i> Menu i Sekcje</h3>
+          <div class="module-content" style="display:none;">
+            <form id="menuForm" class="form grid g4">
+              <div class="span-2"><label for="menuText">Tekst (Nazwa Sekcji)</label><input id="menuText" required /></div>
+              <div class="span-2"><label for="menuUrl">URL</label><input id="menuUrl" value="Sekcja.html" required /></div>
+              <div class="span-3"> 
+                <label for="menuTheme">Motyw wizualny</label>
+                <select id="menuTheme"></select>
+              </div>
+              <div><label for="menuOrder">Kolejność</label><input id="menuOrder" type="number" value="0" /></div>
+              <div class="span-4 row"><button type="submit" class="primary small">Zapisz</button><button id="cancelMenuEditBtn" type="button" class="ghost small" style="display:none">Anuluj</button></div>
+            </form>
+            <div class="sep"></div><div id="menuListContainer" class="list"></div>
+          </div>
+        </section>
+        
+        <section id="helpSection" class="card lazy-load-section" data-module="help">
+            <h3><i class="fa-solid fa-life-ring"></i> Zarządzaj Pomocą</h3>
+            <div class="module-content" style="display:none;">
+              <form id="helpForm" class="form grid g2">
+                <div><label for="helpWoj">Województwo</label>
+                  <select id="helpWoj" required>
+                    <option value="Ogólnopolskie">Ogólnopolskie</option><option value="Dolnośląskie">Dolnośląskie</option><option value="Kujawsko-pomorskie">Kujawsko-pomorskie</option><option value="Lubelskie">Lubelskie</option><option value="Lubuskie">Lubuskie</option><option value="Łódzkie">Łódzkie</option><option value="Małopolskie">Małopolskie</option><option value="Mazowieckie">Mazowieckie</option><option value="Opolskie">Opolskie</option><option value="Podkarpackie">Podkarpackie</option><option value="Podlaskie">Podlaskie</option><option value="Pomorskie">Pomorskie</option><option value="Śląskie">Śląskie</option><option value="Świętokrzyskie">Świętokrzyskie</option><option value="Warmińsko-mazurskie">Warmińsko-mazurskie</option><option value="Wielkopolskie">Wielkopolskie</option><option value="Zachodniopomorskie">Zachodniopomorskie</option>
+                  </select>
+                </div>
+                <div><label for="helpName">Nazwa Ośrodka</label><input id="helpName" required /></div>
+                <div><label for="helpAddress">Adres</label><input id="helpAddress" /></div>
+                <div><label for="helpPhone">Telefon</label><input id="helpPhone" /></div>
+                <div class="span-2"><label for="helpDesc">Opis</label><div id="helpDescWrapper"><textarea id="helpDesc" rows="2"></textarea></div></div>
+                <div class="span-2"><label for="helpLink">Link (URL)</label><input id="helpLink" type="url" /></div>
+                <div class="span-2 row"><button type="submit" class="primary small">Zapisz</button><button id="cancelHelpEditBtn" type="button" class="ghost small" style="display:none">Anuluj</button></div>
+              </form>
+              <div class="sep"></div><div id="helpListContainer" class="list"></div>
+            </div>
+        </section>
+        
+        <section id="notesSection" class="card lazy-load-section" data-module="notes">
+            <h3><i class="fa-solid fa-sticky-note"></i> Notatki</h3>
+            <div class="module-content" style="display:none;">
+              <form id="noteForm" class="form">
+                  <div><label for="noteTitle">Tytuł</label><input id="noteTitle" required /></div>
+                  <div style="margin-top:10px;"><label for="noteContent">Treść</label><div id="noteContentWrapper"><textarea id="noteContent" rows="2" required></textarea></div></div>
+                  <div style="margin-top:10px;" class="row"><button type="submit" class="primary small">Zapisz</button></div>
+              </form>
+              <div class="sep"></div><div id="noteListContainer" class="list"></div>
+            </div>
         </section>
       </div>
-
-      <section class="card">
-        <h3><i class="fa-solid fa-images"></i> Galeria</h3>
-        <form id="galleryForm" class="grid g3">
-            <div><label for="galleryDesc">Opis</label><input id="galleryDesc" /></div>
-            <div><label for="galleryUpload">Plik</label><input id="galleryUpload" type="file" accept="image/*" /></div>
-            <div><label>&nbsp;</label><button type="submit" style="width:100%">Wyślij</button></div>
-        </form>
-        <progress id="galleryProgressBar" value="0" max="100"></progress>
-        <div id="galleryList" class="list"></div>
-      </section>
-
-      <section class="card">
-        <h3><i class="fa-solid fa-sticky-note"></i> Notatki</h3>
-        <form id="noteForm">
-            <div><label for="noteTitle">Tytuł</label><input id="noteTitle" required /></div>
-            <div style="margin-top:10px;"><label for="noteContent">Treść</label><textarea id="noteContent" rows="2" required></textarea></div>
-            <div style="margin-top:10px;" class="row">
-              <button id="addNoteBtn" type="submit">Dodaj</button>
-              <button id="cancelNoteEditBtn" type="button" style="display:none">Anuluj</button>
-              <span id="noteMsg"></span>
-            </div>
-        </form>
-        <div id="noteListContainer" class="list"></div>
-      </section>
     </main>
-    
-    <footer><div class="muted-small">© 2025 Od Dna do Światła — Panel administracyjny</div></footer>
+  </div>
+  
+  <div id="entryModal" class="modal"><div class="modal-content"><header class="modal-header"><h3 id="entryModalTitle"></h3><button id="modalCloseBtn" class="ghost small" aria-label="Zamknij okno">&times;</button></header><div id="entryModalMeta" class="muted-small"></div><article id="entryModalBody" class="modal-body prose"></article><footer class="modal-footer"><button id="modalTtsBtn" class="action-button">Odsłuchaj</button><button id="modalEditBtn" class="primary small">Edytuj</button><button id="modalCloseBtn2" class="ghost small">Zamknij</button></footer></div></div>
+  
+  <div id="customConfirmModal" class="custom-modal-backdrop">
+    <div class="custom-modal-content">
+      <h4 id="customModalTitle">Potwierdź działanie</h4>
+      <p id="customModalText">Czy na pewno chcesz to zrobić?</p>
+      <div class="row" style="justify-content: center;">
+        <button id="customConfirmBtn" class="primary danger">Potwierdź</button>
+        <button id="customCancelBtn" class="ghost">Anuluj</button>
+      </div>
+    </div>
   </div>
 
-  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
+  <div id="globalToast"></div>
   
-  <script type="module" src="/js/admin.js"></script>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/translations/pl.js"></script>
 
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>
