@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dzień po Dniu – Od Dna do Światła</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  body { margin:0; overflow:hidden; background:black; color:white; font-family:sans-serif; }
+  #ui { position:fixed; top:15px; left:15px; z-index:10; display:flex; gap:10px; }
+  .action-button { 
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px;
+    font-size: 1em; text-decoration: none; color: #ffd700; background: rgba(0,0,0,0.7);
+    border-radius: 8px; border: 1px solid #ffd700; cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .action-button:hover { background: #ffd700; color: #000; }
+  .action-button:disabled { cursor: not-allowed; opacity: 0.5; background: #222; border-color: #555; color: #777; }
+  canvas { display:block; }
+  #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5em; text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="ui">
+  <button id="runExperienceBtn" class="action-button" disabled><i class="fas fa-play"></i> Uruchom</button>
+  <a href="index.html" class="action-button"><i class="fas fa-arrow-left"></i> Powrót</a>
+</div>
+<div id="loading">Wczytywanie silnika i sceny...</div>
+
+<canvas id="glcanvas"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+<script type="module" src="js/lightlang-player.js"></script>
+
+</body>
+</html>

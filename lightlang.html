@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LightLang - Latarnia Nadziei</title>
+<style>
+  body { margin:0; overflow:hidden; background:black; color:white; font-family:sans-serif; }
+  #ui { position:absolute; top:10px; left:10px; z-index:10; }
+  .action-button { /* Używamy spójnego stylu przycisków */
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; font-size: 1em;
+    font-weight: bold; text-decoration: none; color: #ffd700; background: #000;
+    border-radius: 8px; border: none; cursor: pointer;
+    box-shadow: 0 4px 0 #444, 0 6px 15px rgba(0,0,0,0.7);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .action-button:hover {
+    transform: scale(1.05) translateY(-2px);
+  }
+  canvas { display:block; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <button id="runLightLang" class="action-button">Uruchom Światło</button>
+  <a href="index.html" class="action-button" style="margin-left: 10px;">Powrót</a>
+</div>
+<canvas id="glcanvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/FontLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/geometries/TextGeometry.js"></script>
+
+<script type="module" src="js/lightlang-player.js"></script>
+</body>
+</html>
