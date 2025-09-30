@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latarnia Nadziei</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video autoplay muted loop id="bg-video">
+    <source src="Latarnia.webm" type="video/webm">
+    Twoja przeglądarka nie obsługuje wideo w tle.
+  </video>
+
+  <div class="content-box-dynamic">
+    <div id="manifesto-text">
+      <h2>Projekt „Od Dna do Światła”</h2>
+
+      <h3>Czym jest ten projekt</h3>
+      <p>Projekt „Od Dna do Światła” – nie jest to zwykła strona, nie jest to zwykły blog. To żywe świadectwo drogi człowieka przez cierpienie, uzależnienie, samotność i mroki życia, które niejednego zmiażdżyłyby bez litości.</p>
+
+      <p>Twórcą tego projektu jest Krzysztof Godlewski, znany jako Chudy – człowiek, który nie tylko przeszedł przez piekło własnej przeszłości, ale potrafi je przekuć w narzędzie nadziei dla innych. To jego wizja, jego serce i jego historia, która staje się drogowskazem dla tych, którzy szukają światła po długim upadku.</p>
+
+      <p>Strona powstaje w niesamowitych trudach – każdy element, każda funkcja, każdy efekt wizualny i interaktywny to efekt walki z ograniczeniami technologicznymi, z chaosem kodu, z tym, że wiele osób uznałoby pewne rzeczy za niemożliwe. Nie jeden programista mógłby się schować przy tym, co robi Chudy na swoim telefonie – a on robi to sam, krok po kroku, ręcznie, z precyzją i obsesją, która jest nie do podrobienia.</p>
+
+      <h3>Trzy główne linie projektu</h3>
+      <ul>
+        <li><strong>„Piciorys”</strong> – prawdziwa, emocjonalna historia życia Chudego, pełna bólu, upadków i chwil triumfu.</li>
+        <li><strong>„Kronika”</strong> – codzienne zapiski, refleksje, przemyślenia, które dokumentują drogę przemiany, wspierając innych w ich własnej walce.</li>
+        <li><strong>„Wsparcie”</strong> – część dla użytkowników, którzy szukają słów nadziei, inspiracji i duchowego przewodnictwa, wzmacniających ich w trudnych chwilach.</li>
+      </ul>
+    </div>
+    <div class="button-container-dynamic">
+      <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
+    </div>
+  </div>
+
+  <style>
+    #bg-video {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      z-index: -1;
+    }
+
+    .content-box-dynamic {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      margin: 5vh auto;
+      background-color: rgba(10, 20, 30, 0.85);
+      color: #f0f0f0;
+      padding: 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-box-dynamic h2, .content-box-dynamic h3 {
+      color: #ffd700;
+      text-shadow: 0 0 8px #ffd700;
+    }
+
+    .button-container-dynamic {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .dynamic-button {
+      background-color: #6c757d;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  </style>
+</body>
+</html>
