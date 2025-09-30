@@ -1,88 +1,153 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Latarnia Nadziei</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <video autoplay muted loop id="bg-video">
-    <source src="Latarnia.webm" type="video/webm">
-    Twoja przeglądarka nie obsługuje wideo w tle.
-  </video>
-
-  <div class="content-box-dynamic">
-    <div id="manifesto-text">
-      <h2>Projekt „Od Dna do Światła”</h2>
-
-      <h3>Czym jest ten projekt</h3>
-      <p>Projekt „Od Dna do Światła” – nie jest to zwykła strona, nie jest to zwykły blog. To żywe świadectwo drogi człowieka przez cierpienie, uzależnienie, samotność i mroki życia, które niejednego zmiażdżyłyby bez litości.</p>
-
-      <p>Twórcą tego projektu jest Krzysztof Godlewski, znany jako Chudy – człowiek, który nie tylko przeszedł przez piekło własnej przeszłości, ale potrafi je przekuć w narzędzie nadziei dla innych. To jego wizja, jego serce i jego historia, która staje się drogowskazem dla tych, którzy szukają światła po długim upadku.</p>
-
-      <p>Strona powstaje w niesamowitych trudach – każdy element, każda funkcja, każdy efekt wizualny i interaktywny to efekt walki z ograniczeniami technologicznymi, z chaosem kodu, z tym, że wiele osób uznałoby pewne rzeczy za niemożliwe. Nie jeden programista mógłby się schować przy tym, co robi Chudy na swoim telefonie – a on robi to sam, krok po kroku, ręcznie, z precyzją i obsesją, która jest nie do podrobienia.</p>
-
-      <h3>Trzy główne linie projektu</h3>
-      <ul>
-        <li><strong>„Piciorys”</strong> – prawdziwa, emocjonalna historia życia Chudego, pełna bólu, upadków i chwil triumfu.</li>
-        <li><strong>„Kronika”</strong> – codzienne zapiski, refleksje, przemyślenia, które dokumentują drogę przemiany, wspierając innych w ich własnej walce.</li>
-        <li><strong>„Wsparcie”</strong> – część dla użytkowników, którzy szukają słów nadziei, inspiracji i duchowego przewodnictwa, wzmacniających ich w trudnych chwilach.</li>
-      </ul>
-    </div>
-    <div class="button-container-dynamic">
-      <button id="back-to-main-btn" class="dynamic-button">⟵ Wróć</button>
-    </div>
-  </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O Projekcie — Od Dna do Światła</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <style>
-    #bg-video {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%;
-      min-height: 100%;
-      z-index: -1;
+    /* --- RESET I PODSTAWY --- */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Arial', sans-serif; }
+    html, body { height:100%; width:100%; overflow-x:hidden; }
+
+    /* --- TŁO WIDEO --- */
+    .video-bg {
+      position: fixed; inset:0; z-index:-2; overflow:hidden;
+    }
+    .video-bg video {
+      width:100%; height:100%; object-fit:cover; object-position:center;
     }
 
-    .content-box-dynamic {
-      position: relative;
-      z-index: 10;
-      max-width: 900px;
-      margin: 5vh auto;
-      background-color: rgba(10, 20, 30, 0.85);
-      color: #f0f0f0;
-      padding: 40px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-      animation: fadeIn 1s ease-in-out;
+    /* --- PULSUJĄCE ŚWIATŁO --- */
+    .overlay-light {
+      position: fixed; inset:0;
+      background: radial-gradient(circle, rgba(255,200,50,0.2) 0%, rgba(0,0,0,0.6) 100%);
+      z-index:-1; pointer-events:none; animation: pulseLight 4s ease-in-out infinite;
+    }
+    @keyframes pulseLight {
+      0%,100%{opacity:0.2;}
+      50%{opacity:0.35;}
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* --- KONTENER TREŚCI --- */
+    .wrapper {
+      position: relative; z-index:1;
+      display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+      min-height:100vh; padding:60px 20px; text-align:center;
     }
 
-    .content-box-dynamic h2, .content-box-dynamic h3 {
-      color: #ffd700;
-      text-shadow: 0 0 8px #ffd700;
+    /* --- TYTUŁ NEONOWY --- */
+    .main-title {
+      font-size:clamp(3rem,8vw,5rem); font-weight:900; margin-bottom:40px;
+      color:#ffd700;
+      text-shadow:
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px #ffd700,
+        0 0 30px #ffd700,
+        0 0 40px #ffb800;
+      animation: neonPulse 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes neonPulse {
+      0%{ text-shadow: 0 0 5px #fff,0 0 10px #fff,0 0 20px #ffd700,0 0 30px #ffd700,0 0 40px #ffb800;}
+      100%{ text-shadow: 0 0 10px #fff,0 0 20px #fff,0 0 30px #ffd700,0 0 40px #ffd700,0 0 50px #ffb800;}
     }
 
-    .button-container-dynamic {
-      text-align: center;
-      margin-top: 30px;
+    /* --- SEKCJE TEKSTOWE --- */
+    .content-section {
+      max-width:800px; margin:40px auto; padding:20px; 
+      font-size:1.2rem; line-height:1.7; 
+      opacity:0; transform:translateY(30px); transition:opacity 1s ease-out, transform 1s ease-out;
+    }
+    .content-section.visible { opacity:1; transform:translateY(0); }
+
+    /* Nagłówki sekcji */
+    .content-section h3 {
+      font-size:clamp(1.5rem,4vw,2rem); margin-bottom:15px;
+      color:#ffc107; text-shadow:0 0 5px #ffc107;
     }
 
-    .dynamic-button {
-      background-color: #6c757d;
-      color: white;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
+    /* Akapity - biały tekst z połyskiem */
+    .content-section p {
+      color: #fff; /* biały kolor tekstu */
+      font-weight: 500;
+      text-shadow: 
+        0 1px 2px rgba(255,255,255,0.5), 
+        0 2px 4px rgba(255,255,255,0.3), 
+        0 3px 6px rgba(255,255,255,0.2);
     }
+
+    /* --- PRZYCISK POWROTU --- */
+    .back-button {
+      display:inline-block; margin-top:40px; padding:12px 30px;
+      border:1px solid #ffc107; border-radius:50px; color:#ffc107; font-size:1.2rem;
+      text-decoration:none; transition:all 0.3s ease;
+      position:relative; overflow:hidden;
+    }
+    .back-button::before {
+      content:''; position:absolute; top:0; left:-150%; width:100%; height:100%;
+      background: linear-gradient(100deg, transparent, rgba(255, 238, 179,0.4), transparent);
+      transform: skewX(-25deg); transition:left 0.7s ease-in-out;
+    }
+    .back-button:hover::before { left:150%; }
+    .back-button:hover { box-shadow:0 0 20px rgba(255, 215, 0,0.3); color:#fff; border-color:#fff; }
   </style>
+</head>
+
+<body>
+
+  <div class="video-bg">
+    <video autoplay muted loop playsinline>
+      <source src="videos/latarnia.webm" type="video/webm">
+    </video>
+  </div>
+
+  <div class="overlay-light"></div>
+
+  <div class="wrapper">
+    <h1 class="main-title">O Projekcie</h1>
+
+    <section class="content-section">
+      <h3>Świadectwo Drogi</h3>
+      <p>Projekt „Od Dna do Światła” – nie jest to zwykła strona, nie jest to zwykły blog. To żywe świadectwo drogi człowieka przez cierpienie, uzależnienie, samotność i mroki życia, które niejednego zmiażdżyłyby bez litości.</p>
+    </section>
+
+    <section class="content-section">
+      <h3>Twórca i Jego Wizja</h3>
+      <p>Twórcą tego projektu jest Krzysztof Godlewski, znany jako Chudy – człowiek, który nie tylko przeszedł przez piekło własnej przeszłości, ale potrafi je przekuć w narzędzie nadziei dla innych. To jego wizja, jego serce i jego historia, która staje się drogowskazem dla tych, którzy szukają światła po długim upadku.</p>
+    </section>
+
+    <section class="content-section">
+      <h3>Zrodzony z Pasji i Trudu</h3>
+      <p>Strona powstaje w niesamowitych trudach – każdy element, każda funkcja, każdy efekt wizualny i interaktywny to efekt walki z ograniczeniami technologicznymi, z chaosem kodu, z tym, że wiele osób uznałoby pewne rzeczy za niemożliwe. Nie jeden programista mógłby się schować przy tym, co robi Chudy na swoim telefonie – a on robi to sam, krok po kroku, ręcznie, z precyzją i obsesją, która jest nie do podrobienia.</p>
+    </section>
+
+    <section class="content-section">
+      <h3>Co Znajdziesz na Stronie</h3>
+      <p>Projekt łączy trzy główne linie:<br><br>1. „Piciorys” – prawdziwa, emocjonalna historia życia Chudego, pełna bólu, upadków i chwil triumfu.<br><br>2. „Kronika” – codzienne zapiski, refleksje, przemyślenia, które dokumentują drogę przemiany, wspierając innych w ich własnej walce.<br><br>3. „Wsparcie” – część dla użytkowników, którzy szukają słów nadziei, inspiracji i duchowego przewodnictwa, wzmacniających ich w trudnych chwilach.</p>
+    </section>
+
+    <a href="index.html" class="back-button">⟵ Powrót</a>
+  </div>
+
+  <script>
+    // Animacja wejścia sekcji przy scrollu
+    const sections = document.querySelectorAll('.content-section');
+    window.addEventListener('scroll', () => {
+      sections.forEach(sec => {
+        const top = sec.getBoundingClientRect().top;
+        if(top < window.innerHeight - 100) sec.classList.add('visible');
+      });
+    });
+
+    // Animacja przy starcie
+    window.addEventListener('load', () => {
+      sections.forEach((sec, i) => {
+        setTimeout(() => sec.classList.add('visible'), i*400);
+      });
+    });
+  </script>
+
 </body>
 </html>
