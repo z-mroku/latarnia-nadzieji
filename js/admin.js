@@ -1,4 +1,4 @@
-/ Plik: /js/admin.js (WERSJA OSTATECZNA, NAPRAWIONA, KOMPLETNA)
+// Plik: /js/admin.js (WERSJA OSTATECZNA, NAPRAWIONA, KOMPLETNA)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
