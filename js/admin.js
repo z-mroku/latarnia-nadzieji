@@ -1,5 +1,5 @@
 
-// Plik: /js/admin.js (WERSJA OSTATECZNA Z SILNIKIEM MOTYWÓW)
+// Plik: /js/admin.js (WERSJA NAPRAWCZA - PRZYWRACA FUNKCJE)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -28,7 +28,27 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-document.addEventListener('DOMContentLoaded', () => {
+
+// <<< GŁÓWNA POPRAWKA: CZEKAMY NA POTWIERDZENIE ZALOGOWANIA >>>
+// Dopiero gdy Firebase potwierdzi, że jesteś zalogowany, uruchomimy logikę panelu.
+onAuthStateChanged(auth, user => {
+    if (user) {
+        // Użytkownik jest zalogowany, więc uruchamiamy całą logikę panelu.
+        console.log("✅ Użytkownik jest zalogowany. Uruchamiam panel admina...");
+        document.body.style.visibility = 'visible';
+        runAdminPanel(user); // Uruchamiamy Twoją funkcję
+    } else {
+        // Użytkownik nie jest zalogowany, przekierowujemy na stronę logowania.
+        window.location.href = 'login.html';
+    }
+});
+
+
+// <<< CAŁA TWOJA LOGIKA ZOSTAŁA PRZENIESIONA DO TEJ JEDNEJ FUNKCJI >>>
+// Dzięki temu mamy pewność, że wykona się dopiero po zalogowaniu.
+function runAdminPanel(user) {
+
+    // === POCZĄTEK TWOJEGO ORYGINALNEGO KODU (BEZ ZMIAN) ===
 
     const $ = id => document.getElementById(id);
     const DRAFT_KEY = 'adminEntryDraft_v_final_v7';
@@ -79,16 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('keydown', escapeListener);
         });
     }
-
-    onAuthStateChanged(auth, user => {
-        if (user) {
-            document.body.style.visibility = 'visible';
-            initPanel(user).catch(console.error);
-        } else {
-            window.location.href = 'login.html';
-        }
-    });
-
+    
+    // Ta funkcja jest teraz wywoływana w bezpiecznym miejscu
     async function initPanel(user) {
         const adminEmail = $('adminEmail');
         if (adminEmail) adminEmail.textContent = user.email || user.uid;
@@ -981,5 +993,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(err) { toast('Błąd', false); console.error(err); }
         });
     }
-});
+
+    // Uruchamiamy pierwszą funkcję w łańcuchu
+    initPanel(user);
+}
 
