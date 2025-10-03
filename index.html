@@ -6,8 +6,7 @@
     <title>Od Dna do Światła</title>
     <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-
+    
     <style>
     /* ============================================== */
     /* == STYLE DLA PRZESTROGI I PANELU ADMINA     == */
@@ -18,60 +17,67 @@
       border: 2px solid gold;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
       padding: 20px;
-      margin: 20px auto 40px auto; 
+      margin: 20px auto 40px auto;
       max-width: 800px;
       border-radius: 8px;
       background: rgba(0,0,0,0.2);
+      transition: border-color 0.5s, box-shadow 0.5s; /* Płynne przejścia */
     }
     .animated-warning p {
       border-right: 3px solid rgba(255, 255, 255, .75);
       white-space: pre-wrap;
       overflow: hidden;
       min-height: 1.2em;
-      animation: blink-cursor .75s step-end infinite, gold-glow 3s ease-in-out infinite;
-      font-size: 1.3em;
+      animation: blink-cursor .75s step-end infinite;
+      color: #f0e6d2;
+      font-size: 1.1em;
       text-align: center;
       line-height: 1.6;
-      font-family: 'Cinzel', serif;
-      background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 5px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.4);
-      font-weight: 700;
     }
 
-    @keyframes gold-glow {
-      0%, 100% { text-shadow: 0 0 5px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.4); }
-      50% { text-shadow: 0 0 15px rgba(255,215,0,0.8), 0 0 25px rgba(255,215,0,0.6); }
+    /* === NOWOŚĆ: Animacja czerwonej eksplozji === */
+    @keyframes red-explosion {
+        0% {
+            border-color: gold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        25% {
+            /* Szczyt eksplozji */
+            border-color: #ff4d4d;
+            box-shadow: 0 0 40px #ff1111, 
+                        0 0 80px #ff1111, 
+                        0 0 120px #d40000, 
+                        inset 0 0 30px rgba(255,0,0,0.6);
+        }
+        100% {
+            /* Powolne wygaszanie */
+            border-color: gold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+    }
+    
+    /* Klasa uruchamiająca animację */
+    .explode-red {
+        animation: red-explosion 1.5s ease-out;
     }
 
     @keyframes blink-cursor {
       from, to { border-color: transparent; }
       50% { border-color: rgba(255, 255, 255, .75); }
     }
-
-    @keyframes frame-blink {
-      50% { border-color: transparent; box-shadow: none; }
-    }
-    .blinking-frame {
-      animation: frame-blink 0.3s 3;
-    }
-
+    
     /* 2. PRZYCISK PANELU ADMINA */
     .admin-panel-button {
         position: fixed;
         top: 15px;
         right: 15px;
         z-index: 1001;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
+        display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 20px;
         border: 2px solid #7fffd4;
         border-radius: 25px;
         color: #7fffd4;
-        text-decoration: none;
-        font-weight: bold;
+        text-decoration: none; font-weight: bold;
         background-color: rgba(15, 32, 39, 0.8);
         transition: all 0.3s ease-in-out;
     }
@@ -110,6 +116,11 @@
             <div style="text-align: center; margin: 40px 0;">
                 <a href="latarnia-template.html" class="index-nav-button">
                     <span>O Latarni Nadziei</span>
+                </a>
+            </div>
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="O_Autorze.html" class="index-nav-button">
+                    <span>O Autorze</span>
                 </a>
             </div>
 
@@ -155,14 +166,15 @@
     <script type="module" src="js/main.js"></script>
     
     <script>
-    // SKRYPT DLA PRZESTROGI DLA RODZICÓW
+    // === SKRYPT DLA PRZESTROGI ZMODYFIKOWANY O EKSPLOZJĘ ===
     document.addEventListener('DOMContentLoaded', () => {
       const warningBox = document.getElementById('warning-box');
       const warningTextElement = document.getElementById('warning-text');
       if (warningTextElement) {
           const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
-          const typingSpeed = 50; 
-          const pauseDuration = 10000;
+          const typingSpeed = 50;
+          const pauseDuration = 3000; // Skrócona pauza przed eksplozją
+          const explosionDuration = 1500; // Czas trwania animacji eksplozji w ms
           
           function typeWriter(text, i, onComplete) {
             if (i < text.length) {
@@ -174,16 +186,26 @@
           }
 
           function runAnimationCycle() {
+            // Upewniamy się, że ramka nie ma klasy animacji na starcie
+            warningBox.classList.remove('explode-red');
+            warningTextElement.innerHTML = '';
+            warningTextElement.style.borderRightColor = ''; // Reset kursora
+
             typeWriter(fullText, 0, () => {
+              // Zatrzymujemy miganie kursora po napisaniu
               warningTextElement.style.borderRightColor = 'transparent';
+              
+              // Czekamy chwilę przed eksplozją
               setTimeout(() => {
-                warningBox.classList.add('blinking-frame');
+                // Uruchamiamy animację eksplozji
+                warningBox.classList.add('explode-red');
+                
+                // Po zakończeniu animacji resetujemy cykl
                 setTimeout(() => {
-                  warningBox.classList.remove('blinking-frame');
-                  warningTextElement.innerHTML = '';
-                  warningTextElement.style.borderRightColor = '';
-                  setTimeout(runAnimationCycle, 500);
-                }, 900);
+                  warningTextElement.innerHTML = ''; // Czyścimy tekst
+                  // Czekamy chwilę przed rozpoczęciem nowego cyklu pisania
+                  setTimeout(runAnimationCycle, 1000);
+                }, explosionDuration);
               }, pauseDuration);
             });
           }
@@ -193,3 +215,4 @@
     </script>
 </body>
 </html>
+
