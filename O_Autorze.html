@@ -30,7 +30,19 @@
             to { text-shadow: 0 0 30px rgba(255, 215, 0, 1.2), 0 0 50px rgba(255, 215, 0, 0.9); }
         }
 
-        /* --- NOWOŚĆ: Sekcja Lektora --- */
+        /* DODANY STYL DLA NOWEGO NAGŁÓWKA */
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            color: #fecfef;
+            text-shadow: 0 0 10px rgba(255, 207, 239, 0.7);
+            opacity: 0;
+            animation: fadeInText 1.5s ease-in forwards;
+        }
+
         .lector-controls {
             text-align: center;
             margin-bottom: 30px;
@@ -58,9 +70,7 @@
             transform: scale(1.1);
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
-        .lector-btn.hidden {
-            display: none;
-        }
+        .lector-btn.hidden { display: none; }
 
         p { font-size: 1.1rem; line-height: 1.8; font-weight: 400; text-align: justify; text-shadow: 0 1px 1px rgba(0,0,0,0.7); opacity: 0; animation: fadeInText 1.5s ease-in forwards; }
         @keyframes fadeInText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -72,14 +82,20 @@
         .interactive-word:hover { -webkit-text-fill-color: #fecfef; text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 200, 200, 0.6); animation-play-state: paused; }
         .shimmer-content:has(.interactive-word:hover) { animation-play-state: paused; }
 
+        /* ZAKTUALIZOWANE OPÓŹNIENIA ANIMACJI */
         p:nth-of-type(1) { animation-delay: 1s; }
         p:nth-of-type(2) { animation-delay: 1.3s; }
         p:nth-of-type(3) { animation-delay: 1.6s; }
         p:nth-of-type(4) { animation-delay: 1.9s; }
         p:nth-of-type(5) { animation-delay: 2.2s; }
         p:nth-of-type(6) { animation-delay: 2.5s; }
+        
+        h2 { animation-delay: 2.8s; }
+        p:nth-of-type(7) { animation-delay: 3.1s; }
+        p:nth-of-type(8) { animation-delay: 3.4s; }
+        p:nth-of-type(9) { animation-delay: 3.7s; }
 
-        .contact-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center; opacity: 0; animation: fadeInText 1.5s ease-in forwards; animation-delay: 2.8s; }
+        .contact-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center; opacity: 0; animation: fadeInText 1.5s ease-in forwards; animation-delay: 4.0s; } /* Zaktualizowane opóźnienie */
         .contact-section a { color: #fecfef; text-decoration: none; font-size: 1.2rem; margin: 0 20px; transition: all 0.3s ease; }
         .contact-section a i { margin-right: 10px; transition: all 0.3s ease; }
         .contact-section a:hover { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 215, 0, 0.6); }
@@ -88,6 +104,7 @@
         @media (max-width: 600px) {
             .author-card { padding: 30px 20px; margin: 20px 10px; }
             h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; margin-top: 40px; }
             .lector-btn { width: 50px; height: 50px; font-size: 1.2rem; }
             p { font-size: 1rem; }
             .contact-section a { display: block; margin: 15px 0; }
@@ -121,6 +138,11 @@
         <p><span class="shimmer-content">Chudy wierzy w moc człowieka do odrodzenia się, nawet po najciemniejszych doświadczeniach. Jego życie i twórczość są dowodem, że każdy, kto spojrzy w głąb siebie, może znaleźć iskrę <span class="interactive-word">światła</span>, która stanie się drogowskazem. Strona, którą stworzył, jest miejscem, gdzie jego doświadczenie miesza się z nadzieją, a jego historia staje się mapą dla innych – przewodnikiem dla tych, którzy w chaosie szukają sensu.</span></p>
         <p><span class="shimmer-content">Chudy nie tworzy dla sławy ani dla poklasku. Tworzy, bo musi – bo każda myśl, każda emocja, każdy fragment życia domaga się wyjścia na <span class="interactive-word">światło</span>. Jego autorstwo to manifest wrażliwości, odwagi i wolności. To dowód na to, że nawet wśród chaosu i <span class="interactive-word">burzy</span> myśli można odnaleźć porządek, a nawet w najciemniejszej nocy – <span class="interactive-word">światło</span>.</span></p>
         
+        <h2>O Księżniczce</h2>
+        <p><span class="shimmer-content">Księżniczka – nie z bajki, nie z zamku, nie w koronie. To kobieta z krwi i kości, która tak jak ja zna ciemność i światło. Jej siła to nie słowa, ale obecność. Kiedy ja walczyłem ze swoimi demonami, ona potrafiła usiąść obok – nie żeby ratować, nie żeby oceniać, ale żeby być.</span></p>
+        <p><span class="shimmer-content">Jest współautorką tej strony, bo ta droga nie jest tylko moja. Każdy, kto to czyta, musi wiedzieć: nikt nie wychodzi z bagna sam. Potrzebujesz kogoś, kto chociaż przez chwilę przypomni ci, że masz w sobie człowieka, nie tylko ruinę. Dla mnie tym kimś była właśnie Księżniczka.</span></p>
+        <p><span class="shimmer-content">To nie jest bohaterka z bajki – to bohaterka z życia. I choć w tej stronie moje słowa krzyczą najgłośniej, to jej obecność jest cicha, ale cholernie ważna. Bo gdyby nie ona, może nie byłoby ani mnie, ani tego miejsca.</span></p>
+
         <div class="contact-section">
             <a href="mailto:krzgod8003@gmail.com"><i class="fas fa-envelope"></i>krzgod8003@gmail.com</a>
             <a href="tel:750-825-338"><i class="fas fa-phone"></i>750-825-338</a>
@@ -269,7 +291,7 @@
 
             const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; document.dispatchEvent(new CustomEvent('lector-stopped')); };
             const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; document.dispatchEvent(new CustomEvent('lector-paused')); } };
-            const resume = () => { if (isPaused) { window.speechSynthesis.resume(); isPaused = false; document.dispatchEvent(new CustomEvent('lector-resumed')); } };
+            const resume = () => { if isPaused) { window.speechSynthesis.resume(); isPaused = false; document.dispatchEvent(new CustomEvent('lector-resumed')); } };
             const setMode = (newMode) => { if (modes[newMode]) { mode = newMode; } };
 
             return { enqueue, stop, pause, resume, setMode };
@@ -292,8 +314,9 @@
 
             playBtn.addEventListener('click', () => {
                 if (!isPlaying) {
-                    const textElements = document.querySelectorAll('.author-card p');
-                    const fullText = Array.from(textElements).map(p => p.textContent).join(' ');
+                    // Selektor .author-card p obejmie teraz również nowe akapity
+                    const textElements = document.querySelectorAll('.author-card h2, .author-card p');
+                    const fullText = Array.from(textElements).map(el => el.textContent).join(' ');
                     lektor.setMode('lektorski');
                     lektor.enqueue(fullText);
                 } else {
@@ -342,7 +365,6 @@
                 pauseBtn.title = 'Pauza';
             });
 
-            // Zatrzymanie lektora przy zamykaniu strony, aby uniknąć błędów
             window.addEventListener('beforeunload', () => {
                 lektor.stop();
             });
