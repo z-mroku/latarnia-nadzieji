@@ -30,7 +30,6 @@
             to { text-shadow: 0 0 30px rgba(255, 215, 0, 1.2), 0 0 50px rgba(255, 215, 0, 0.9); }
         }
 
-        /* DODANY STYL DLA NOWEGO NAGŁÓWKA */
         h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 2rem;
@@ -82,7 +81,6 @@
         .interactive-word:hover { -webkit-text-fill-color: #fecfef; text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 200, 200, 0.6); animation-play-state: paused; }
         .shimmer-content:has(.interactive-word:hover) { animation-play-state: paused; }
 
-        /* ZAKTUALIZOWANE OPÓŹNIENIA ANIMACJI */
         p:nth-of-type(1) { animation-delay: 1s; }
         p:nth-of-type(2) { animation-delay: 1.3s; }
         p:nth-of-type(3) { animation-delay: 1.6s; }
@@ -95,7 +93,7 @@
         p:nth-of-type(8) { animation-delay: 3.4s; }
         p:nth-of-type(9) { animation-delay: 3.7s; }
 
-        .contact-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center; opacity: 0; animation: fadeInText 1.5s ease-in forwards; animation-delay: 4.0s; } /* Zaktualizowane opóźnienie */
+        .contact-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center; opacity: 0; animation: fadeInText 1.5s ease-in forwards; animation-delay: 4.0s; }
         .contact-section a { color: #fecfef; text-decoration: none; font-size: 1.2rem; margin: 0 20px; transition: all 0.3s ease; }
         .contact-section a i { margin-right: 10px; transition: all 0.3s ease; }
         .contact-section a:hover { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 215, 0, 0.6); }
@@ -176,7 +174,7 @@
             let currentUtterance = null;
             let isPaused = false;
             let selectedVoice = null;
-            let mode = "lektorski"; // Domyślny tryb
+            let mode = "lektorski";
 
             const modes = {
                 normalny: { rate: 1, pitch: 1, volume: 1 },
@@ -291,7 +289,8 @@
 
             const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; document.dispatchEvent(new CustomEvent('lector-stopped')); };
             const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; document.dispatchEvent(new CustomEvent('lector-paused')); } };
-            const resume = () => { if isPaused) { window.speechSynthesis.resume(); isPaused = false; document.dispatchEvent(new CustomEvent('lector-resumed')); } };
+            // TA LINIA ZOSTAŁA NAPRAWIONA
+            const resume = () => { if (isPaused) { window.speechSynthesis.resume(); isPaused = false; document.dispatchEvent(new CustomEvent('lector-resumed')); } };
             const setMode = (newMode) => { if (modes[newMode]) { mode = newMode; } };
 
             return { enqueue, stop, pause, resume, setMode };
@@ -314,7 +313,6 @@
 
             playBtn.addEventListener('click', () => {
                 if (!isPlaying) {
-                    // Selektor .author-card p obejmie teraz również nowe akapity
                     const textElements = document.querySelectorAll('.author-card h2, .author-card p');
                     const fullText = Array.from(textElements).map(el => el.textContent).join(' ');
                     lektor.setMode('lektorski');
