@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O autorze - Krzysztof "Chudy" Godlewski (z Lektorem)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { margin: 0; font-family: 'Lato', sans-serif; background-color: #0c0c0f; color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #parallax-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-image: radial-gradient(circle at center, #1a1a2a, #0c0c0f); overflow: hidden; }
+        .parallax-layer { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-position: center; background-repeat: repeat; transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        #p-layer-1 { background-image: radial-gradient(1px 1px at 25px 25px, white, rgba(255,255,255,0)); background-size: 100px 100px; }
+        #p-layer-2 { background-image: radial-gradient(1px 1px at 50px 75px, white, rgba(255,255,255,0)); background-size: 200px 200px; }
+        #p-layer-3 { background-image: radial-gradient(2px 2px at 150px 150px, white, rgba(255,255,255,0)); background-size: 300px 300px; }
+
+        .author-card { position: relative; z-index: 1; max-width: 800px; padding: 50px; margin: 40px 20px; background: rgba(0, 0, 0, 0.2); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); opacity: 0; animation: fadeInGlow 2.5s ease-out forwards; }
+        @keyframes fadeInGlow {
+            0% { opacity: 0; transform: scale(0.9); box-shadow: 0 0 0px rgba(255,255,255,0); }
+            50% { opacity: 0.8; box-shadow: 0 0 50px rgba(255,255,255,0.6), 0 0 100px rgba(255,255,255,0.4); }
+            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px rgba(255,255,255,0.1), 0 0 5px rgba(0,0,0,0.5); }
+        }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 8vw, 4.5rem); text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 1px 0px rgba(255,255,255,0.7), 0px 2px 0px rgba(255,255,255,0.6), 0px 3px 0px rgba(255,255,255,0.5), 0px 4px 0px rgba(255,255,255,0.4), 0px 5px 0px rgba(255,255,255,0.3), 0px 6px 0px rgba(255,255,255,0.2), 0px 7px 0px rgba(255,255,255,0.1), 0px 10px 0px rgba(0,0,0,0.1), 0px 12px 10px rgba(0,0,0,0.3), 0 0 20px rgba(255, 215, 0, 1), 0 0 40px rgba(255, 215, 0, 0.7), 0 0 60px rgba(255, 215, 0, 0.4); animation: pulseGold 3s infinite alternate; }
+        @keyframes pulseGold {
+            from { text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 40px rgba(255, 215, 0, 0.7); }
+            to { text-shadow: 0 0 30px rgba(255, 215, 0, 1.2), 0 0 50px rgba(255, 215, 0, 0.9); }
+        }
+
+        /* --- NOWOŚĆ: Sekcja Lektora --- */
+        .lector-controls {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInText 1.5s ease-in forwards;
+            animation-delay: 0.8s;
+        }
+        .lector-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #e0e0e0;
+            font-size: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(3px);
+        }
+        .lector-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            color: #FFD700;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .lector-btn.hidden {
+            display: none;
+        }
+
+        p { font-size: 1.1rem; line-height: 1.8; font-weight: 400; text-align: justify; text-shadow: 0 1px 1px rgba(0,0,0,0.7); opacity: 0; animation: fadeInText 1.5s ease-in forwards; }
+        @keyframes fadeInText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .shimmer-content { display: inline-block; background: linear-gradient(to right, #ff9a9e 20%, #fecfef 40%, white 50%, #fecfef 60%, #ff9a9e 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 10s linear infinite; }
+        @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        
+        .interactive-word { transition: all 0.3s ease; cursor: pointer; }
+        .interactive-word:hover { -webkit-text-fill-color: #fecfef; text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 200, 200, 0.6); animation-play-state: paused; }
+        .shimmer-content:has(.interactive-word:hover) { animation-play-state: paused; }
+
+        p:nth-of-type(1) { animation-delay: 1s; }
+        p:nth-of-type(2) { animation-delay: 1.3s; }
+        p:nth-of-type(3) { animation-delay: 1.6s; }
+        p:nth-of-type(4) { animation-delay: 1.9s; }
+        p:nth-of-type(5) { animation-delay: 2.2s; }
+        p:nth-of-type(6) { animation-delay: 2.5s; }
+
+        .contact-section { margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center; opacity: 0; animation: fadeInText 1.5s ease-in forwards; animation-delay: 2.8s; }
+        .contact-section a { color: #fecfef; text-decoration: none; font-size: 1.2rem; margin: 0 20px; transition: all 0.3s ease; }
+        .contact-section a i { margin-right: 10px; transition: all 0.3s ease; }
+        .contact-section a:hover { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 215, 0, 0.6); }
+        .contact-section a:hover i { transform: scale(1.2); }
+
+        @media (max-width: 600px) {
+            .author-card { padding: 30px 20px; margin: 20px 10px; }
+            h1 { font-size: 2.2rem; }
+            .lector-btn { width: 50px; height: 50px; font-size: 1.2rem; }
+            p { font-size: 1rem; }
+            .contact-section a { display: block; margin: 15px 0; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="parallax-container">
+        <div class="parallax-layer" id="p-layer-1" data-speed="2"></div>
+        <div class="parallax-layer" id="p-layer-2" data-speed="5"></div>
+        <div class="parallax-layer" id="p-layer-3" data-speed="10"></div>
+    </div>
+
+    <div class="author-card">
+        <h1>O autorze</h1>
+
+        <div class="lector-controls">
+            <button id="lector-toggle-play" class="lector-btn" title="Odtwórz tekst">
+                <i class="fas fa-play"></i>
+            </button>
+            <button id="lector-toggle-pause" class="lector-btn hidden" title="Pauza">
+                <i class="fas fa-pause"></i>
+            </button>
+        </div>
+
+        <p><span class="shimmer-content">Krzysztof „Chudy” Godlewski to człowiek, który żyje w ciągłym <span class="interactive-word">przepływie</span> – między przeszłością a przyszłością, <span class="interactive-word">światłem</span> a <span class="interactive-word">cieniem</span>, ciszą a <span class="interactive-word">burzą</span> myśli. Urodzony pod znakiem <span class="interactive-word">Wodnika</span>, jest duszą wolną, niepokorną i nieprzewidywalną, której wewnętrzny kompas nigdy nie zgadza się w pełni z utartymi szlakami świata. Wodnik w nim nie zna kompromisów, za to nosi w sobie głód prawdy, ciekawość wszechświata i potrzebę zrozumienia tego, co niewidoczne dla oka, ale oczywiste dla intuicji.</span></p>
+        <p><span class="shimmer-content">Od najmłodszych lat Chudy doświadczał życia intensywnie, jakby każde wydarzenie miało wyryć w nim ślad na zawsze. Zabawy w lesie, przygody z paczką przyjaciół, eksperymenty, które balansowały na granicy ryzyka i szaleństwa – to wszystko tworzyło fundament jego wrażliwości i odwagi. Jego ścieżka nie była gładka: straty, samotność, zmagania z własnymi demonami – każda trudność była niczym lawa kształtująca skałę. Ale w tej ogniowej próbie Chudy nie zatracił w sobie <span class="interactive-word">światła</span> – wręcz przeciwnie, nauczył się w nim widzieć drogę do innych i do siebie samego.</span></p>
+        <p><span class="shimmer-content">Chudy to autor, który nie ucieka przed prawdą. Jego teksty, jego słowa i jego historia są bezlitosne w swojej szczerości – czasem bolesne, czasem przejmująco jasne. Nie szuka aprobaty, nie buduje iluzji. To, co pisze, powstaje z głębokiego zrozumienia, że życie człowieka nie jest linią prostą, lecz labiryntem, w którym każdy upadek i każde <span class="interactive-word">światło</span> mają sens. Jego piciorys to zapis nie tylko własnych zmagań, ale i przewodnik dla tych, którzy szukają <span class="interactive-word">światła</span> w ciemności – przestrzeń, w której doświadczenie staje się mapą, a nadzieja nie jest sloganem, lecz żywym oddechem.</span></p>
+        <p><span class="shimmer-content">W codziennym świecie Chudy jest praktykiem i twórcą. Lubi działać własnymi rękami, tworzyć w ogrodzie, dotykać rzeczywistości w sposób namacalny, choć jego umysł wciąż wędruje w stronę idei, filozofii i pytań, które nie mają prostych odpowiedzi. Jest obserwatorem ludzi i świata, który widzi więcej niż większość – dostrzega subtelne niuanse, emocje między słowami, prawdę w tym, co często ukryte. Jego intuicja, typowa dla <span class="interactive-word">Wodnika</span>, pozwala mu rozumieć rzeczy wcześniej, zanim staną się oczywiste, i widzieć połączenia, których inni nie zauważają.</span></p>
+        <p><span class="shimmer-content">Chudy wierzy w moc człowieka do odrodzenia się, nawet po najciemniejszych doświadczeniach. Jego życie i twórczość są dowodem, że każdy, kto spojrzy w głąb siebie, może znaleźć iskrę <span class="interactive-word">światła</span>, która stanie się drogowskazem. Strona, którą stworzył, jest miejscem, gdzie jego doświadczenie miesza się z nadzieją, a jego historia staje się mapą dla innych – przewodnikiem dla tych, którzy w chaosie szukają sensu.</span></p>
+        <p><span class="shimmer-content">Chudy nie tworzy dla sławy ani dla poklasku. Tworzy, bo musi – bo każda myśl, każda emocja, każdy fragment życia domaga się wyjścia na <span class="interactive-word">światło</span>. Jego autorstwo to manifest wrażliwości, odwagi i wolności. To dowód na to, że nawet wśród chaosu i <span class="interactive-word">burzy</span> myśli można odnaleźć porządek, a nawet w najciemniejszej nocy – <span class="interactive-word">światło</span>.</span></p>
+        
+        <div class="contact-section">
+            <a href="mailto:krzgod8003@gmail.com"><i class="fas fa-envelope"></i>krzgod8003@gmail.com</a>
+            <a href="tel:750-825-338"><i class="fas fa-phone"></i>750-825-338</a>
+        </div>
+    </div>
+
+    <script>
+        // --- Skrypt Paralaksa ---
+        const isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (!isTouchDevice()) {
+            document.addEventListener('mousemove', function(e) {
+                const layers = document.querySelectorAll('.parallax-layer');
+                const x = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+                const y = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+                layers.forEach(layer => {
+                    const speed = layer.getAttribute('data-speed');
+                    const xOffset = -x * speed * 2;
+                    const yOffset = -y * speed * 2;
+                    layer.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+                });
+            });
+        }
+
+        // --- Skrypt Lektora ---
+
+        // ========================================
+        // Lektor Arcymistrz PRO – Serce projektu
+        // ========================================
+        const lektor = (() => {
+            let queue = [];
+            let currentUtterance = null;
+            let isPaused = false;
+            let selectedVoice = null;
+            let mode = "lektorski"; // Domyślny tryb
+
+            const modes = {
+                normalny: { rate: 1, pitch: 1, volume: 1 },
+                szybki: { rate: 1.4, pitch: 1, volume: 1 },
+                wolny: { rate: 0.8, pitch: 1, volume: 1 },
+                szept: { rate: 1, pitch: 1.2, volume: 0.4 },
+                lektorski: { rate: 0.9, pitch: 0.9, volume: 1 }
+            };
+
+            const stripHtml = (html = "") => {
+                const div = document.createElement("div");
+                div.innerHTML = html;
+                return div.textContent || div.innerText || "";
+            };
+
+            const numToWords = (num) => {
+                if (num > 99999) return num.toString();
+                const ones = ["zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć"];
+                const teens = ["dziesięć", "jedenaście", "dwanaście", "trzynaście", "czternaście", "piętnaście", "szesnaście", "siedemnaście", "osiemnaście", "dziewiętnaście"];
+                const tens = ["", "dziesięć", "dwadzieścia", "trzydzieści", "czterdzieści", "pięćdziesiąt", "sześćdziesiąt", "siedemdziesiąt", "osiemdziesiąt", "dziewięćdziesiąt"];
+                const hundreds = ["", "sto", "dwieście", "trzysta", "czterysta", "pięćset", "sześćset", "siedemset", "osiemset", "dziewięćset"];
+                if (num < 10) return ones[num];
+                if (num < 20) return teens[num - 10];
+                if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? " " + ones[num % 10] : "");
+                if (num < 1000) return hundreds[Math.floor(num / 100)] + (num % 100 ? " " + numToWords(num % 100) : "");
+                if (num === 1000) return "tysiąc";
+                const thousands = Math.floor(num / 1000);
+                const remainder = num % 1000;
+                if (thousands === 1) return "tysiąc" + (remainder ? " " + numToWords(remainder) : "");
+                const endings = { 2: "tysiące", 3: "tysiące", 4: "tysiące" };
+                const ending = (endings[thousands] || "tysięcy");
+                return numToWords(thousands) + " " + ending + (remainder ? " " + numToWords(remainder) : "");
+            };
+
+            const parseDate = (str) => {
+                const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                if (!match) return null;
+                const [_, d, m, y] = match.map(Number);
+                const months = ["", "stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+                return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`;
+            };
+
+            const normalizeText = (input = "") => {
+                let text = stripHtml(input);
+                const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica" };
+                for (const [abbr, full] of Object.entries(replacements)) {
+                    text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full);
+                }
+                text = text.replace(/\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b/g, (d) => parseDate(d) || d);
+                text = text.replace(/\b(\d+)\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); });
+                return text.replace(/\s+/g, " ").trim();
+            };
+
+            const splitText = (text, maxLen = 250) => {
+                const parts = [];
+                const sentences = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]*|[^.!?]+$/g) || [];
+                let chunk = "";
+                for (const s of sentences) {
+                    if ((chunk + " " + s).length > maxLen) {
+                        if (chunk) parts.push(chunk.trim());
+                        chunk = s;
+                    } else {
+                        chunk += " " + s;
+                    }
+                }
+                if (chunk.trim()) parts.push(chunk.trim());
+                return parts;
+            };
+
+            const pickVoice = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (!voices || voices.length === 0) return null;
+                return voices.find(v => v.lang === "pl-PL") || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices.find(v => v.default) || voices[0];
+            };
+
+            const initVoices = () => {
+                selectedVoice = pickVoice();
+                if (selectedVoice) console.log("✅ Wybrany głos lektora:", selectedVoice.name);
+            };
+
+            window.speechSynthesis.onvoiceschanged = initVoices;
+            initVoices();
+
+            const enqueue = (rawText) => {
+                if (!rawText) return;
+                stop();
+                const clean = normalizeText(rawText);
+                const parts = splitText(clean);
+                queue.push(...parts);
+                if (!currentUtterance) speakNext();
+            };
+
+            const speakNext = () => {
+                if (queue.length === 0) {
+                    currentUtterance = null;
+                    document.dispatchEvent(new CustomEvent('lector-finished'));
+                    return;
+                }
+                const text = queue.shift();
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = "pl-PL";
+                if (selectedVoice) currentUtterance.voice = selectedVoice;
+                const cfg = modes[mode] || modes.normalny;
+                currentUtterance.rate = cfg.rate;
+                currentUtterance.pitch = cfg.pitch;
+                currentUtterance.volume = cfg.volume;
+                currentUtterance.onend = () => { if (!isPaused) speakNext(); };
+                currentUtterance.onerror = (e) => { console.error("❌ Błąd lektora:", e); currentUtterance = null; speakNext(); };
+                window.speechSynthesis.speak(currentUtterance);
+                document.dispatchEvent(new CustomEvent('lector-started'));
+            };
+
+            const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; document.dispatchEvent(new CustomEvent('lector-stopped')); };
+            const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; document.dispatchEvent(new CustomEvent('lector-paused')); } };
+            const resume = () => { if (isPaused) { window.speechSynthesis.resume(); isPaused = false; document.dispatchEvent(new CustomEvent('lector-resumed')); } };
+            const setMode = (newMode) => { if (modes[newMode]) { mode = newMode; } };
+
+            return { enqueue, stop, pause, resume, setMode };
+        })();
+        
+        // ========================================
+        // Logika Interfejsu Lektora
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const playBtn = document.getElementById('lector-toggle-play');
+            const pauseBtn = document.getElementById('lector-toggle-pause');
+            
+            if (!playBtn || !pauseBtn) return;
+
+            const playIcon = playBtn.querySelector('i');
+            const pauseIcon = pauseBtn.querySelector('i');
+
+            let isPlaying = false;
+            let isPaused = false;
+
+            playBtn.addEventListener('click', () => {
+                if (!isPlaying) {
+                    const textElements = document.querySelectorAll('.author-card p');
+                    const fullText = Array.from(textElements).map(p => p.textContent).join(' ');
+                    lektor.setMode('lektorski');
+                    lektor.enqueue(fullText);
+                } else {
+                    lektor.stop();
+                }
+            });
+
+            pauseBtn.addEventListener('click', () => {
+                if (!isPaused) {
+                    lektor.pause();
+                } else {
+                    lektor.resume();
+                }
+            });
+            
+            const handleStop = () => {
+                isPlaying = false;
+                isPaused = false;
+                playIcon.className = 'fas fa-play';
+                playBtn.title = 'Odtwórz tekst';
+                pauseBtn.classList.add('hidden');
+            };
+
+            document.addEventListener('lector-started', () => {
+                isPlaying = true;
+                isPaused = false;
+                playIcon.className = 'fas fa-stop';
+                playBtn.title = 'Zatrzymaj';
+                pauseBtn.classList.remove('hidden');
+                pauseIcon.className = 'fas fa-pause';
+                pauseBtn.title = 'Pauza';
+            });
+
+            document.addEventListener('lector-stopped', handleStop);
+            document.addEventListener('lector-finished', handleStop);
+
+            document.addEventListener('lector-paused', () => {
+                isPaused = true;
+                pauseIcon.className = 'fas fa-play';
+                pauseBtn.title = 'Wznów';
+            });
+
+            document.addEventListener('lector-resumed', () => {
+                isPaused = false;
+                pauseIcon.className = 'fas fa-pause';
+                pauseBtn.title = 'Pauza';
+            });
+
+            // Zatrzymanie lektora przy zamykaniu strony, aby uniknąć błędów
+            window.addEventListener('beforeunload', () => {
+                lektor.stop();
+            });
+        });
+
+    </script>
+</body>
+</html>
+
