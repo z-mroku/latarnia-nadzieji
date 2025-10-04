@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gdzie szukać pomocy – Terapia Uzależnień w Polsce</title>
+  <meta name="description" content="Znajdź profesjonalną pomoc w walce z uzależnieniem. Aktualna i darmowa baza szpitali, ośrodków terapii i grup wsparcia we wszystkich województwach." />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.2em;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .filter-bar {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .filter-bar select {
+      padding: 10px;
+      font-size: 1em;
+    }
+
+    .accordion {
+      background-color: #0056b3;
+      color: white;
+      cursor: pointer;
+      padding: 15px;
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 1.1em;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+      margin: 10px 0;
+      text-align: left;
+    }
+
+    .accordion:hover, .accordion.active {
+      background-color: #003f88;
+    }
+
+    .accordion::after {
+      content: '+';
+      float: right;
+      font-size: 1.4em;
+    }
+
+    .accordion.active::after {
+      content: '−';
+    }
+
+    .panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-top: none;
+      padding: 0 15px;
+    }
+
+    .place-entry {
+      border-bottom: 1px dashed #ccc;
+      padding: 15px 0;
+    }
+
+    .place-entry:last-child {
+      border-bottom: none;
+    }
+
+    .place-entry h3 {
+      margin: 0 0 5px;
+    }
+
+    .place-entry p {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Gdzie szukać pomocy – Uzależnienia</h1>
+</header>
+
+<div class="container">
+  <div class="filter-bar">
+    <label for="wojewodztwoSelect"><strong>Filtruj wg województwa:</strong></label>
+    <select id="wojewodztwoSelect">
+      <option value="all">Wszystkie</option>
+      <option value="Dolnośląskie">Dolnośląskie</option>
+      <option value="Kujawsko-Pomorskie">Kujawsko-Pomorskie</option>
+      <option value="Lubelskie">Lubelskie</option>
+      <option value="Lubuskie">Lubuskie</option>
+      <option value="Łódzkie">Łódzkie</option>
+      <option value="Małopolskie">Małopolskie</option>
+      <option value="Mazowieckie">Mazowieckie</option>
+      <option value="Opolskie">Opolskie</option>
+      <option value="Podkarpackie">Podkarpackie</option>
+      <option value="Podlaskie">Podlaskie</option>
+      <option value="Pomorskie">Pomorskie</option>
+      <option value="Śląskie">Śląskie</option>
+      <option value="Świętokrzyskie">Świętokrzyskie</option>
+      <option value="Warmińsko-Mazurskie">Warmińsko-Mazurskie</option>
+      <option value="Wielkopolskie">Wielkopolskie</option>
+      <option value="Zachodniopomorskie">Zachodniopomorskie</option>
+    </select>
+  </div>
+
+  <button class="accordion">📞 Ogólnopolska pomoc i telefony zaufania</button>
+  <div class="panel">
+    <div class="place-entry">
+      <h3>Ogólnopolski Telefon Zaufania Uzależnienia</h3>
+      <p><strong>Telefon:</strong> 800 199 990 (codziennie 16:00–21:00)</p>
+      <p><strong>Opis:</strong> Bezpłatna, anonimowa pomoc dla osób uzależnionych i ich rodzin.</p>
+    </div>
+    <div class="place-entry">
+      <h3>Kryzysowy Telefon Zaufania</h3>
+      <p><strong>Telefon:</strong> 116 123 (codziennie 14:00–22:00)</p>
+      <p><strong>Opis:</strong> Wsparcie dla dorosłych w kryzysie emocjonalnym.</p>
+    </div>
+    <div class="place-entry">
+      <h3>Anonimowi Alkoholicy – Infolinia</h3>
+      <p><strong>Telefon:</strong> 801 033 242 (codziennie 8:00–22:00)</p>
+      <p><strong>Opis:</strong> Informacje o chorobie alkoholowej i spotkaniach AA.</p>
+    </div>
+    <div class="place-entry">
+      <h3>Oficjalny Spis Mityngów AA</h3>
+      <p><a href="https://spis.aa.org.pl/" target="_blank">spis.aa.org.pl – Znajdź mityng AA w Twoim mieście</a></p>
+    </div>
+  </div>
+  <div data-woj="Dolnośląskie">
+      <button class="accordion woj">🏥 Dolnośląskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Dolnośląskie Centrum Zdrowia Psychicznego</h3>
+          <p><strong>Adres:</strong> ul. Wybrzeże J. Słowackiego 12-14, Wrocław</p>
+          <p><strong>Telefon:</strong> 71 326 05 00</p>
+          <p><strong>Opis:</strong> Oddział leczenia uzależnień od alkoholu i narkotyków.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Ośrodek Leczenia Uzależnień "Monar" Wrocław</h3>
+          <p><strong>Adres:</strong> ul. Nowowiejska 28, Wrocław</p>
+          <p><strong>Telefon:</strong> 71 322 58 72</p>
+          <p><strong>Opis:</strong> Terapia uzależnień, grupy wsparcia, detoksykacja.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Wrocław – Mityngi Anonimowych Alkoholików</h3>
+          <p><strong>Adres:</strong> Różne lokalizacje – sprawdź na <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+          <p><strong>Opis:</strong> Spotkania AA w Wrocławiu i całym województwie.</p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Kujawsko-Pomorskie">
+      <button class="accordion woj">🏥 Kujawsko-Pomorskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień – Toruń</h3>
+          <p><strong>Adres:</strong> ul. Szosa Bydgoska 1, Toruń</p>
+          <p><strong>Telefon:</strong> 56 611 88 00</p>
+          <p><strong>Opis:</strong> Oddział dzienny i poradnia terapii uzależnień.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Monar – Ośrodek Rehabilitacyjny Nowa Wieś</h3>
+          <p><strong>Adres:</strong> Nowa Wieś 67, gm. Lubicz</p>
+          <p><strong>Telefon:</strong> 56 674 16 51</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień od narkotyków i alkoholu.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Bydgoszcz i Toruń – Grupy</h3>
+          <p><strong>Opis:</strong> Mityngi AA w regionie – <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Lubelskie">
+      <button class="accordion woj">🏥 Lubelskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień – Lublin</h3>
+          <p><strong>Adres:</strong> ul. Abramowicka 2, 20-442 Lublin</p>
+          <p><strong>Telefon:</strong> 81 744 30 76</p>
+          <p><strong>Opis:</strong> Terapia indywidualna, grupowa, oddział dzienny. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>SP ZOZ w Parczewie – Poradnia Terapii Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. Szpitalna 2, 21-200 Parczew</p>
+          <p><strong>Telefon:</strong> 83 355 12 88</p>
+          <p><strong>Opis:</strong> Bezpłatne leczenie uzależnień od alkoholu, substancji psychoaktywnych.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Lublin – Mityngi</h3>
+          <p><strong>Opis:</strong> Grupy wsparcia w całym województwie – szczegóły na <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+    <div data-woj="Lubuskie">
+      <button class="accordion woj">🏥 Lubuskie</button>
+      <div class="panel woj-panel">
+        </div>
+  </div>
+    <div data-woj="Łódzkie">
+      <button class="accordion woj">🏥 Łódzkie</button>
+      <div class="panel woj-panel">
+        </div>
+  </div>
+  <div data-woj="Małopolskie">
+      <button class="accordion woj">🏥 Małopolskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Szpital Kliniczny im. dr. J. Babińskiego – Kraków</h3>
+          <p><strong>Adres:</strong> ul. Babińskiego 29, 30-393 Kraków</p>
+          <p><strong>Telefon:</strong> 12 65 24 270</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień, detoksykacja, terapia dla nieubezpieczonych. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Ośrodek Terapii Uzależnień „Strefa Trzeźwości” – Tarnów</h3>
+          <p><strong>Adres:</strong> ul. Bitwy o Wał Pomorski 2, 33-100 Tarnów</p>
+          <p><strong>Telefon:</strong> 606 848 211</p>
+          <p><strong>Opis:</strong> Indywidualna i grupowa terapia, wsparcie rodzin, program dla DDA.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Kraków i okolice – Grupy Wsparcia</h3>
+          <p><strong>Opis:</strong> Regularne mityngi AA dostępne na stronie: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Mazowieckie">
+      <button class="accordion woj">🏥 Mazowieckie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Instytut Psychiatrii i Neurologii – Warszawa</h3>
+          <p><strong>Adres:</strong> ul. Sobieskiego 9, 02-957 Warszawa</p>
+          <p><strong>Telefon:</strong> 22 458 26 38</p>
+          <p><strong>Opis:</strong> Jedna z najważniejszych placówek w Polsce. Leczenie uzależnień w ramach NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Szpital Nowowiejski – Oddział Terapii Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. Nowowiejska 27, 00-665 Warszawa</p>
+          <p><strong>Telefon:</strong> 22 822 30 41</p>
+          <p><strong>Opis:</strong> Terapia uzależnień, detoks, leczenie współuzależnienia. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Poradnia Leczenia Uzależnień SP ZOZ Praga-Północ</h3>
+          <p><strong>Adres:</strong> ul. Burdzińskiego 4, 03-480 Warszawa</p>
+          <p><strong>Telefon:</strong> 22 619 29 63</p>
+          <p><strong>Opis:</strong> Leczenie ambulatoryjne uzależnień, również dla młodzieży. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Warszawa i Mazowsze – Grupy wsparcia</h3>
+          <p><strong>Opis:</strong> Spotkania w całym regionie – dostępne na: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Opolskie">
+      <button class="accordion woj">🏥 Opolskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Specjalistyczny Zespół Neuropsychiatryczny w Opolu</h3>
+          <p><strong>Adres:</strong> ul. Wodociągowa 4, 45-221 Opole</p>
+          <p><strong>Telefon:</strong> 77 454 50 41</p>
+          <p><strong>Opis:</strong> Publiczny szpital oferujący leczenie uzależnień, w tym detoks. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Poradnia Terapii Uzależnienia od Alkoholu i Współuzależnienia – Opole</h3>
+          <p><strong>Adres:</strong> ul. Głogowska 37, 45-315 Opole</p>
+          <p><strong>Telefon:</strong> 77 453 09 99</p>
+          <p><strong>Opis:</strong> Leczenie ambulatoryjne – indywidualne i grupowe. Finansowane przez NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Opole i Region</h3>
+          <p><strong>Opis:</strong> Lista spotkań grup AA z regionu dostępna na: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Podkarpackie">
+      <button class="accordion woj">🏥 Podkarpackie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień w Rzeszowie</h3>
+          <p><strong>Adres:</strong> ul. Siemieńskiego 17, 35-234 Rzeszów</p>
+          <p><strong>Telefon:</strong> 17 859 43 00</p>
+          <p><strong>Opis:</strong> Placówka oferująca stacjonarną i ambulatoryjną terapię uzależnień. Leczenie NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Podkarpacki Ośrodek Leczenia Uzależnień – Jarosław</h3>
+          <p><strong>Adres:</strong> ul. Tarnowskiego 1, 37-500 Jarosław</p>
+          <p><strong>Telefon:</strong> 16 624 50 00</p>
+          <p><strong>Opis:</strong> Kompleksowa pomoc dla osób z uzależnieniem od alkoholu i narkotyków. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Rzeszów i okolice</h3>
+          <p><strong>Opis:</strong> Spotkania grup wsparcia w całym regionie, sprawdź aktualny grafik pod <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Podlaskie">
+      <button class="accordion woj">🏥 Podlaskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Stowarzyszenie "Droga" – Ośrodek Terapii Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. Bema 100/1, 15-370 Białystok</p>
+          <p><strong>Telefon:</strong> 85 744 52 24</p>
+          <p><strong>Opis:</strong> Oferuje kompleksową terapię indywidualną i grupową dla osób uzależnionych. Bezpłatnie w ramach NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Poradnia Terapii Uzależnień SP ZOZ MSWiA – Białystok</h3>
+          <p><strong>Adres:</strong> ul. Fabryczna 27, 15-483 Białystok</p>
+          <p><strong>Telefon:</strong> 85 664 88 00</p>
+          <p><strong>Opis:</strong> Poradnia zajmuje się terapią uzależnień od alkoholu, leków i narkotyków. Dostęp do psychologa i psychiatry.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Białystok i region</h3>
+          <p><strong>Opis:</strong> Aktualna mapa mityngów grup Anonimowych Alkoholików w regionie znajduje się na <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Pomorskie">
+      <button class="accordion woj">🏥 Pomorskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień w Gdańsku</h3>
+          <p><strong>Adres:</strong> ul. Srebrniki 1, 80-282 Gdańsk</p>
+          <p><strong>Telefon:</strong> 58 341 43 45</p>
+          <p><strong>Opis:</strong> Oferuje leczenie stacjonarne i ambulatoryjne uzależnień od alkoholu, narkotyków i leków. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Gdyńskie Centrum Profilaktyki i Terapii Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. Warszawska 42, 81-309 Gdynia</p>
+          <p><strong>Telefon:</strong> 58 621 50 91</p>
+          <p><strong>Opis:</strong> Pomoc psychologiczna i terapia dla osób uzależnionych i współuzależnionych. Bezpłatnie.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Stacjonarny Ośrodek Leczenia Uzależnień "Nowy Dom" – Starogard Gdański</h3>
+          <p><strong>Adres:</strong> ul. Skarszewska 7, 83-200 Starogard Gdański</p>
+          <p><strong>Telefon:</strong> 58 562 28 00</p>
+          <p><strong>Opis:</strong> Ośrodek prywatny z programami terapii uzależnień. Leczenie krótkoterminowe i detoksykacja.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Gdańsk – Gdynia – Sopot</h3>
+          <p><strong>Opis:</strong> Grupy wsparcia AA działają w całym Trójmieście – najnowszy harmonogram dostępny na <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Śląskie">
+      <button class="accordion woj">🏥 Śląskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Ośrodek Terapii Uzależnień "Familia" w Gliwicach</h3>
+          <p><strong>Adres:</strong> ul. Słoneczna 2, 44-100 Gliwice</p>
+          <p><strong>Telefon:</strong> 32 231 22 81</p>
+          <p><strong>Opis:</strong> Publiczny ośrodek leczenia uzależnień od alkoholu i substancji psychoaktywnych. Programy dzienne i stacjonarne.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Szpital Specjalistyczny im. J. Babińskiego w Katowicach</h3>
+          <p><strong>Adres:</strong> ul. Korczaka 27, 40-340 Katowice</p>
+          <p><strong>Telefon:</strong> 32 256 37 11</p>
+          <p><strong>Opis:</strong> Oddziały leczenia uzależnień, detoksykacji oraz terapii współuzależnienia. Pracuje w ramach NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Centrum Zdrowia Psychicznego i Leczenia Uzależnień – Cieszyn</h3>
+          <p><strong>Adres:</strong> ul. Bielicka 4, 43-400 Cieszyn</p>
+          <p><strong>Telefon:</strong> 33 852 12 47</p>
+          <p><strong>Opis:</strong> Terapia uzależnień i pomoc psychologiczna w trybie ambulatoryjnym i dziennym.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Katowice i okolice</h3>
+          <p><strong>Opis:</strong> Grupy Anonimowych Alkoholików w Katowicach, Sosnowcu, Tychach, Gliwicach, Częstochowie i innych.  
+          Wyszukiwarka spotkań: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Świętokrzyskie">
+      <button class="accordion woj">🏥 Świętokrzyskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnienia i Współuzależnienia w Kielcach</h3>
+          <p><strong>Adres:</strong> ul. Kościuszki 25, 25-310 Kielce</p>
+          <p><strong>Telefon:</strong> 41 368 39 53</p>
+          <p><strong>Opis:</strong> Oferuje leczenie uzależnień w ramach NFZ – oddział dzienny i poradnia, pomoc dla rodzin i osób współuzależnionych.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Specjalistyczna Poradnia Terapii Uzależnień – Ostrowiec Świętokrzyski</h3>
+          <p><strong>Adres:</strong> ul. Focha 5, 27-400 Ostrowiec Świętokrzyski</p>
+          <p><strong>Telefon:</strong> 41 263 43 88</p>
+          <p><strong>Opis:</strong> Terapia dla osób uzależnionych od alkoholu i innych substancji, grupy wsparcia, NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Stacjonarny Ośrodek Leczenia Uzależnień – Opatów</h3>
+          <p><strong>Adres:</strong> ul. Sienkiewicza 49, 27-500 Opatów</p>
+          <p><strong>Telefon:</strong> 15 868 26 40</p>
+          <p><strong>Opis:</strong> Ośrodek leczenia uzależnień dla dorosłych. Leczenie alkoholizmu, narkomanii i hazardu.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Świętokrzyskie</h3>
+          <p><strong>Opis:</strong> Grupy AA w Kielcach, Starachowicach, Sandomierzu, Skarżysku-Kamiennej i innych miastach.  
+          Aktualne miejsca i godziny spotkań: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Warmińsko-Mazurskie">
+      <button class="accordion woj">🏥 Warmińsko-Mazurskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnienia w Olsztynie</h3>
+          <p><strong>Adres:</strong> ul. Wojska Polskiego 35, 10-228 Olsztyn</p>
+          <p><strong>Telefon:</strong> 89 523 52 00</p>
+          <p><strong>Opis:</strong> Kompleksowa terapia uzależnień – alkohol, narkotyki, leki. Działa w ramach NFZ. Oddział dzienny i poradnia.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Ośrodek Leczenia Uzależnień – Ełk</h3>
+          <p><strong>Adres:</strong> ul. Baranki 24, 19-300 Ełk</p>
+          <p><strong>Telefon:</strong> 87 621 64 12</p>
+          <p><strong>Opis:</strong> Leczenie ambulatoryjne i stacjonarne, grupa dla współuzależnionych. NFZ i prywatnie.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Szpital Psychiatryczny w Węgorzewie – Oddział Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. 3 Maja 17, 11-600 Węgorzewo</p>
+          <p><strong>Telefon:</strong> 87 427 32 30</p>
+          <p><strong>Opis:</strong> Hospitalizacja osób z uzależnieniami. Leczenie alkoholizmu, lekomania, współuzależnienie.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Warmińsko-Mazurskie</h3>
+          <p><strong>Opis:</strong> Grupy wsparcia w Olsztynie, Giżycku, Elblągu, Mrągowie, Ełku i innych miejscowościach.  
+          Aktualny harmonogram spotkań dostępny na: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Wielkopolskie">
+      <button class="accordion woj">🏥 Wielkopolskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wielkopolskie Centrum Zdrowia Psychicznego – Poznań</h3>
+          <p><strong>Adres:</strong> ul. Szpitalna 27/33, 60-572 Poznań</p>
+          <p><strong>Telefon:</strong> 61 846 30 45</p>
+          <p><strong>Opis:</strong> Oddział dzienny terapii uzależnień, leczenie uzależnień od alkoholu, leków, hazardu. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Ośrodek Terapii Uzależnień w Lesznie</h3>
+          <p><strong>Adres:</strong> ul. Paderewskiego 33, 64-100 Leszno</p>
+          <p><strong>Telefon:</strong> 65 529 41 23</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień i współuzależnień. Indywidualne i grupowe terapie. NFZ i prywatnie.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Poradnia Terapii Uzależnień – Kalisz</h3>
+          <p><strong>Adres:</strong> ul. Nowy Świat 35, 62-800 Kalisz</p>
+          <p><strong>Telefon:</strong> 62 764 24 34</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień od substancji psychoaktywnych. Wsparcie dla rodzin. Terapia grupowa.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Wielkopolska</h3>
+          <p><strong>Opis:</strong> Grupy AA w Poznaniu, Koninie, Pile, Lesznie, Gnieźnie i innych miastach.  
+          Dostęp do spotkań: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+  <div data-woj="Zachodniopomorskie">
+      <button class="accordion woj">🏥 Zachodniopomorskie</button>
+      <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Ośrodek Terapii Uzależnień MONAR – Mielenko</h3>
+          <p><strong>Adres:</strong> ul. Morska 1, 76-032 Mielenko (k. Mielna)</p>
+          <p><strong>Telefon:</strong> 94 316 60 85</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień młodzieży i dorosłych, pobyty stacjonarne. Grupy terapeutyczne. NFZ i prywatnie.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień – Szczecin</h3>
+          <p><strong>Adres:</strong> ul. Jagiellońska 11, 70-382 Szczecin</p>
+          <p><strong>Telefon:</strong> 91 462 40 41</p>
+          <p><strong>Opis:</strong> Poradnia i oddział dzienny uzależnień, wsparcie dla współuzależnionych i DDA. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Poradnia Leczenia Uzależnień – Koszalin</h3>
+          <p><strong>Adres:</strong> ul. Lelewela 7, 75-450 Koszalin</p>
+          <p><strong>Telefon:</strong> 94 347 21 50</p>
+          <p><strong>Opis:</strong> Leczenie uzależnień i współuzależnienia. Indywidualna i grupowa psychoterapia. Przychodnia z kontraktem NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Zachodniopomorskie</h3>
+          <p><strong>Opis:</strong> Grupy Anonimowych Alkoholików w Szczecinie, Koszalinie, Świnoujściu, Stargardzie i innych miejscowościach.  
+          Sprawdź na: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
+  </div>
+
+</div>
+
+<footer>
+    <p>&copy; 2025 Wszelkie prawa zastrzeżone. Stworzone z troską.</p>
+</footer>
+
+<script>
+  // Kod JavaScript dla akordeonu i filtra
+  document.addEventListener('DOMContentLoaded', function() {
+    // Funkcjonalność akordeonu
+    const accordions = document.querySelectorAll('.accordion');
+    accordions.forEach(function(accordion) {
+      accordion.addEventListener('click', function() {
+        this.classList.toggle('active');
+        const panel = this.nextElementSibling;
+        if (panel.style.maxHeight) {
+          panel.style.maxHeight = null;
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+    });
+
+    // Funkcjonalność filtra
+    const select = document.getElementById('wojewodztwoSelect');
+    const wojewodztwoDivs = document.querySelectorAll('[data-woj]');
+
+    select.addEventListener('change', function() {
+      const selectedValue = this.value;
+
+      wojewodztwoDivs.forEach(function(div) {
+        if (selectedValue === 'all' || div.getAttribute('data-woj') === selectedValue) {
+          div.style.display = 'block';
+        } else {
+          div.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
