@@ -4,13 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gdzie szukać pomocy – Terapia Uzależnień w Polsce</title>
-  <meta name="description" content="Znajdź profesjonalną pomoc w walce z uzależnieniem. Aktualna i darmowa baza szpitali, ośrodków terapii i grup wsparcia we wszystkich województwach." />
+  <meta name="description" content="Znajdź profesjonalną pomoc w walce z uzależnieniem. Aktualna i darmowa baza szpitali, ośrodków terapii i grup wsparcia we wszystkich województwach, z interaktywną mapą." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f0f2f5;
       margin: 0;
       padding: 0;
+      color: #333;
     }
 
     header {
@@ -18,6 +27,7 @@
       color: white;
       padding: 20px;
       text-align: center;
+      border-bottom: 5px solid #0056b3;
     }
 
     h1 {
@@ -31,7 +41,17 @@
       padding: 20px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px
+ 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Styl dla kontenera mapy */
+    #map {
+        height: 500px;
+        width: 100%;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        border: 2px solid #ddd;
     }
 
     .filter-bar {
@@ -42,6 +62,8 @@
     .filter-bar select {
       padding: 10px;
       font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
     .accordion {
@@ -55,7 +77,7 @@
       font-size: 1.1em;
       transition: background-color 0.3s;
       border-radius: 5px;
-      margin: 10px 0;
+      margin: 10px 0 0;
       text-align: left;
     }
 
@@ -67,6 +89,7 @@
       content: '+';
       float: right;
       font-size: 1.4em;
+      line-height: 1;
     }
 
     .accordion.active::after {
@@ -94,11 +117,21 @@
 
     .place-entry h3 {
       margin: 0 0 5px;
+      color: #0056b3;
     }
 
     .place-entry p {
       margin: 4px 0;
       line-height: 1.5;
+    }
+    
+    .place-entry a {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    .place-entry a:hover {
+        text-decoration: underline;
     }
 
     footer {
@@ -116,6 +149,10 @@
 </header>
 
 <div class="container">
+
+  <h2>Interaktywna Mapa Ośrodków</h2>
+  <div id="map"></div>
+
   <div class="filter-bar">
     <label for="wojewodztwoSelect"><strong>Filtruj wg województwa:</strong></label>
     <select id="wojewodztwoSelect">
@@ -143,18 +180,18 @@
   <div class="panel">
     <div class="place-entry">
       <h3>Ogólnopolski Telefon Zaufania Uzależnienia</h3>
-      <p><strong>Telefon:</strong> 800 199 990 (codziennie 16:00–21:00)</p>
-      <p><strong>Opis:</strong> Bezpłatna, anonimowa pomoc dla osób uzależnionych i ich rodzin.</p>
+      <p><strong>Telefon:</strong> 800 199 990 (czynny codziennie 16:00–21:00)</p>
+      <p><strong>Opis:</strong> Bezpłatna, anonimowa pomoc telefoniczna dla osób uzależnionych i ich bliskich.</p>
     </div>
     <div class="place-entry">
-      <h3>Kryzysowy Telefon Zaufania</h3>
-      <p><strong>Telefon:</strong> 116 123 (codziennie 14:00–22:00)</p>
-      <p><strong>Opis:</strong> Wsparcie dla dorosłych w kryzysie emocjonalnym.</p>
+      <h3>Narkomania - Telefon Zaufania</h3>
+      <p><strong>Telefon:</strong> 800 120 289 (czynny codziennie 10:00-21:00)</p>
+      <p><strong>Opis:</strong> Specjalistyczna pomoc dla osób używających narkotyków, a także ich rodzin i przyjaciół.</p>
     </div>
-    <div class="place-entry">
+     <div class="place-entry">
       <h3>Anonimowi Alkoholicy – Infolinia</h3>
-      <p><strong>Telefon:</strong> 801 033 242 (codziennie 8:00–22:00)</p>
-      <p><strong>Opis:</strong> Informacje o chorobie alkoholowej i spotkaniach AA.</p>
+      <p><strong>Telefon:</strong> 801 033 242 (czynny codziennie 8:00–22:00)</p>
+      <p><strong>Opis:</strong> Informacje o chorobie alkoholowej, wsparcie i dane o najbliższych mityngach AA.</p>
     </div>
     <div class="place-entry">
       <h3>Oficjalny Spis Mityngów AA</h3>
@@ -228,32 +265,100 @@
     <div data-woj="Lubuskie">
       <button class="accordion woj">🏥 Lubuskie</button>
       <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Szpital Specjalistyczny dla Nerwowo i Psychicznie Chorych w Ciborzu</h3>
+          <p><strong>Adres:</strong> Cibórz 13, 66-213 Skąpe</p>
+          <p><strong>Telefon:</strong> 68 341 95 00</p>
+          <p><strong>Opis:</strong> Stacjonarny oddział terapii uzależnień od alkoholu. Leczenie w ramach NFZ.</p>
         </div>
+        <div class="place-entry">
+          <h3>Poradnia Terapii Uzależnienia od Alkoholu – Zielona Góra</h3>
+          <p><strong>Adres:</strong> ul. Wrocławska 42, 65-218 Zielona Góra</p>
+          <p><strong>Telefon:</strong> 68 325 35 66</p>
+          <p><strong>Opis:</strong> Terapia ambulatoryjna dla osób uzależnionych i współuzależnionych. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Ośrodek Leczenia Uzależnień "Neuron" – Gorzów Wielkopolski</h3>
+          <p><strong>Adres:</strong> ul. Walczaka 25, 66-400 Gorzów Wielkopolski</p>
+          <p><strong>Telefon:</strong> 95 722 44 88</p>
+          <p><strong>Opis:</strong> Terapia uzależnień, leczenie ambulatoryjne, grupy wsparcia. NFZ.</p>
+        </div>
+         <div class="place-entry">
+          <h3>AA Lubuskie</h3>
+          <p><strong>Opis:</strong> Znajdź mityng AA w Zielonej Górze, Gorzowie i innych miastach na stronie: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
+      </div>
   </div>
     <div data-woj="Łódzkie">
       <button class="accordion woj">🏥 Łódzkie</button>
       <div class="panel woj-panel">
+        <div class="place-entry">
+          <h3>Wojewódzki Ośrodek Terapii Uzależnień i Współuzależnienia w Łodzi</h3>
+          <p><strong>Adres:</strong> ul. Czechosłowacka 8/10, 92-216 Łódź</p>
+          <p><strong>Telefon:</strong> 42 676 18 50</p>
+          <p><strong>Opis:</strong> Kompleksowa pomoc, oddział dzienny, poradnia, terapia DDA. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>Szpital im. J. Babińskiego w Łodzi – Oddział Terapii Uzależnień</h3>
+          <p><strong>Adres:</strong> ul. Aleksandrowska 159, 91-229 Łódź</p>
+          <p><strong>Telefon:</strong> 42 652 70 11</p>
+          <p><strong>Opis:</strong> Stacjonarne leczenie uzależnień od alkoholu i narkotyków. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>MONAR - Poradnia Profilaktyki, Leczenia i Terapii Uzależnień w Łodzi</h3>
+          <p><strong>Adres:</strong> ul. Tuszyńska 106, 93-305 Łódź</p>
+          <p><strong>Telefon:</strong> 42 646 64 22</p>
+          <p><strong>Opis:</strong> Terapia dla osób uzależnionych od substancji psychoaktywnych i ich rodzin. NFZ.</p>
+        </div>
+        <div class="place-entry">
+          <h3>AA Łódź i region</h3>
+          <p><strong>Opis:</strong> Wyszukiwarka spotkań grup wsparcia dla regionu: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+        </div>
         </div>
   </div>
   <div data-woj="Małopolskie">
       <button class="accordion woj">🏥 Małopolskie</button>
       <div class="panel woj-panel">
-        <div class="place-entry">
-          <h3>Szpital Kliniczny im. dr. J. Babińskiego – Kraków</h3>
-          <p><strong>Adres:</strong> ul. Babińskiego 29, 30-393 Kraków</p>
-          <p><strong>Telefon:</strong> 12 65 24 270</p>
-          <p><strong>Opis:</strong> Leczenie uzależnień, detoksykacja, terapia dla nieubezpieczonych. NFZ.</p>
-        </div>
-        <div class="place-entry">
-          <h3>Ośrodek Terapii Uzależnień „Strefa Trzeźwości” – Tarnów</h3>
-          <p><strong>Adres:</strong> ul. Bitwy o Wał Pomorski 2, 33-100 Tarnów</p>
-          <p><strong>Telefon:</strong> 606 848 211</p>
-          <p><strong>Opis:</strong> Indywidualna i grupowa terapia, wsparcie rodzin, program dla DDA.</p>
-        </div>
-        <div class="place-entry">
-          <h3>AA Kraków i okolice – Grupy Wsparcia</h3>
-          <p><strong>Opis:</strong> Regularne mityngi AA dostępne na stronie: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
-        </div>
+          <div class="place-entry">
+              <h3>Szpital Specjalistyczny im. dr. J. Babińskiego w Krakowie</h3>
+              <p><strong>Adres:</strong> ul. Babińskiego 29, 30-393 Kraków</p>
+              <p><strong>Telefon:</strong> 12 65 24 270 (centrala), 12 65 24 277 (Oddział Terapii Uzależnień)</p>
+              <p><strong>Opis:</strong> Kluczowa placówka w regionie. Oferuje stacjonarne leczenie uzależnień (detoks, terapia) w ramach NFZ. Pomoc także dla osób nieubezpieczonych w stanach nagłych.</p>
+          </div>
+          <div class="place-entry">
+              <h3>Krakowski Ośrodek Terapii Uzależnień (KOTU)</h3>
+              <p><strong>Adres:</strong> ul. Wielicka 73, 30-552 Kraków</p>
+              <p><strong>Telefon:</strong> 12 425 57 47</p>
+              <p><strong>Opis:</strong> Specjalistyczna poradnia oferująca ambulatoryjną i dzienną terapię uzależnień dla dorosłych i młodzieży. Leczenie w ramach NFZ.</p>
+          </div>
+          <div class="place-entry">
+              <h3>Poradnia Profilaktyki i Terapii Uzależnień MONAR w Krakowie</h3>
+              <p><strong>Adres:</strong> ul. Św. Katarzyny 4, 31-063 Kraków</p>
+              <p><strong>Telefon:</strong> 12 430 63 33</p>
+              <p><strong>Opis:</strong> Bezpłatna pomoc ambulatoryjna (nie wymaga skierowania) dla osób uzależnionych od narkotyków, leków, hazardu i ich rodzin. Terapia indywidualna i grupowa.</p>
+          </div>
+           <div class="place-entry">
+              <h3>Wojewódzki Szpital im. Św. Łukasza w Tarnowie - Oddział Leczenia Uzależnień</h3>
+              <p><strong>Adres:</strong> ul. Lwowska 178a, 33-100 Tarnów</p>
+              <p><strong>Telefon:</strong> 14 631 52 38</p>
+              <p><strong>Opis:</strong> Stacjonarny oddział terapii uzależnienia od alkoholu. Terapia podstawowa i pogłębiona w ramach NFZ.</p>
+          </div>
+           <div class="place-entry">
+              <h3>Ośrodek Terapii Uzależnień "Watra" w Nowym Sączu</h3>
+              <p><strong>Adres:</strong> ul. Nawojowska 155a, 33-300 Nowy Sącz</p>
+              <p><strong>Telefon:</strong> 18 441 57 37</p>
+              <p><strong>Opis:</strong> Poradnia leczenia uzależnień oferująca terapię ambulatoryjną dla osób uzależnionych od alkoholu i innych substancji oraz dla ich rodzin. NFZ.</p>
+          </div>
+          <div class="place-entry">
+              <h3>Ośrodek Terapii Uzależnień "Pogranicze" w Zakopanem</h3>
+              <p><strong>Adres:</strong> ul. Harenda 23, 34-500 Zakopane</p>
+              <p><strong>Telefon:</strong> 18 201 59 15</p>
+              <p><strong>Opis:</strong> Prywatny, stacjonarny ośrodek leczenia uzależnień od alkoholu, narkotyków, leków i hazardu. Oferuje detoks i terapie indywidualne.</p>
+          </div>
+          <div class="place-entry">
+              <h3>AA Małopolska – Grupy Wsparcia</h3>
+              <p><strong>Opis:</strong> W całym województwie działają dziesiątki grup Anonimowych Alkoholików. Aktualną listę mityngów w Krakowie, Tarnowie, Nowym Sączu i innych miastach znajdziesz na oficjalnej stronie: <a href="https://spis.aa.org.pl" target="_blank">spis.aa.org.pl</a></p>
+          </div>
       </div>
   </div>
   <div data-woj="Mazowieckie">
@@ -521,9 +626,86 @@
 </footer>
 
 <script>
-  // Kod JavaScript dla akordeonu i filtra
   document.addEventListener('DOMContentLoaded', function() {
-    // Funkcjonalność akordeonu
+    // --- Kod dla MAPY ---
+    const map = L.map('map').setView([52.23, 19.14], 6); // Ustawienie widoku na Polskę
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const locations = [
+      // Dolnośląskie
+      { lat: 51.1079, lon: 17.0557, name: "Dolnośląskie Centrum Zdrowia Psychicznego", address: "ul. Wybrzeże J. Słowackiego 12-14, Wrocław" },
+      { lat: 51.1187, lon: 17.0492, name: "Ośrodek Leczenia Uzależnień 'Monar' Wrocław", address: "ul. Nowowiejska 28, Wrocław" },
+      // Kujawsko-Pomorskie
+      { lat: 53.0138, lon: 18.6291, name: "Wojewódzki Ośrodek Terapii Uzależnień – Toruń", address: "ul. Szosa Bydgoska 1, Toruń" },
+      { lat: 53.0333, lon: 18.7333, name: "Monar – Ośrodek Rehabilitacyjny Nowa Wieś", address: "Nowa Wieś 67, gm. Lubicz" },
+      // Lubelskie
+      { lat: 51.2370, lon: 22.5684, name: "Wojewódzki Ośrodek Terapii Uzależnień – Lublin", address: "ul. Abramowicka 2, Lublin" },
+      { lat: 51.6548, lon: 22.9691, name: "SP ZOZ w Parczewie – Poradnia Terapii Uzależnień", address: "ul. Szpitalna 2, Parczew" },
+      // Lubuskie
+      { lat: 52.1333, lon: 15.5333, name: "Szpital w Ciborzu", address: "Cibórz 13, 66-213 Skąpe" },
+      { lat: 51.9592, lon: 15.5053, name: "Poradnia Terapii Uzależnienia – Zielona Góra", address: "ul. Wrocławska 42, Zielona Góra" },
+      { lat: 52.7661, lon: 15.2277, name: "Ośrodek 'Neuron' – Gorzów Wielkopolski", address: "ul. Walczaka 25, Gorzów Wielkopolski" },
+      // Łódzkie
+      { lat: 51.7687, lon: 19.4570, name: "Wojewódzki Ośrodek Terapii Uzależnień – Łódź", address: "ul. Czechosłowacka 8/10, Łódź" },
+      { lat: 51.7770, lon: 19.3330, name: "Szpital im. J. Babińskiego w Łodzi", address: "ul. Aleksandrowska 159, Łódź" },
+      { lat: 51.7200, lon: 19.4800, name: "MONAR Poradnia – Łódź", address: "ul. Tuszyńska 106, Łódź" },
+      // Małopolskie - NOWE I ZAKTUALIZOWANE WPISY
+      { lat: 50.0267, lon: 19.8972, name: "Szpital Specjalistyczny im. dr. J. Babińskiego", address: "ul. Babińskiego 29, Kraków" },
+      { lat: 50.0306, lon: 19.9808, name: "Krakowski Ośrodek Terapii Uzależnień (KOTU)", address: "ul. Wielicka 73, Kraków" },
+      { lat: 50.0519, lon: 19.9442, name: "Poradnia MONAR w Krakowie", address: "ul. Św. Katarzyny 4, Kraków" },
+      { lat: 50.0055, lon: 20.9995, name: "Szpital im. Św. Łukasza w Tarnowie", address: "ul. Lwowska 178a, Tarnów" },
+      { lat: 49.6133, lon: 20.7025, name: "Ośrodek Terapii Uzależnień 'Watra'", address: "ul. Nawojowska 155a, Nowy Sącz" },
+      { lat: 49.3245, lon: 19.9822, name: "Ośrodek Terapii Uzależnień 'Pogranicze'", address: "ul. Harenda 23, Zakopane" },
+      // Mazowieckie
+      { lat: 52.2131, lon: 21.0425, name: "Instytut Psychiatrii i Neurologii – Warszawa", address: "ul. Sobieskiego 9, Warszawa" },
+      { lat: 52.2384, lon: 21.0028, name: "Szpital Nowowiejski – Warszawa", address: "ul. Nowowiejska 27, Warszawa" },
+      { lat: 52.2618, lon: 21.0664, name: "Poradnia Leczenia Uzależnień Praga-Północ", address: "ul. Burdzińskiego 4, Warszawa" },
+      // Opolskie
+      { lat: 50.6698, lon: 17.9048, name: "Wojewódzki Specjalistyczny Zespół Neuropsychiatryczny w Opolu", address: "ul. Wodociągowa 4, Opole" },
+      { lat: 50.6669, lon: 17.9546, name: "Poradnia Terapii Uzależnienia – Opole", address: "ul. Głogowska 37, Opole" },
+      // Podkarpackie
+      { lat: 50.0833, lon: 22.0000, name: "Wojewódzki Ośrodek Terapii Uzależnień w Rzeszowie", address: "ul. Siemieńskiego 17, Rzeszów" },
+      { lat: 50.0333, lon: 22.6667, name: "Podkarpacki Ośrodek Leczenia Uzależnień – Jarosław", address: "ul. Tarnowskiego 1, Jarosław" },
+      // Podlaskie
+      { lat: 53.1325, lon: 23.1688, name: "Stowarzyszenie 'Droga' – Białystok", address: "ul. Bema 100/1, Białystok" },
+      { lat: 53.1360, lon: 23.1490, name: "Poradnia Terapii Uzależnień MSWiA – Białystok", address: "ul. Fabryczna 27, Białystok" },
+      // Pomorskie
+      { lat: 54.3722, lon: 18.6000, name: "Wojewódzki Ośrodek Terapii Uzależnień w Gdańsku", address: "ul. Srebrniki 1, Gdańsk" },
+      { lat: 54.5189, lon: 18.5305, name: "Gdyńskie Centrum Profilaktyki i Terapii Uzależnień", address: "ul. Warszawska 42, Gdynia" },
+      { lat: 53.8667, lon: 18.4000, name: "Ośrodek 'Nowy Dom' – Starogard Gdański", address: "ul. Skarszewska 7, Starogard Gdański" },
+      // Śląskie
+      { lat: 50.2980, lon: 18.6650, name: "Ośrodek Terapii Uzależnień 'Familia' – Gliwice", address: "ul. Słoneczna 2, Gliwice" },
+      { lat: 50.2500, lon: 19.0833, name: "Szpital Specjalistyczny im. J. Babińskiego – Katowice", address: "ul. Korczaka 27, Katowice" },
+      { lat: 49.7500, lon: 18.6333, name: "Centrum Zdrowia Psychicznego – Cieszyn", address: "ul. Bielicka 4, Cieszyn" },
+      // Świętokrzyskie
+      { lat: 50.8284, lon: 20.6358, name: "Wojewódzki Ośrodek Terapii Uzależnienia – Kielce", address: "ul. Kościuszki 25, Kielce" },
+      { lat: 50.8790, lon: 21.4160, name: "Poradnia Terapii Uzależnień – Ostrowiec Świętokrzyski", address: "ul. Focha 5, Ostrowiec Świętokrzyski" },
+      { lat: 50.7833, lon: 21.5667, name: "Stacjonarny Ośrodek Leczenia Uzależnień – Opatów", address: "ul. Sienkiewicza 49, Opatów" },
+      // Warmińsko-Mazurskie
+      { lat: 53.7784, lon: 20.4801, name: "Wojewódzki Ośrodek Terapii Uzależnienia w Olsztynie", address: "ul. Wojska Polskiego 35, Olsztyn" },
+      { lat: 53.8167, lon: 22.3667, name: "Ośrodek Leczenia Uzależnień – Ełk", address: "ul. Baranki 24, Ełk" },
+      { lat: 54.1667, lon: 21.7500, name: "Szpital Psychiatryczny w Węgorzewie", address: "ul. 3 Maja 17, Węgorzewo" },
+      // Wielkopolskie
+      { lat: 52.4064, lon: 16.9252, name: "Wielkopolskie Centrum Zdrowia Psychicznego – Poznań", address: "ul. Szpitalna 27/33, Poznań" },
+      { lat: 51.8167, lon: 16.5833, name: "Ośrodek Terapii Uzależnień w Lesznie", address: "ul. Paderewskiego 33, Leszno" },
+      { lat: 51.8000, lon: 18.0833, name: "Poradnia Terapii Uzależnień – Kalisz", address: "ul. Nowy Świat 35, Kalisz" },
+      // Zachodniopomorskie
+      { lat: 54.2167, lon: 16.1500, name: "Ośrodek MONAR – Mielenko", address: "ul. Morska 1, Mielenko" },
+      { lat: 53.4350, lon: 14.5450, name: "Wojewódzki Ośrodek Terapii Uzależnień – Szczecin", address: "ul. Jagiellońska 11, Szczecin" },
+      { lat: 54.1833, lon: 16.1667, name: "Poradnia Leczenia Uzależnień – Koszalin", address: "ul. Lelewela 7, Koszalin" }
+    ];
+
+    locations.forEach(function(loc) {
+      L.marker([loc.lat, loc.lon]).addTo(map)
+        .bindPopup(`<b>${loc.name}</b><br>${loc.address}`);
+    });
+
+
+    // --- Kod dla AKORDEONU i FILTRA ---
     const accordions = document.querySelectorAll('.accordion');
     accordions.forEach(function(accordion) {
       accordion.addEventListener('click', function() {
@@ -537,7 +719,6 @@
       });
     });
 
-    // Funkcjonalność filtra
     const select = document.getElementById('wojewodztwoSelect');
     const wojewodztwoDivs = document.querySelectorAll('[data-woj]');
 
