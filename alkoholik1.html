@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z punktu chorego alkoholika</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* Główne style strony */
+        body {
+            font-family: 'Merriweather', serif;
+            font-weight: 400;
+            line-height: 2;
+            background-color: #1a1a1a;
+            color: #c2c2c2;
+            margin: 0;
+            padding: 0 0 120px 0; /* Dodatkowy padding na dole dla panelu lektora */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 50px auto;
+            padding: 40px 60px;
+            background-color: #212121;
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            text-align: center;
+            color: #f5f5f5;
+            letter-spacing: 1.5px;
+        }
+
+        h1 {
+            font-size: 3.2em;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 30px;
+            font-weight: 400;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        h2 {
+            font-size: 2.4em;
+            margin-top: 80px;
+            margin-bottom: 35px;
+            font-weight: 400;
+        }
+        
+        h3 {
+            font-size: 1.8em;
+            margin-top: 60px;
+            margin-bottom: 25px;
+            font-style: italic;
+            font-weight: 300;
+            color: #a99a7c;
+        }
+
+        p {
+            font-size: 1.15em;
+            margin-bottom: 2em;
+            text-align: justify;
+        }
+        
+        .intro {
+            font-style: italic;
+            color: #a99a7c;
+            text-align: center;
+            font-size: 1.25em;
+            margin: 40px 0;
+            padding: 0 20px;
+        }
+        
+        blockquote {
+            border-left: 3px solid #a99a7c;
+            padding-left: 30px;
+            margin: 50px 0;
+            font-style: italic;
+            color: #e0e0e0;
+            font-size: 1.25em;
+            font-weight: 300;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 90px auto;
+            font-size: 1.8em;
+            color: #555;
+            letter-spacing: 1em;
+        }
+
+        .final-epilogue {
+             margin-top: 90px;
+             padding-top: 50px;
+             border-top: 1px solid #444;
+        }
+        
+        .final-epilogue h2 {
+            font-size: 2.8em;
+            color: #f5f5f5;
+        }
+        
+        /* Style dla panelu lektora */
+        .lector-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+
+        .lector-panel button {
+            background-color: transparent;
+            border: 1px solid #a99a7c;
+            color: #a99a7c;
+            font-family: 'Lato', sans-serif;
+            font-size: 1em;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap; /* Zapobiega łamaniu tekstu w przyciskach */
+        }
+        
+        .lector-panel button:hover, .lector-panel button.active {
+            background-color: #a99a7c;
+            color: #1a1a1a;
+            box-shadow: 0 0 15px rgba(169, 154, 124, 0.5);
+        }
+        
+        .lector-panel button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+        }
+        
+        .lector-panel button:disabled:hover {
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+                border: none;
+            }
+            h1 { font-size: 2.5em; }
+            h2 { font-size: 2em; }
+            p { font-size: 1.1em; line-height: 1.8; }
+            blockquote { font-size: 1.15em; }
+            .lector-panel button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="text-to-read">
+
+        <h1>Z Punktu Chorego Alkoholika</h1>
+
+        <p class="intro">
+            Ostrzeżenie: Zanim pójdziesz dalej, zgaś światło. Wyłącz muzykę. To, co za chwilę przeczytasz, wymaga ciszy. To podróż w głąb ciemności, bez mapy i bez gwarancji powrotu. To zbiór głosów z samego serca wojny. Czytaj na własną odpowiedzialność.
+        </p>
+
+        <div class="divider">
+            * * *
+        </div>
+
+        <article>
+            <h2>Ja, Głos i Wódka</h2>
+
+            <h3>Część I: Głos ma zawsze rację</h3>
+            <p>
+                Budzę się, a właściwie to wojna budzi się we mnie. Jeszcze nie otwieram oczu, ale już wiem. Ciało płonie i marznie jednocześnie. Każdy nerw jest jak naciągnięta do granic możliwości struna, która drży w agonii. Serce wali w czaszkę, a nie w klatkę piersiową, próbując rozsadzić mi głowę od środka. W ustach mam smak starej krwi i wstydu. W pokoju unosi się słodkawy smród przepoconej pościeli i przetrawionego alkoholu. To jest poranek. Mój poranek.
+            </p>
+            <p>
+                Pierwsza świadoma myśl nie jest moja. Należy do niego. Do Głosu. On mieszka w mojej głowie od tak dawna, że już nie pamiętam, jak brzmi cisza. Nigdy nie krzyczy. Zawsze jest spokojny, racjonalny.
+            </p>
+            <blockquote>
+                „Spokojnie” – szepcze. „Oddychaj. Wiem, że boli. Wiem, że się boisz. To tylko twoje ciało się buntuje. Potrzebuje lekarstwa. W lodówce jest lekarstwo. Tylko setka. Wypijesz i ręce przestaną ci się trząść. Będziesz mógł normalnie funkcjonować. Przecież musisz jakoś przetrwać ten dzień”.
+            </blockquote>
+            <p>
+                Próbuję walczyć. Resztkami woli, resztkami człowieczeństwa, które jeszcze we mnie zostały, mówię „nie”. „Dzisiaj nie. Koniec z tym”. Głos śmieje się cicho. To nie jest złośliwy śmiech. To śmiech pełen pobłażliwej troski, jak śmiech rodzica patrzącego na naiwne dziecko.
+            </p>
+            <p>
+                „Oczywiście, że koniec” – zgadza się. „Masz absolutną rację. Ale nie dasz rady skończyć w takim stanie. Jesteś chory. Musisz najpierw stanąć na nogi. Uspokoić organizm. To logiczne. Traktuj to jak ostatnią dawkę leku przed odstawieniem. Wstań. Idź do lodówki”.
+            </p>
+            <p>
+                Jego logika jest bezbłędna. Jest jak woda, która wypełnia każdą szczelinę w mojej pękającej psychice. Nie chcę iść. Ale moje nogi już spuszczają się z łóżka. Moje ciało już nie jest moje. To marionetka, a on pociąga za sznurki. Idę do kuchni. Ręce trzęsą mi się tak, że ledwo trafiam kluczem w zamek lodówki, który zamontowałem w jednym z tych idiotycznych zrywów walki o siebie. Drżącą dłonią wyjmuję butelkę. Palce nie potrafią odkręcić nakrętki, więc robię to zębami. Pierwszy łyk ciepłej wódki pali mi przełyk jak kwas. Ciało wygina się w konwulsji. Ale po chwili czuję, jak trucizna rozlewa się po żyłach. Jak uspokaja rozszalałe nerwy. Drżenie rąk powoli ustaje. Piekło w głowie na moment cichnie. Głos ma rację. To jest lekarstwo.
+            </p>
+            <p>
+                Po kilku godzinach i kilku kolejnych „dawkach lekarstwa” przychodzi ten moment. Przebłysk. Siedzę na kanapie, a alkohol na chwilę otwiera okno w mojej zamurowanej celi. I widzę. Widzę zaschniętą plamę na dywanie. Widzę stos nieodebranych listów na stole. Widzę na ekranie telefonu dwadzieścia siedem połączeń od mojej matki. I nagle, jak fala tsunami, zalewa mnie żałoba. Płaczę. Nie płaczę łzami, płaczę całym ciałem. To szloch za człowiekiem, którym kiedyś byłem. Za życiem, które utopiłem. Za miłością, którą zdeptałem. Ból jest tak fizyczny, tak totalny, że wyrywa mnie z odrętwienia. Chcę umrzeć. Naprawdę chcę umrzeć.
+            </p>
+            <blockquote>
+                I wtedy znów pojawia się on. Głos. Tym razem jest pełen czułości. Obejmuje mnie ramieniem. „Wiem, że boli” – szepcze. „Widzę twoje cierpienie. Jesteś dobrym człowiekiem, dlatego tak cię to wszystko niszczy. Ale nie musisz tego czuć. Nie musisz. Mam na to sposób. Znam lekarstwo. Jest w butelce. Wypijmy. Wypijmy, aż znów będzie cicho. Aż znów będzie dobrze. Zasłużyłeś na chwilę spokoju. Zasłużyłeś”.
+            </blockquote>
+            <p>
+                Ma rację. Głos ma zawsze rację. Podnoszę butelkę i piję. Piję łapczywie, prosto z gwinta, aż cały ten ból, cała ta świadomość, cała ta żałoba znów tonie w lepkim, ciemnym bagnie. Aż znów jestem nikim. Aż znów jest cicho.
+            </p>
+
+            <h3>Część II: Cisza na dnie</h3>
+            <p>
+                Myślisz, że dno to jest moment, w którym tracisz pracę, rodzinę i dom. To nie jest dno. To tylko kolejne etapy upadku. Prawdziwe dno jest znacznie niżej. Dno to moment, w którym alkohol przestaje działać.
+            </p>
+            <p>
+                To był wtorek. A może czwartek. Dni już dawno zlały mi się w jedną, szarą masę. Piłem od rana. Ale coś było nie tak. Wódka nie przynosiła już ulgi. Nie uspokajała. Nie znieczulała. Wręcz przeciwnie. Każdy kieliszek potęgował lęk, wyostrzał nienawiść do samego siebie. Byłem pijany i jednocześnie przeraźliwie trzeźwy w ocenie własnego upadku. Tortura była podwójna.
+            </p>
+            <p>
+                Wieczorem przyszła moja siostra. Nie wiem dlaczego. Może to była ostatnia próba. Stała w progu, patrząc na mnie i na ten syf wokół. Ja, pijany, zacząłem krzyczeć. Chciałem ją sprowokować. Chciałem, żeby na mnie nawrzeszczała, żeby mnie uderzyła, żeby pokazała, że jej jeszcze zależy. Żeby cokolwiek poczuć. A ona tylko patrzyła. I w jej oczach nie było złości, nie było smutku, nie było nawet litości. Była tylko spokojna, przerażająca obojętność. Patrzyła na mnie tak, jak patrzy się na zepsuty mebel, który trzeba w końcu wyrzucić. Jak na kogoś, kto już umarł, tylko ciało jeszcze o tym nie wie.
+            </p>
+            <p>
+                I w tej chwili, w tej jej obojętności, zobaczyłem prawdę. Zabiłem w niej ostatnią resztkę nadziei. Zabiłem jej miłość do mnie. Zostałem sam. Gdy wyszła, w moim mieszkaniu zapadła cisza. Ale to była inna cisza. Głos też zamilkł. Bo co mógł mi teraz zaoferować? Ulgi już nie było. Zapomnienia też nie. Jedyne, co zostało, to ból. Czysty, stuprocentowy, nieznieczulony ból.
+            </p>
+            <p>
+                Leżałem na podłodze, a w mojej głowie po raz pierwszy od lat nie było nic. Żadnych szeptów, żadnych wspomnień, żadnych krzyków. Tylko pustka. I świadomość, że umieram. Że każda opcja to śmierć. Picie to powolna śmierć w agonii. Niepicie to szybka śmierć w agonii. To było to. Dno. Absolutna cisza na samym dnie piekła. Nie wiem, skąd wziąłem siłę. To nie była siła. To była ostateczna kapitulacja. Doczołgałem się do telefonu. Wybrałem numer, który ktoś kiedyś zapisał mi na kartce. Ktoś odebrał. A ja nie mogłem wydusić słowa. Po prostu płakałem do słuchawki. A potem wyszeptałem jedno słowo: „Pomocy”. To nie był krzyk zwycięstwa. To był ostatni skowyt pokonanego zwierzęcia.
+            </p>
+
+            <h3>Część III: Wojna w świetle dnia</h3>
+            <p>
+                Zapomnij o wszystkim, co widziałeś na filmach. Trzeźwość to nie jest piękny wschód słońca po burzliwej nocy. Trzeźwość to przeniesienie wojny z ciemnej, śmierdzącej piwnicy na otwarte, zalane słońcem pole. Teraz nie ma gdzie się schować. Widzisz każdego wroga. I czujesz każde, nawet najmniejsze draśnięcie.
+            </p>
+            <p>
+                Pierwsze tygodnie to piekło. Twoje ciało wije się w agonii. Głos wrócił. Teraz już nie szepcze. Teraz wrzeszczy. Błaga, grozi, szantażuje. Pokazuje ci obrazy zimnej, zapoconej butelki. Obiecuje, że jeśli tylko stąd wyjdziesz, on wszystko naprawi. To jest nieustanny, trwający całą dobę atak paniki. Ale przetrwałeś. I wtedy zaczynają się dziać te małe, popieprzone cuda, które nazywają „momentami zwycięstwa”.
+            </p>
+            <p>
+                Zwycięstwo to nie jest odzyskanie rodziny. Zwycięstwo to pierwszy od lat prawdziwy smak jedzenia, które nie jest tylko zagryzką. Zwycięstwo to przespanie trzech godzin bez budzenia się w kałuży potu. Zwycięstwo to moment, w którym patrzysz ekspedientce w sklepie w oczy i nie czujesz się jak robak. To chwile tak małe i tak gigantyczne, że chce ci się płakać z wdzięczności.
+            </p>
+            <p>
+                Ale wojna trwa. Głos jest cierpliwy. Zmienił taktykę. Teraz jest sabotażystą. Atakuje w najlepszych momentach. Dostałeś pracę? *„No i brawo. Należy ci się nagroda. Jedno piwo, jak za starych, dobrych czasów. Przecież teraz już panujesz nad sytuacją”*. Pokłóciłeś się z kimś? *„Widzisz? Mówiłem, że na trzeźwo nie dasz rady. Świat jest do dupy. Wypij, zapomnij”*.
+            </p>
+            <p>
+                Trzeźwość to codzienne, świadome przeżywanie żałoby po sobie samym. To konfrontacja ze zniszczeniami. To patrzenie w oczy ludziom, których skrzywdziłeś i mówienie „przepraszam”, wiedząc, że to słowo niczego nie naprawi. To nauka odczuwania emocji na nowo – radości, która jest tak intensywna, że aż boli, i smutku, który jest tak głęboki, że boisz się, że utoniesz. Nie ma znieczulenia. Jest tylko życie. Nagie, surowe i bolesne.
+            </p>
+            <p>
+                Minęły dwa lata. Każdego ranka staję przed lustrem. Nie widzę już potwora. Nie widzę też człowieka, którym byłem. Widzę kogoś nowego. Obcego. Zmęczonego weterana z bliznami na duszy. Słyszę w głowie cichy szept Głosu. Już nie rozkazuje, tylko pyta. Kusicielsko. Już z nim nie walczę. Nie dyskutuję. Po prostu go słyszę. Przyjmuję do wiadomości, że jest częścią mnie. Jak blizna. Jak wspomnienie amputowanej kończyny. Biorę głęboki oddech, patrzę temu obcemu facetowi w lustrze prosto w oczy i bez słów mówię mu: „Nie dzisiaj, skurwysynu”. Wojna się nie skończyła. Ona nigdy się nie skończy.
+            </p>
+            <blockquote>
+                Ale dzisiaj. Tylko dzisiaj. To ja tu dowodzę.
+            </blockquote>
+        </article>
+        
+        <div class="divider">
+            * * *
+        </div>
+      
+            </p>
+        </div>
+    </div>
+    
+    <div class="lector-panel">
+        <button id="playBtn" title="Odtwarzaj">PLAY</button>
+        <button id="pauseBtn" title="Pauza" disabled>PAUZA</button>
+        <button id="resumeBtn" title="Wznów" disabled>WZNÓW</button>
+        <button id="stopBtn" title="Zatrzymaj / Powrót na początek">STOP</button>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- System Lektora ---
+        const lektor = (() => {
+            let queue = [];
+            let currentUtterance = null;
+            let isPaused = false;
+            let selectedVoice = null;
+
+            const stripHtml = (html = "") => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                return doc.body.textContent || "";
+            };
+
+            const normalizeText = (input = "") => {
+                let text = stripHtml(input);
+                const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "św.": "świętego" };
+                for (const [abbr, full] of Object.entries(replacements)) {
+                    text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full);
+                }
+                return text.replace(/\s+/g, " ").trim();
+            };
+            
+            const splitText = (text, maxLen = 220) => {
+                const parts = [];
+                const sentences = text.match(/[^.!?…]+[.!?…]?/g) || [];
+                let currentChunk = "";
+
+                for (const sentence of sentences) {
+                    if (currentChunk.length + sentence.length > maxLen) {
+                        if (currentChunk.trim()) {
+                            parts.push(currentChunk.trim());
+                        }
+                        currentChunk = sentence;
+                    } else {
+                        currentChunk += " " + sentence;
+                    }
+                }
+                if (currentChunk.trim()) {
+                    parts.push(currentChunk.trim());
+                }
+                return parts;
+            };
+
+            const pickVoice = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (!voices || voices.length === 0) return null;
+                return voices.find(v => v.name === "Google polski") || voices.find(v => v.lang === "pl-PL") || voices.find(v => v.lang.startsWith("pl")) || null;
+            };
+
+            const initVoices = () => {
+                selectedVoice = pickVoice();
+                if (selectedVoice) {
+                    console.log("Lektor: Wybrano głos:", selectedVoice.name);
+                } else {
+                    console.warn("Lektor: Nie znaleziono polskiego głosu. Użyty zostanie głos domyślny.");
+                }
+            };
+
+            window.speechSynthesis.onvoiceschanged = initVoices;
+            initVoices();
+
+            const speakNext = () => {
+                if (isPaused) return;
+                if (queue.length === 0) {
+                    currentUtterance = null;
+                    document.dispatchEvent(new CustomEvent('lector-finished'));
+                    return;
+                }
+
+                const text = queue.shift();
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = "pl-PL";
+                if (selectedVoice) {
+                    currentUtterance.voice = selectedVoice;
+                }
+                currentUtterance.rate = 0.9;
+                currentUtterance.pitch = 0.95;
+                currentUtterance.volume = 1;
+
+                currentUtterance.onend = () => {
+                    setTimeout(() => speakNext(), 200);
+                };
+                currentUtterance.onerror = (e) => {
+                    console.error("Lektor: Wystąpił błąd:", e);
+                    currentUtterance = null;
+                    speakNext(); 
+                };
+                
+                window.speechSynthesis.speak(currentUtterance);
+                document.dispatchEvent(new CustomEvent('lector-speaking'));
+            };
+            
+            const enqueue = (rawHtml) => {
+                if (!rawHtml) return;
+                stop();
+                const cleanText = normalizeText(rawHtml);
+                queue = splitText(cleanText);
+                speakNext();
+            };
+
+            const stop = () => {
+                isPaused = false;
+                queue = [];
+                window.speechSynthesis.cancel();
+                currentUtterance = null;
+                document.dispatchEvent(new CustomEvent('lector-stopped'));
+            };
+
+            const pause = () => {
+                if (window.speechSynthesis.speaking && !isPaused) {
+                    window.speechSynthesis.pause();
+                    isPaused = true;
+                    document.dispatchEvent(new CustomEvent('lector-paused'));
+                }
+            };
+
+            const resume = () => {
+                if (isPaused) {
+                    isPaused = false;
+                    // WORKAROUND: Anuluj bieżącą (potencjalnie zablokowaną) wypowiedź
+                    // i ręcznie uruchom następną z kolejki. To obchodzi błąd przeglądarki,
+                    // w którym zdarzenie 'onend' nie jest wywoływane po wznowieniu.
+                    window.speechSynthesis.cancel();
+                    document.dispatchEvent(new CustomEvent('lector-resumed'));
+                    // Dajemy krótki czas na wykonanie `cancel()` przed startem kolejnej wypowiedzi
+                    setTimeout(() => speakNext(), 50);
+                }
+            };
+            
+            return { enqueue, stop, pause, resume };
+        })();
+
+        // --- Kontrola UI Lektora ---
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const textContainer = document.getElementById('text-to-read');
+
+        const updateButtons = (state) => {
+            switch (state) {
+                case 'playing':
+                    playBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    resumeBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    playBtn.classList.remove('active');
+                    pauseBtn.classList.add('active');
+                    resumeBtn.classList.remove('active');
+                    break;
+                case 'paused':
+                    playBtn.disabled = true;
+                    pauseBtn.disabled = true;
+                    resumeBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    pauseBtn.classList.remove('active');
+                    resumeBtn.classList.add('active');
+                    break;
+                case 'stopped':
+                default:
+                    playBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    resumeBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    playBtn.classList.remove('active');
+                    pauseBtn.classList.remove('active');
+                    resumeBtn.classList.remove('active');
+                    break;
+            }
+        };
+
+        playBtn.addEventListener('click', () => {
+            const content = textContainer.innerHTML;
+            lektor.enqueue(content);
+        });
+
+        pauseBtn.addEventListener('click', () => lektor.pause());
+        resumeBtn.addEventListener('click', () => lektor.resume());
+        stopBtn.addEventListener('click', () => lektor.stop());
+
+        document.addEventListener('lector-speaking', () => updateButtons('playing'));
+        document.addEventListener('lector-paused', () => updateButtons('paused'));
+        document.addEventListener('lector-resumed', () => updateButtons('playing'));
+        document.addEventListener('lector-finished', () => updateButtons('stopped'));
+        document.addEventListener('lector-stopped', () => updateButtons('stopped'));
+
+        updateButtons('stopped');
+    });
+</script>
+
+</body>
+</html>
