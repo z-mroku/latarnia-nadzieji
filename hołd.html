@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W hołdzie dla tych, co przegrali</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            background-color: #000; /* Gwarantowane czarne tło */
+            color: #c2c2c2;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .monument {
+            max-width: 600px;
+            width: 100%;
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+            padding: 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 2s ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Pozostałe style bez zmian */
+        .music-icon-container { margin-bottom: 30px; }
+        .music-icon-container button { 
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 3.5em; 
+            color: #777; 
+            text-decoration: none; 
+            transition: color 0.4s ease, text-shadow 0.4s ease; 
+        }
+        .music-icon-container button:hover { 
+            color: #ddd; 
+            text-shadow: 0 0 15px rgba(221, 221, 221, 0.5); 
+        }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.8em; font-weight: 400; color: #e0e0e0; margin: 0 0 30px 0; text-shadow: 1px 1px 3px #000; }
+        p { font-size: 1.2em; line-height: 1.9; text-align: center; margin-bottom: 1.5em; color: #b0b0b0; }
+        .divider { width: 80px; height: 1px; background-color: #555; margin: 40px auto; }
+        .controls { margin-top: auto; padding-top: 40px; border-top: 1px solid #444; width: 100%; }
+        .lector-panel { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .action-button { font-family: 'Lato', sans-serif; background-color: transparent; border: 1px solid #666; color: #999; font-size: 0.9em; padding: 8px 18px; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .action-button:hover:not(:disabled) { background-color: #333; color: #ddd; border-color: #888; }
+        .action-button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .back-link-container { margin-top: 20px; }
+        .back-link { font-family: 'Lato', sans-serif; color: #777; text-decoration: none; font-size: 1em; transition: color 0.3s ease; }
+        .back-link:hover { color: #ccc; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .monument { padding: 25px; }
+            h1 { font-size: 2.2em; }
+            p { font-size: 1.1em; }
+            .lector-panel { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="monument">
+        
+        <div class="music-icon-container">
+            <button id="playMusicBtn" title="Odsłuchaj utwór">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+
+        <header>
+            <h1>W hołdzie dla tych, co przegrali</h1>
+        </header>
+
+        <div class="divider"></div>
+
+        <div id="text-to-read">
+            <p>Zapomnijmy na chwilę o chorobie. O statystykach, o diagnozach, o pustych butelkach i złamanych obietnicach. Zapomnijmy o słowie „alkoholik”.</p>
+            <p>I spróbujmy przypomnieć sobie człowieka.</p>
+            <p>Przypomnijmy sobie jego śmiech, ten prawdziwy, z czasów, zanim stał się pusty i nerwowy. Przypomnijmy sobie błysk w jego oku, gdy opowiadał o swoich marzeniach. Przypomnijmy sobie jego dłonie – te, które potrafiły naprawić zepsuty rower, zasadzić kwiaty w ogrodzie, które trzymały naszą rękę tak pewnie i ciepło. Przypomnijmy sobie jej głos, gdy śpiewała do radia, fałszując niemiłosiernie, ale z taką radością, że cały świat zdawał się śmiać razem z nią.</p>
+            <p>Przypomnijmy sobie ich serca, zanim zostały skradzione. Zanim w ich duszach zamieszkał ten lodowaty, obcy lokator, który kazał im kłamać, ranić i niszczyć wszystko, co kochali.</p>
+            <p>Bo oni przegrali. Ale to, że polegli, nie znaczy, że nie byli bohaterami.</p>
+            <p>Nigdy nie zobaczymy najcięższych bitew, jakie stoczyli. Nie zobaczymy tej walki, która odbywała się o trzeciej nad ranem, w przepoconej pościeli, gdy ich własne ciało zamieniało się w salę tortur. Nie usłyszymy tego bezgłośnego krzyku, gdy wylewali do zlewu pełną butelkę, obiecując sobie, że to już ostatni raz. Nie poczujemy tej tytanicznej siły, jakiej potrzeba, by przeżyć jeden, jedyny dzień w trzeźwości, gdy każda komórka ciała wyje z głodu.</p>
+            <p>Świat widział tylko ich upadki. Tylko my, którzy byliśmy blisko, mogliśmy czasem dostrzec ślady tej niewidzialnej, toczonej w ogłuszającej samotności wojny. Widzieliśmy ją w ich oczach – w tych krótkich, przerażających przebłyskach świadomości, w których pojawiała się cała żałoba po sobie samych. Widzieli, co tracą. Widzieli, kogo ranią. I ten ból był gorszy niż jakakolwiek fizyczna agonia.</p>
+            <p>Dziś oddajemy im hołd.</p>
+            <p>Hołd za ich siłę, nie za słabość. Hołd za każdą godzinę, którą wyrwali chorobie. Za każdą próbę podjęcia leczenia. Za każdą łzę żalu i każdą obietnicę, w którą wierzyli, nawet jeśli my już przestaliśmy.</p>
+            <p>I hołd dla Was. Tych, którzy zostali. Którzy kochali do końca, nawet wtedy, gdy miłość była już tylko bólem. Którzy dziś noszą w sobie najcięższy z paradoksów – tęsknotę za człowiekiem i nienawiść do choroby, która go zabrała. Waszym ostatecznym aktem miłości jest teraz pamiętać. Pamiętać ten śmiech, te dłonie, ten błysk w oku. Nie pozwolić, by ostatnim wspomnieniem stała się choroba.</p>
+            <p>Oni nie byli swoim nałogiem. Byli ludźmi, którzy mieli w sobie światło – piękne, jasne, ciepłe światło – zanim pochłonął je cień. Dziś nie prosimy o litość dla nich. Prosimy o szacunek.</p>
+            <p>Dla żołnierzy, którzy polegli na niewidzialnym froncie.</p>
+            <p>Spoczywajcie w ciszy, na którą tak bardzo zasłużyliście. W ciszy bez walki, bez głodu i bez Głosu.</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <footer>
+            <div class="controls">
+                <div class="lector-panel">
+                    <button id="playBtn" title="Odtwarzaj" class="action-button"><i class="fas fa-play"></i> Play</button>
+                    <button id="pauseBtn" title="Pauza" class="action-button" disabled><i class="fas fa-pause"></i> Pauza</button>
+                    <button id="resumeBtn" title="Wznów" class="action-button" disabled><i class="fas fa-play"></i> Wznów</button>
+                    <button id="stopBtn" title="Zatrzymaj" class="action-button" disabled><i class="fas fa-stop"></i> Stop</button>
+                </div>
+                <div class="back-link-container">
+                    <a href="index.html" class="back-link">⟵ Wróć do strony głównej</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Odtwarzacz muzyki ---
+        const playMusicBtn = document.getElementById('playMusicBtn');
+        const audio = new Audio('piosenka.mp3');
+        audio.loop = true;
+
+        playMusicBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playMusicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; // Zmień ikonę na wyciszenie
+            } else {
+                audio.pause();
+                playMusicBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; // Zmień ikonę na głośność
+            }
+        });
+
+        // --- System Lektora ---
+        const lektor = (() => {
+            let queue = [];
+            let isPaused = false;
+            let selectedVoice = null;
+
+            const stripHtml = (html = "") => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                return doc.body.textContent || "";
+            };
+
+            const splitText = (text, maxLen = 220) => {
+                const parts = [];
+                const sentences = text.replace(/([.!?…])\s*(?=[A-Z])/g, "$1|").split("|");
+                let currentChunk = "";
+                for (const sentence of sentences) {
+                    if ((currentChunk + " " + sentence).length > maxLen) {
+                        if (currentChunk.trim()) parts.push(currentChunk.trim());
+                        currentChunk = sentence;
+                    } else {
+                        currentChunk += " " + sentence;
+                    }
+                }
+                if (currentChunk.trim()) parts.push(currentChunk.trim());
+                return parts;
+            };
+            
+            const pickVoice = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (!voices || voices.length === 0) return null;
+                return voices.find(v => v.name === "Google polski") || voices.find(v => v.lang === "pl-PL") || voices.find(v => v.lang.startsWith("pl")) || null;
+            };
+
+            const initVoices = () => {
+                selectedVoice = pickVoice();
+                if (!selectedVoice) console.warn("Lektor: Nie znaleziono polskiego głosu. Może zostać użyty głos domyślny.");
+            };
+
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = initVoices;
+            }
+            initVoices();
+
+            const speakNext = () => {
+                if (isPaused || queue.length === 0) {
+                    if (queue.length === 0) document.dispatchEvent(new CustomEvent('lector-finished'));
+                    return;
+                }
+                
+                const text = queue.shift();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "pl-PL";
+                if (selectedVoice) utterance.voice = selectedVoice;
+                
+                utterance.rate = 0.85; 
+                utterance.pitch = 0.9;
+
+                utterance.onend = () => setTimeout(speakNext, 300);
+                utterance.onerror = (e) => {
+                    console.error("Lektor: Błąd syntezy mowy:", e);
+                    speakNext();
+                };
+                
+                window.speechSynthesis.speak(utterance);
+                document.dispatchEvent(new CustomEvent('lector-speaking'));
+            };
+
+            const enqueue = (rawHtml) => {
+                if (!rawHtml) return;
+                stop();
+                const cleanText = stripHtml(rawHtml);
+                queue = splitText(cleanText);
+                setTimeout(initVoices, 100); 
+                setTimeout(speakNext, 200);
+            };
+
+            const stop = () => {
+                isPaused = false;
+                queue = [];
+                window.speechSynthesis.cancel();
+                document.dispatchEvent(new CustomEvent('lector-stopped'));
+            };
+
+            const pause = () => {
+                if (window.speechSynthesis.speaking && !isPaused) {
+                    window.speechSynthesis.pause();
+                    isPaused = true;
+                    document.dispatchEvent(new CustomEvent('lector-paused'));
+                }
+            };
+
+            const resume = () => {
+                if (isPaused) {
+                    window.speechSynthesis.resume();
+                    isPaused = false;
+                    document.dispatchEvent(new CustomEvent('lector-resumed'));
+                }
+            };
+
+            return { enqueue, stop, pause, resume };
+        })();
+        
+        // --- Kontrola UI Lektora ---
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const textContainer = document.getElementById('text-to-read');
+
+        const updateButtons = (state) => {
+            playBtn.disabled = state === 'playing' || state === 'paused';
+            pauseBtn.disabled = state !== 'playing';
+            resumeBtn.disabled = state !== 'paused';
+            stopBtn.disabled = state === 'stopped';
+        };
+
+        playBtn.addEventListener('click', () => {
+            const content = textContainer.innerHTML;
+            lektor.enqueue(content);
+        });
+
+        pauseBtn.addEventListener('click', () => lektor.pause());
+        resumeBtn.addEventListener('click', () => lektor.resume());
+        stopBtn.addEventListener('click', () => lektor.stop());
+
+        document.addEventListener('lector-speaking', () => updateButtons('playing'));
+        document.addEventListener('lector-resumed', () => updateButtons('playing'));
+        document.addEventListener('lector-paused', () => updateButtons('paused'));
+        document.addEventListener('lector-finished', () => updateButtons('stopped'));
+        document.addEventListener('lector-stopped', () => updateButtons('stopped'));
+
+        updateButtons('stopped');
+    });
+</script>
+
+</body>
+</html>
+
