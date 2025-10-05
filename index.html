@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Od Dna do Światła</title>
+
+    <!-- 🔹 META SEO -->
+    <title>Latarnia Nadziei – Od Dna do Światła</title>
+    <meta name="description" content="Latarnia Nadziei – miejsce, gdzie ubrudzeni życiem odnajdują światło. Historie, wsparcie i nadzieja od Chudego i Aurela." />
+    <meta name="keywords" content="nadzieja, uzależnienie, wsparcie, piciorys, od dna do światła, życie, przestroga, inspiracja, Chudy, Latarnia Nadziei" />
+    <meta name="author" content="Krzysztof 'Chudy' Godlewski" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- 🔹 OPEN GRAPH -->
+    <meta property="og:title" content="Latarnia Nadziei – Od Dna do Światła" />
+    <meta property="og:description" content="To miejsce dla ubrudzonych życiem i dla tych, którzy szukają światła." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://latarnia-nadzieji.vercel.app/" />
+    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/img/latarnia.jpg" />
+
+    <!-- 🔹 STYLES -->
     <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
@@ -173,8 +188,8 @@
       if (warningTextElement) {
           const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
           const typingSpeed = 50;
-          const pauseDuration = 3000; // Skrócona pauza przed eksplozją
-          const explosionDuration = 1500; // Czas trwania animacji eksplozji w ms
+          const pauseDuration = 3000;
+          const explosionDuration = 1500;
           
           function typeWriter(text, i, onComplete) {
             if (i < text.length) {
@@ -186,24 +201,18 @@
           }
 
           function runAnimationCycle() {
-            // Upewniamy się, że ramka nie ma klasy animacji na starcie
             warningBox.classList.remove('explode-red');
             warningTextElement.innerHTML = '';
-            warningTextElement.style.borderRightColor = ''; // Reset kursora
+            warningTextElement.style.borderRightColor = '';
 
             typeWriter(fullText, 0, () => {
-              // Zatrzymujemy miganie kursora po napisaniu
               warningTextElement.style.borderRightColor = 'transparent';
               
-              // Czekamy chwilę przed eksplozją
               setTimeout(() => {
-                // Uruchamiamy animację eksplozji
                 warningBox.classList.add('explode-red');
                 
-                // Po zakończeniu animacji resetujemy cykl
                 setTimeout(() => {
-                  warningTextElement.innerHTML = ''; // Czyścimy tekst
-                  // Czekamy chwilę przed rozpoczęciem nowego cyklu pisania
+                  warningTextElement.innerHTML = '';
                   setTimeout(runAnimationCycle, 1000);
                 }, explosionDuration);
               }, pauseDuration);
@@ -215,4 +224,3 @@
     </script>
 </body>
 </html>
-
