@@ -4,7 +4,7 @@ import { lektor } from './lektor.js';
 
 export const ModalModule = {
     modal: null,
-    lectorEventHandler: null, 
+    eventListeners: [], // Przechowujemy referencje, aby je później usunąć
     init() {
         if (document.getElementById('glass-modal')) return;
         const modalHtml = `<div id="glass-modal" class="modal-overlay"><div class="modal-content"><button class="modal-close-btn">&times;</button><h2 id="modal-title" class="modal-title"></h2><div id="modal-meta" class="modal-meta"></div><div id="modal-body" class="modal-body"></div></div></div>`;
@@ -59,13 +59,10 @@ export const ModalModule = {
         stopBtn.onclick = () => lektor.stop();
         closeBtn.onclick = () => this.close();
         
-        this.lectorEventHandler = (event) => {
-            const activeModal = document.getElementById('glass-modal');
-            if (!activeModal || activeModal.style.display === 'none') return;
-
-            const playBtn = activeModal.querySelector('.lector-play');
-            const pauseBtn = activeModal.querySelector('.lector-pause');
-            const resumeBtn = activeModal.querySelector('.lector-resume');
+        const lectorEventHandler = (event) => {
+            const playBtn = this.modal?.querySelector('.lector-play');
+            const pauseBtn = this.modal?.querySelector('.lector-pause');
+            const resumeBtn = this.modal?.querySelector('.lector-resume');
             if (!playBtn || !pauseBtn || !resumeBtn) return;
 
             if (event.type === 'lector-started' || event.type === 'lector-resumed') {
@@ -82,8 +79,9 @@ export const ModalModule = {
             }
         };
 
-        ['lector-started', 'lector-paused', 'lector-resumed', 'lector-stopped', 'lector-finished'].forEach(evt => {
-            document.addEventListener(evt, this.lectorEventHandler);
+        this.eventListeners = ['lector-started', 'lector-paused', 'lector-resumed', 'lector-stopped', 'lector-finished'];
+        this.eventListeners.forEach(evt => {
+            document.addEventListener(evt, lectorEventHandler);
         });
 
         this.modal.style.display = 'flex';
@@ -93,12 +91,9 @@ export const ModalModule = {
     close() {
         if (!this.modal) return;
         lektor.stop();
-        if (this.lectorEventHandler) {
-            ['lector-started', 'lector-paused', 'lector-resumed', 'lector-stopped', 'lector-finished'].forEach(evt => {
-                document.removeEventListener(evt, this.lectorEventHandler);
-            });
-            this.lectorEventHandler = null;
-        }
+        // Usuwamy listenery, aby uniknąć wycieków pamięci
+        this.eventListeners.forEach(evt => document.removeEventListener(evt, this.lectorEventHandler));
+        this.eventListeners = [];
 
         this.modal.classList.remove('visible');
         document.body.style.overflow = '';
