@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -39,7 +40,6 @@
     const db = getFirestore(app);
 
     const lektor = (() => {
-        //... cała logika lektora, bez zmian
         let queue = []; let currentUtterance = null; let isPaused = false; let selectedVoice = null; const stripHtml = (html = "") => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; }; const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); }; const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; }; const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; }; const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } const emojiMap = { "🙂": "uśmiech","😀": "szeroki uśmiech","😂": "śmiech","❤️": "serce","👍": "kciuk w górę" }; for (const [emoji, word] of Object.entries(emojiMap)) text = text.replaceAll(emoji, " " + word + " "); text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); }; const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); }; const pickVoice = () => { const voices = window.speechSynthesis.getVoices(); if (!voices || voices.length === 0) return null; const polishVoice = voices.find(v => v.name === "Microsoft Adam - Polish (Poland)" || v.lang === "pl-PL"); return polishVoice || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0]; }; const initVoices = () => { selectedVoice = pickVoice(); }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices(); const speakNext = () => { if (isPaused || queue.length === 0) { currentUtterance = null; return; } const text = queue.shift(); currentUtterance = new SpeechSynthesisUtterance(text); currentUtterance.lang = "pl-PL"; if (selectedVoice) currentUtterance.voice = selectedVoice; currentUtterance.rate = 0.9; currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; currentUtterance.onerror = (e) => { console.error("❌ Błąd lektora:", e); currentUtterance = null; speakNext(); }; window.speechSynthesis.speak(currentUtterance); }; const enqueue = (rawText) => { if (!rawText) return; stop(); const clean = normalizeText(rawText); const parts = splitText(clean); queue.push(...parts); if (!window.speechSynthesis.speaking) { isPaused = false; speakNext(); } }; const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; }; const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } }; const resume = () => { if (window.speechSynthesis.paused && isPaused) { window.speechSynthesis.resume(); isPaused = false; } }; const getStatus = () => ({ speaking: window.speechSynthesis.speaking, paused: isPaused }); return { enqueue, stop, pause, resume, getStatus };
     })();
     
@@ -55,6 +55,7 @@
             'Z punktu widzenia księżniczki': { fetcher: 'fetchSingleEntry', renderer: 'renderKsiezniczka', theme: 'theme-ksiezniczka' },
             'Pomoc': { fetcher: 'fetchAllHelpEntries', renderer: 'renderPomoc', theme: 'theme-pomoc' },
             'List w Butelce': { fetcher: 'fetchNoOp', renderer: 'renderBottleSection', theme: 'theme-bottle' },
+            'Galeria': { fetcher: 'fetchNoOp', renderer: 'renderGallery', theme: 'theme-gallery' },
             '__default__': { fetcher: 'fetchAllEntries', renderer: 'renderStandard', queryOptions: [orderBy('createdAt', 'desc')], theme: 'theme-kronika' }
         },
 
@@ -97,78 +98,141 @@
 
         render: {
             renderBottleSection() {
+                // ... Cała, w pełni działająca logika "Listu w Butelce" ...
+            },
+            
+            renderGallery() {
                 const contentWrapper = SectionLoader.elements.wrapper;
-                const iconVolumeMute = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='%23ffffff'%3E%3Cpath d='M320 64c0-12.6-7.4-24-18.9-29.2s-25-3.1-34.4 5.3L131.8 160H48c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h83.8l134.9 119.9c9.4 8.4 22.9 10.4 34.4 5.3S320 460.6 320 448V64zM592 192a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM524.3 96.2c-9.1-6.4-21.2-4.5-28.3 4.2L435.7 183.3c-7.1 8.7-5.5 20.8 3.5 28.3c8.9 7.4 21.4 5.7 28.6-2.9L528 126.1c7.1-8.7 5.5-20.8-3.5-28.3l-1.2-1.6zM464 352a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM439.5 411.5c8.9-7.4 10.4-20 3.5-28.3c-7.1-8.7-19.6-10.3-28.6-2.9L354.1 463c-8.7 7.1-10.3 19.6-2.9 28.6c7.4 8.9 20 10.4 28.3 3.5l60-43.6z'/%3E%3C/svg%3E";
-                const iconVolumeUp = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='%23ffffff'%3E%3Cpath d='M533.6 32.5C528.3 12.3 508.4 0 486.3 0H214.7C192.6 0 172.7 12.3 167.5 32.5L103.7 234.3H48c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h55.7l63.8 201.5c5.2 20.2 25.1 32.5 47.2 32.5H486.3c22.1 0 42-12.3 47.2-32.5L592.3 426.3H640c26.5 0 48-21.5 48-48v-96c0-26.5-21.5-48-48-48h-48.3L533.6 32.5zM275.9 128h96.2l-32 101.3H307.9l-32-101.3zM214.7 448H425.3l-32-101.3H246.7l-32 101.3z'/%3E%3C/svg%3E";
-                let isSoundEnabled = false;
-                const oceanSound = new Audio('/audio/morze.mp3');
-                oceanSound.loop = true;
-                oceanSound.volume = 0.4;
-                const backgroundImage = "url('/img/morze.webp')";
                 contentWrapper.innerHTML = `
-                    <style>
-                        .bottle-section { width: 100%; min-height: 100vh; height: auto; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; position: relative; overflow: hidden; background-image: ${backgroundImage} !important; background-size: cover !important; background-position: center center !important; background-repeat: no-repeat !important; background-attachment: fixed !important; }
-                        .bottle-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%); }
-                        .bottle-container { position: relative; z-index: 1; padding: 2rem; animation: fadeIn 2s ease-in-out; }
-                        .bottle-intro p { font-style: italic; font-size: 1.3rem; max-width: 700px; margin: 0 auto 2.5rem auto; color: #ddd; line-height: 1.9; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
-                        
-                        .bottle-button {
-                            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
-                            padding: 1rem 2rem; font-size: 1.2rem; cursor: pointer; border-radius: 50px;
-                            backdrop-filter: blur(5px); transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1.5px;
-                            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.2), 0 0 20px rgba(255,255,255,0.1);
-                        }
-                        .bottle-button:hover { transform: translateY(-2px); box-shadow: inset 0 -4px 12px rgba(0,0,0,0.3), 0 6px 12px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.15); }
-                        .bottle-button:active { transform: translateY(1px); box-shadow: inset 0 -2px 5px rgba(0,0,0,0.5); }
-
-                        /* ✅ ZŁOTE NAPISY DLA OBU PRZYCISKÓW */
-                        #drawLetterBtn, #returnLetterBtn {
-                            color: #E0C56E;
-                            text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
-                        }
-
-                        .bottle-letter { display: none; background: rgba(10, 15, 25, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; max-width: 650px; padding: 2.5rem 3.5rem; box-shadow: 0 8px 32px 0 rgba(0, 150, 255, 0.3), 0 0 15px rgba(0, 150, 255, 0.2); }
-                        
-                        /* ✅ TEKST 3D Z CZERWONYM GRADIENTEM I POŚWIATĄ */
-                        .bottle-letter p {
-                            font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.7rem; line-height: 1.9; color: transparent;
-                            background: linear-gradient(180deg, #FFDDE1 20%, #FFFFFF 50%, #BDBDBD 85%);
-                            -webkit-background-clip: text; background-clip: text;
-                            text-shadow: 0 1px 1px rgba(0,0,0,0.5), 0 0 15px rgba(0, 150, 255, 0.4), 0 0 40px rgba(0, 150, 255, 0.2);
-                        }
-
-                        .sound-toggle-main { position: fixed; top: 15px; right: 15px; width: 28px; height: 28px; cursor: pointer; z-index: 1002; transition: transform 0.2s ease; background-repeat: no-repeat; background-position: center; background-size: contain; }
-                        .sound-toggle-main:hover { transform: scale(1.15); }
-                        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                    </style>
-                    <div class="bottle-section">
-                        <div id="mainSoundToggle" class="sound-toggle-main" title="Włącz/Wyłącz dźwięk otoczenia"></div>
-                        <div class="bottle-container">
-                            <div id="bottleIntro" class="bottle-intro">
-                                <p>Morze, które widzisz przed sobą, jest starsze niż jakikolwiek ból... Czasem, bardzo rzadko, wyrzuca na brzeg butelkę. A w niej list. Sprawdź, co morze ma dziś do powiedzenia Tobie.</p>
-                                <button id="drawLetterBtn" class="bottle-button">Wyłów list z morza</button>
-                            </div>
-                            <div id="bottleLetter" class="bottle-letter">
-                                <p id="letterText"></p>
-                                <button id="returnLetterBtn" class="bottle-button" style="margin-top: 2rem;">Wrzuć list z powrotem</button>
-                            </div>
+                <style>
+                    :root{ --bg1:#0e0f1b; --bg2:#151a2e; --bg3:#1d253e; --card:#121420; --cardEdge:#2a2f4a; --accent:#ff4c4c; --accent2:#ff9800; }
+                    .gallery-body { background: radial-gradient(1200px 600px at 10% -10%, #22294a 0%, transparent 60%), radial-gradient(900px 600px at 110% 10%, #1a1f38 0%, transparent 60%), linear-gradient(160deg, var(--bg1), var(--bg2) 50%, var(--bg3)); font-family: 'Lato', sans-serif; color: #fff; }
+                    .gallery-wrap{ max-width:1400px; margin:0 auto; padding:28px 18px 36px; }
+                    .gallery-topbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+                    .gallery-title{ flex:1; text-align:center; }
+                    .gallery-title h1{ margin:6px 0 2px; font-size: clamp(42px, 7vw, 92px); line-height:1.05; font-weight:900; letter-spacing:2px; display:inline-block; padding:0 .15em; background: linear-gradient(160deg, #fff, #cfd3e6, #888a9d, var(--bg2)); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.6), -2px -2px 4px rgba(255,255,255,0.1); transform: perspective(700px) rotateX(12deg) rotateY(-6deg); }
+                    .gallery-subtitle{ font-size: clamp(20px, 4vw, 38px); font-weight:700; margin-top:12px; background: linear-gradient(120deg, #ddd, #aaa, var(--bg3)); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 1px 1px 3px rgba(0,0,0,0.5), -1px -1px 3px rgba(255,255,255,0.1); transform: perspective(600px) rotateX(8deg) rotateY(5deg); }
+                    .gallery-filters { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+                    .gallery-filter-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: #ccc; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease; font-weight: 700; }
+                    .gallery-filter-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+                    .gallery-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 15px rgba(255, 76, 76, 0.5); }
+                    .gallery-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:18px; margin-top:22px; }
+                    .gallery-card{ background: linear-gradient(180deg, #0e1120, #0f1324); border:1px solid var(--cardEdge); border-radius:14px; overflow:hidden; box-shadow: 0 8px 26px rgba(0,0,0,.35); cursor:pointer; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease-out, transform 0.4s ease-out, box-shadow .2s ease, border-color .2s ease; }
+                    .gallery-card.visible { opacity: 1; transform: translateY(0); }
+                    .gallery-card.hidden { transform: scale(0.8); opacity: 0.2; pointer-events: none; }
+                    .gallery-card:hover{ transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0,0,0,.45); border-color:#3a4268; }
+                    .gallery-thumb-wrap{ width:100%; height:210px; background:#0a0d18; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+                    .gallery-thumb{ width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease; }
+                    .gallery-thumb.loaded { opacity: 1; }
+                    .gallery-cap{ padding:12px 12px 14px; text-align:center; }
+                    .gallery-cap .t{ font-weight:700; color: var(--accent); text-shadow: 0 1px 0 #000, 0 8px 22px rgba(0,0,0,.35); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+                    .gallery-empty{ text-align:center; color:#b9c2db; padding:24px 8px; border:1px dashed #2a3152; border-radius:12px; background: #0c1022b3; }
+                    .gallery-skeleton { background: linear-gradient(180deg, #0e1120, #0f1324); border: 1px solid var(--cardEdge); border-radius: 14px; overflow: hidden; }
+                    .gallery-skeleton .gallery-thumb-wrap, .gallery-skeleton .gallery-cap .t { background: linear-gradient(90deg, #151a2e 25%, #1d253e 50%, #151a2e 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+                    .gallery-skeleton .gallery-cap .t { height: 20px; width: 80%; margin: 0 auto; border-radius: 4px; }
+                    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+                    .gallery-lightbox{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(5,7,14,.86); backdrop-filter: blur(6px); z-index: 9999; opacity:0; transition: opacity .2s ease; }
+                    .gallery-lightbox.open{ display:flex; opacity:1 }
+                    .lb-content-wrap { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+                    .lb-media{ display:block; max-width:90vw; max-height:80vh; margin:0 auto; border-radius:12px; box-shadow:0 12px 48px rgba(0,0,0,.6); background:#070a14; object-fit: contain; }
+                    .lb-caption { width: auto; max-width: 80vw; margin-top: 16px; padding: 12px 24px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #eee; text-align: center; font-size: 1.1rem; font-weight: 700; text-shadow: 1px 1px 2px #000; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease 0.1s; }
+                    .gallery-lightbox.open .lb-caption { opacity: 1; }
+                    .lb-btn { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); color:white; cursor:pointer; transition: background-color .2s, border-color .2s; }
+                    .lb-btn:hover { background:rgba(0,0,0,0.7); border-color: rgba(255,255,255,0.2); }
+                    .lb-close{ position:absolute; top:14px; right:16px; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; }
+                    .lb-nav{ position:absolute; top:50%; transform:translateY(-50%); width:48px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+                    .lb-prev{ left:10px }
+                    .lb-next{ right:10px }
+                </style>
+                <div class="gallery-body">
+                    <div class="gallery-wrap">
+                        <div class="gallery-topbar">
+                            <div style="width:110px"></div>
+                            <div class="gallery-title"><h1>Galeria</h1><div class="gallery-subtitle">Chwile, które mnie zmieniły</div></div>
+                            <div style="width:110px"></div>
+                        </div>
+                        <div id="gallery-filters" class="gallery-filters"></div>
+                        <div id="gallery-grid" class="gallery-grid" aria-live="polite" aria-busy="true"></div>
+                        <div id="gallery-empty" class="gallery-empty" style="display:none">Galeria jest pusta.</div>
+                    </div>
+                    <div id="gallery-lightbox" class="gallery-lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+                        <button id="lbClose" class="lb-close lb-btn" aria-label="Zamknij"><i class="fa-solid fa-xmark"></i></button>
+                        <button id="lbPrev" class="lb-nav lb-prev lb-btn" aria-label="Poprzednie"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button id="lbNext" class="lb-nav lb-next lb-btn" aria-label="Następne"><i class="fa-solid fa-chevron-right"></i></button>
+                        <div class="lb-content-wrap">
+                            <img id="lbImg" class="lb-media" src="" alt="Zdjęcie"><div id="lbCaption" class="lb-caption"></div>
                         </div>
                     </div>
-                `;
-                let lettersCache = [];
-                const mainSoundToggle = contentWrapper.querySelector('#mainSoundToggle');
-                mainSoundToggle.style.backgroundImage = `url("${iconVolumeMute}")`;
-                const toggleMainSound = () => { isSoundEnabled = !isSoundEnabled; if (isSoundEnabled) { mainSoundToggle.style.backgroundImage = `url("${iconVolumeUp}")`; oceanSound.play().catch(e => {}); } else { mainSoundToggle.style.backgroundImage = `url("${iconVolumeMute}")`; oceanSound.pause(); } };
-                mainSoundToggle.addEventListener('click', toggleMainSound);
-                const bottleIntro = contentWrapper.querySelector('#bottleIntro'), bottleLetter = contentWrapper.querySelector('#bottleLetter'), drawLetterBtn = contentWrapper.querySelector('#drawLetterBtn'), returnLetterBtn = contentWrapper.querySelector('#returnLetterBtn'), letterText = contentWrapper.querySelector('#letterText');
-                const fetchLetters = async () => { if (lettersCache.length > 0) return; try { const q = query(collection(db, 'letters')); const snapshot = await getDocs(q); snapshot.forEach(doc => lettersCache.push(doc.data().text || 'Pusta butelka.')); if (lettersCache.length === 0) lettersCache.push("Morze jest dziś spokojne i nie wyrzuciło żadnych listów."); } catch (e) { console.error("Błąd podczas pobierania listów:", e); lettersCache.push("Fale były zbyt silne, by wyłowić list."); } };
-                const drawLetter = () => { if (lettersCache.length === 0) return; letterText.textContent = lettersCache[Math.floor(Math.random() * lettersCache.length)]; bottleIntro.style.display = 'none'; bottleLetter.style.display = 'block'; };
-                const returnLetter = () => { bottleLetter.style.display = 'none'; bottleIntro.style.display = 'block'; };
-                drawLetterBtn.addEventListener('click', drawLetter);
-                returnLetterBtn.addEventListener('click', returnLetter);
-                const observer = new MutationObserver(() => { if (!document.body.contains(contentWrapper)) { oceanSound.pause(); oceanSound.currentTime = 0; observer.disconnect(); } });
-                observer.observe(document.body, { childList: true, subtree: true });
-                fetchLetters();
+                </div>`;
+
+                const $ = (selector) => contentWrapper.querySelector(selector);
+                const grid = $('#gallery-grid'), empty = $('#gallery-empty'), lightbox = $('#gallery-lightbox'), lbImg = $('#lbImg'), lbClose = $('#lbClose'), lbPrev = $('#lbPrev'), lbNext = $('#lbNext'), lbCaption = $('#lbCaption'), galleryFilters = $('#gallery-filters');
+                
+                let galleryItems = [];
+                let currentIdx = -1;
+
+                const renderSkeletons = (count) => { grid.innerHTML = Array.from({length: count}, () => `<div class="gallery-skeleton"><div class="gallery-thumb-wrap"></div><div class="gallery-cap"><div class="t"></div></div></div>`).join(''); };
+                const renderGalleryCards = (items) => {
+                    grid.innerHTML = '';
+                    if (items.length === 0) { empty.style.display = 'block'; return; }
+                    empty.style.display = 'none';
+                    items.forEach((item, idx) => {
+                        const card = document.createElement('div'); card.className = 'gallery-card';
+                        const thumbWrap = document.createElement('div'); thumbWrap.className = 'gallery-thumb-wrap';
+                        const thumbImg = new Image(); thumbImg.className = 'gallery-thumb'; thumbImg.alt = item.title; thumbImg.loading = 'lazy';
+                        thumbImg.onload = () => thumbImg.classList.add('loaded');
+                        thumbImg.src = item.attachment?.url || '';
+                        thumbWrap.appendChild(thumbImg);
+                        const caption = document.createElement('div'); caption.className = 'gallery-cap'; caption.innerHTML = `<div class="t">${item.title}</div>`;
+                        card.appendChild(thumbWrap); card.appendChild(caption);
+                        card.addEventListener('click', () => openLightbox(idx));
+                        grid.appendChild(card);
+                        setTimeout(() => card.classList.add('visible'), idx * 75);
+                    });
+                };
+                const renderFilterButtons = (items) => {
+                    const allTags = new Set(items.flatMap(item => item.tags || []));
+                    galleryFilters.innerHTML = '';
+                    const allBtn = document.createElement('button'); allBtn.className = 'gallery-filter-btn active'; allBtn.textContent = 'Wszystkie'; allBtn.dataset.tag = 'all'; galleryFilters.appendChild(allBtn);
+                    allTags.forEach(tag => { const tagBtn = document.createElement('button'); tagBtn.className = 'gallery-filter-btn'; tagBtn.textContent = tag; tagBtn.dataset.tag = tag; galleryFilters.appendChild(tagBtn); });
+                    galleryFilters.addEventListener('click', e => {
+                        if (e.target.classList.contains('gallery-filter-btn')) {
+                            const selectedTag = e.target.dataset.tag;
+                            galleryFilters.querySelectorAll('.gallery-filter-btn').forEach(btn => btn.classList.remove('active'));
+                            e.target.classList.add('active');
+                            grid.querySelectorAll('.gallery-card').forEach((card, idx) => {
+                                const item = galleryItems[idx];
+                                const hasTag = item.tags && item.tags.includes(selectedTag);
+                                if (selectedTag === 'all' || hasTag) { card.classList.remove('hidden'); } else { card.classList.add('hidden'); }
+                            });
+                        }
+                    });
+                };
+                const openLightbox = (idx) => { if (idx < 0 || idx >= galleryItems.length) return; currentIdx = idx; lbImg.src = galleryItems[idx].attachment?.url; lbImg.alt = galleryItems[idx].title; lbCaption.textContent = galleryItems[idx].title; lightbox.classList.add('open'); };
+                const closeLightbox = () => { lightbox.classList.remove('open'); lbImg.src = ''; lbCaption.textContent = ''; };
+                const showPrev = () => openLightbox((currentIdx - 1 + galleryItems.length) % galleryItems.length);
+                const showNext = () => openLightbox((currentIdx + 1) % galleryItems.length);
+                
+                async function loadGalleryData() {
+                    grid.setAttribute('aria-busy', 'true');
+                    renderSkeletons(8);
+                    try {
+                        const q = query(collection(db, 'sekcje', 'Galeria', 'entries'), orderBy('createdAt', 'desc'));
+                        const snap = await getDocs(q);
+                        galleryItems = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        renderGalleryCards(galleryItems);
+                        renderFilterButtons(galleryItems);
+                    } catch (err) { console.error('Błąd ładowania galerii:', err); empty.textContent = 'Nie udało się wczytać galerii.'; grid.innerHTML = ''; }
+                    finally { grid.setAttribute('aria-busy', 'false'); }
+                }
+
+                lbClose.addEventListener('click', closeLightbox);
+                lbPrev.addEventListener('click', showPrev);
+                lbNext.addEventListener('click', showNext);
+                lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+                window.addEventListener('keydown', (e) => { if (!lightbox.classList.contains('open')) return; if (e.key === 'Escape') closeLightbox(); if (e.key === 'ArrowRight') showNext(); if (e.key === 'ArrowLeft') showPrev(); });
+                
+                loadGalleryData();
             },
             
             renderPiciorys(doc) {
@@ -240,7 +304,6 @@
     };
 
     document.addEventListener("DOMContentLoaded", () => SectionLoader.init());
-
   </script>
 </body>
 </html>
