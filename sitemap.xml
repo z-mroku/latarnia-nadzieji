@@ -1,96 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Strona Główna - Najwyższy priorytet -->
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/index.html</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>daily</changefreq>
+    <loc>https://latarnia-nadzieji.vercel.app/</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Kluczowe Sekcje Fabularne i Emocjonalne -->
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Piciorys%20Chudego</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Z%20punktu%20widzenia%20ksi%C4%99%C5%BCniczki</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Choroba%20Duszy%20i%20Emocji</loc>
-    <lastmod>2025-10-15</lastmod>
+    <loc>https://latarnia-nadzieji.vercel.app/piciorys.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Z%20punktu%20widzenia%20chorego%20alkoholika</loc>
-    <lastmod>2025-10-15</lastmod>
+    <loc>https://latarnia-nadzieji.vercel.app/kronika.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
-  <!-- Sekcje Specjalne i Interaktywne (Arcydzieła) -->
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=List%20w%20Butelce</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=G%C5%82osy%20z%20drugiego%20brzegu</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Wsparcie</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Pozostałe Sekcje i Wpisy -->
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Kronika</loc>
-    <lastmod>2025-10-15</lastmod>
+    <loc>https://latarnia-nadzieji.vercel.app/support.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Opowie%C5%9Bci</loc>
-    <lastmod>2025-10-15</lastmod>
+    <loc>https://latarnia-nadzieji.vercel.app/opowiesci.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Prawdziwe%20historie</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=W%20ho%C5%82dzie%20dla%20tych%2C%20co%20przegrali</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Pomoc</loc>
-    <lastmod>2025-10-15</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://latarnia-nadzieji.vercel.app/audio.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+
   <url>
-    <loc>https://latarnia-nadzieji.vercel.app/Sekcja.html?nazwa=Galeria</loc>
-    <lastmod>2025-10-15</lastmod>
+    <loc>https://latarnia-nadzieji.vercel.app/iskra.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://latarnia-nadzieji.vercel.app/o-autorze.html</loc>
+    <lastmod>2025-10-06T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-  
+
 </urlset>
