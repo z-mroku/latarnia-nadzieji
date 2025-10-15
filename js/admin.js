@@ -1,9 +1,9 @@
-// Plik: /js/admin.js (WERSJA OSTATECZNA, NAPRAWIONA)
+// Plik: /js/admin.js (WERSJA OSTATECZNA, KOMPLETNA)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  query, orderBy, onSnapshot, serverTimestamp, collectionGroup, getDocs
+  query, where, orderBy, onSnapshot, serverTimestamp, collectionGroup, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref as sref, uploadBytesResumable, getDownloadURL, deleteObject
@@ -14,9 +14,9 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.com",
+  authDomain: "projekt-latarnia.firebaseapp.com", // Poprawka na .com
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.firebasestorage.app",
+  storageBucket: "projekt-latarnia.firebasestorage.app", // Poprawka na nowy format
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
   measurementId: "G-LNYWJD2YV7"
@@ -27,28 +27,28 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// <<< GŁÓWNA POPRAWKA: CZEKAMY NA POTWIERDZENIE ZALOGOWANIA >>>
+// Style dla panelu moderacji wsparcia, dodane raz na starcie
+const dynamicAdminStyles = document.createElement('style');
+dynamicAdminStyles.textContent = `
+    .list-item.item-pending { border-left: 3px solid var(--warning-color, #f9d423); }
+    .list-item.item-approved { border-left: 3px solid var(--success-color, #4caf50); }
+    .list-item p { white-space: pre-wrap; word-wrap: break-word; }
+`;
+document.head.appendChild(dynamicAdminStyles);
+
+
 onAuthStateChanged(auth, user => {
     if (user) {
         console.log("✅ Użytkownik jest zalogowany. Uruchamiam panel admina...");
         document.body.style.visibility = 'visible';
-        runAdminPanel(user); // Uruchamiamy funkcję opakowującą
+        runAdminPanel(user);
     } else {
         window.location.href = 'login.html';
     }
 });
 
-
-// <<< CAŁA TWOJA LOGIKA ZOSTAŁA OPAKOWANA W TĘ JEDNĄ FUNKCJĘ >>>
 function runAdminPanel(user) {
     
-    // <<< POPRAWKA: Usunięto zbędny nasłuch na 'DOMContentLoaded', który blokował start >>>
-    // Poniższy kod uruchamia się teraz od razu po potwierdzeniu zalogowania.
-
-    // ==========================================================
-    // === POCZĄTEK TWOJEGO ORYGINALNEGO KODU - NIETKNIĘTY ===
-    // ==========================================================
-
     const $ = id => document.getElementById(id);
     const DRAFT_KEY = 'adminEntryDraft_v_final_v7';
     const THEME_KEY = 'adminTheme_v1';
@@ -78,13 +78,11 @@ function runAdminPanel(user) {
             const modalText = document.getElementById('customModalText');
             const confirmBtn = document.getElementById('customConfirmBtn');
             const cancelBtn = document.getElementById('customCancelBtn');
-
             modalTitle.textContent = title;
             modalText.textContent = text;
             confirmBtn.textContent = confirmText;
             confirmBtn.className = `primary ${confirmClass}`;
             modal.classList.add('open');
-
             const close = (result) => {
                 modal.classList.remove('open');
                 confirmBtn.onclick = null;
@@ -104,10 +102,12 @@ function runAdminPanel(user) {
         if (adminEmail) adminEmail.textContent = user.email || user.uid;
         $('logoutBtn')?.addEventListener('click', () => signOut(auth).catch(console.error));
         const state = {
-            editors: {}, editId: { menu: null, help: null, spark: null, playlist: null, note: null },
+            editors: {},
+            editId: { menu: null, help: null, spark: null, playlist: null, note: null, letter: null },
             entry: { data: null, cache: [], currentPage: 1, totalPages: 1 },
             menuItems: [],
-            lazyModules: new Set(), selectedTTSId: null
+            lazyModules: new Set(),
+            selectedTTSId: null
         };
         initTheme();
         await initEditor(state);
@@ -151,17 +151,8 @@ function runAdminPanel(user) {
         function FirebaseUploadAdapterPlugin(editor) {
             editor.plugins.get('FileRepository').createUploadAdapter = (loader) => new FirebaseUploadAdapter(loader);
         }
-        const editorConfig = {
-            language: 'pl',
-            extraPlugins: [FirebaseUploadAdapterPlugin],
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'imageUpload', 'undo', 'redo'],
-            image: { toolbar: ['imageTextAlternative', 'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'] },
-            table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] }
-        };
-        const simpleEditorConfig = {
-            language: 'pl',
-            toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo'],
-        };
+        const editorConfig = { language: 'pl', extraPlugins: [FirebaseUploadAdapterPlugin], toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'imageUpload', 'undo', 'redo'], image: { toolbar: ['imageTextAlternative', 'imageStyle:inline', 'imageStyle:block', 'imageStyle:side'] }, table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] } };
+        const simpleEditorConfig = { language: 'pl', toolbar: ['heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo'], };
         try {
             if ($('contentInput')) {
                 state.editors.main = await ClassicEditor.create($('contentInput'), editorConfig);
@@ -189,14 +180,12 @@ function runAdminPanel(user) {
                 theme: $('themeSelect').value || 'auto',
                 updatedAt: serverTimestamp()
             };
-
             if (!payload.title && stripHtml(payload.text).length < 10) {
                 toast('Tytuł lub treść są wymagane.', false);
                 publishBtn.disabled = false;
                 publishBtn.textContent = 'Opublikuj';
                 return;
             }
-
             try {
                 const file = $('attachInput').files[0];
                 if (file) {
@@ -214,19 +203,13 @@ function runAdminPanel(user) {
                         });
                     });
                 }
-
                 const sectionName = payload.section;
                 const sectionRef = doc(db, 'sekcje', sectionName);
                 const sectionSnap = await getDoc(sectionRef);
-
                 if (!sectionSnap.exists()) {
-                    await setDoc(sectionRef, {
-                        name: sectionName,
-                        createdAt: serverTimestamp()
-                    });
+                    await setDoc(sectionRef, { name: sectionName, createdAt: serverTimestamp() });
                     toast(`Utworzono nową sekcję: ${sectionName}`, true);
                 }
-
                 if (state.entry.data) {
                     const oldSection = state.entry.data.section;
                     const newSection = payload.section;
@@ -259,7 +242,6 @@ function runAdminPanel(user) {
                 publishBtn.textContent = 'Opublikuj';
             }
         });
-
         cancelBtn?.addEventListener('click', () => resetEntryForm(state));
         clearDraftBtn?.addEventListener('click', async () => {
             if (await confirmAction({title: "Wyczyścić szkic?", text: "Spowoduje to usunięcie niezapisanej treści z edytora."})) {
@@ -620,13 +602,20 @@ function runAdminPanel(user) {
         }, { rootMargin: '200px' });
         lazySections.forEach(section => observer.observe(section));
     }
+
     function loadModule(name, element, state) {
         element.classList.remove('lazy-load-section');
         const content = element.querySelector('.module-content');
         if (content) content.style.display = 'block';
         const moduleInitializers = {
-            sparks: initSparks, playlist: initPlaylist, gallery: initGallery,
-            menu: initMenu, help: initHelp, notes: initNotes,
+            sparks: initSparks,
+            playlist: initPlaylist,
+            gallery: initGallery,
+            menu: initMenu,
+            help: initHelp,
+            notes: initNotes,
+            support: initSupportModeration,
+            letters: initLetters
         };
         if (moduleInitializers[name]) {
             moduleInitializers[name](state);
@@ -809,7 +798,7 @@ function runAdminPanel(user) {
         const populateThemeSelect = async () => {
             try {
                 const snap = await getDocs(query(collection(db, 'themes'), orderBy('name')));
-                themeSelect.innerHTML = '';
+                themeSelect.innerHTML = '<option value="">Domyślny</option>';
                 snap.docs.forEach(doc => {
                     const themeName = doc.data().name;
                     themeSelect.add(new Option(themeName, themeName));
@@ -870,10 +859,8 @@ function runAdminPanel(user) {
             };
             if (!data.text || !data.url) return;
             try {
-                // Używamy nazwy sekcji jako ID dokumentu, aby zapewnić spójność
                 await setDoc(doc(db, 'menu', sectionName), data, { merge: true });
                 if (state.editId.menu && state.editId.menu !== sectionName) {
-                    // Jeśli zmieniono nazwę (ID), usuń stary dokument
                     await deleteDoc(doc(db, 'menu', state.editId.menu));
                 }
                 toast('Zapisano zmiany w menu');
@@ -881,15 +868,16 @@ function runAdminPanel(user) {
             } catch (err) { toast('Błąd', false); console.error(err); }
         });
         cancelBtn.addEventListener('click', () => genericFormReset(form, state, 'menu', 'Zapisz'));
+        
+        urlInput.addEventListener('focus', () => {
+            if(urlInput.value === '') urlInput.value = 'Sekcja.html';
+        });
     }
 
     function initHelp(state) {
         const form = $('helpForm'), cancelBtn = $('cancelHelpEditBtn');
         const listContainer = $('helpListContainer');
-        const fields = {
-            woj: $('helpWoj'), name: $('helpName'), address: $('helpAddress'),
-            phone: $('helpPhone'), link: $('helpLink')
-        };
+        const fields = { woj: $('helpWoj'), name: $('helpName'), address: $('helpAddress'), phone: $('helpPhone'), link: $('helpLink') };
         let helpCache = [];
         onSnapshot(query(collection(db, 'help'), orderBy('name')), (snapshot) => {
             helpCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
@@ -912,9 +900,7 @@ function runAdminPanel(user) {
             const action = button.dataset.action;
             if (action === 'edit') {
                 state.editId.help = item.id;
-                for (const key in fields) {
-                    fields[key].value = item[key] || '';
-                }
+                for (const key in fields) { fields[key].value = item[key] || ''; }
                 state.editors.help.setData(item.desc || '');
                 form.classList.add('is-editing');
                 cancelBtn.style.display = 'inline-block';
@@ -930,9 +916,7 @@ function runAdminPanel(user) {
         form.addEventListener('submit', async e => {
             e.preventDefault();
             const data = {};
-            for(const key in fields) {
-                data[key] = fields[key].value;
-            }
+            for(const key in fields) { data[key] = fields[key].value; }
             data.desc = state.editors.help.getData();
             if(!data.name) return toast("Nazwa jest wymagana.", false);
             try {
@@ -960,7 +944,7 @@ function runAdminPanel(user) {
         let notesCache = [];
         onSnapshot(query(collection(db, 'notes'), orderBy('createdAt', 'desc')), (snapshot) => {
             notesCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-            listContainer.innerHTML = notesCache.length > 0 ? '' : '<div class="list-empty-state">Brak elementów.</div>';
+            listContainer.innerHTML = notesCache.length > 0 ? '' : '<div class="list-empty-state">Brak notatek.</div>';
             notesCache.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'list-item';
@@ -983,10 +967,7 @@ function runAdminPanel(user) {
         });
         form.addEventListener('submit', async e => {
             e.preventDefault();
-            const data = {
-                title: titleInput.value.trim(),
-                content: state.editors.notes.getData()
-            };
+            const data = { title: titleInput.value.trim(), content: state.editors.notes.getData() };
             if(!data.title || !data.content) return toast("Tytuł i treść są wymagane.", false);
             try {
                 data.createdAt = serverTimestamp();
@@ -998,10 +979,162 @@ function runAdminPanel(user) {
         });
     }
 
-    // Ta linia uruchamia cały panel
-    initPanel(user);
+    function initSupportModeration(state) {
+        const listContainer = $('supportModerationList');
+        if (!listContainer) return;
+        let currentFilter = 'pending';
+        let supportCache = [];
+        const renderList = () => {
+            const filtered = supportCache.filter(item => {
+                if (currentFilter === 'pending') return !item.isApproved;
+                if (currentFilter === 'approved') return item.isApproved;
+                return true;
+            }).sort((a, b) => (b.t?.toMillis() || 0) - (a.t?.toMillis() || 0)); // Poprawka: sortowanie po polu 't'
+            listContainer.innerHTML = filtered.length > 0 ? '' : '<div class="list-empty-state">Brak wpisów w tej kategorii.</div>';
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `list-item ${item.isApproved ? 'item-approved' : 'item-pending'}`;
+                div.dataset.id = item.id;
+                const date = item.t?.toDate().toLocaleString('pl-PL') || 'Brak daty';
+                div.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <p><strong>${escapeHtml(item.name)}:</strong> ${escapeHtml(item.text)}</p>
+                        <div class="muted-small">${date} • ${item.likes || 0} ❤️</div>
+                    </div>
+                    <div class="row" style="flex-shrink: 0; align-items: flex-start; gap: 0.5rem;">
+                        ${!item.isApproved 
+                            ? `<button class="primary small" data-action="approve" title="Zatwierdź"><i class="fa-solid fa-check"></i> Zatwierdź</button>` 
+                            : `<button class="ghost small" data-action="unapprove" title="Cofnij zatwierdzenie"><i class="fa-solid fa-ban"></i> Ukryj</button>`
+                        }
+                        <button class="ghost small danger" data-action="delete" title="Usuń trwale"><i class="fa-solid fa-trash"></i> Usuń</button>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        };
+        // ✅ POPRAWKA: Zmiana nazwy kolekcji na 'support_stories' i sortowanie po 't'
+        onSnapshot(query(collection(db, 'support_stories'), orderBy('t', 'desc')), (snapshot) => {
+            supportCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            renderList();
+        });
+        listContainer.addEventListener('click', async (e) => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const action = button.dataset.action;
+            if (!itemId) return;
+             // ✅ POPRAWKA: Zmiana nazwy kolekcji na 'support_stories'
+            const docRef = doc(db, 'support_stories', itemId);
+            try {
+                if (action === 'approve') {
+                    await updateDoc(docRef, { isApproved: true });
+                    toast('Wpis zatwierdzony i opublikowany.');
+                } else if (action === 'unapprove') {
+                    await updateDoc(docRef, { isApproved: false });
+                    toast('Cofnięto publikację wpisu.');
+                } else if (action === 'delete') {
+                    if (await confirmAction({title: "Potwierdź usunięcie", text: "Czy na pewno chcesz trwale usunąć ten wpis i wszystkie jego komentarze? Tej operacji nie można cofnąć.", confirmText: "Usuń Trwale"})) {
+                        await deleteDoc(docRef);
+                        toast('Wpis trwale usunięty.');
+                    }
+                }
+            } catch (err) {
+                console.error("Błąd moderacji:", err);
+                toast("Wystąpił błąd.", false);
+            }
+        });
+        const filterBtns = {
+            pending: $('filterSupportPending'),
+            approved: $('filterSupportApproved'),
+            all: $('filterSupportAll')
+        };
+        Object.keys(filterBtns).forEach(key => {
+            filterBtns[key]?.addEventListener('click', () => {
+                currentFilter = key;
+                Object.values(filterBtns).forEach(btn => btn?.classList.remove('active'));
+                filterBtns[key]?.classList.add('active');
+                renderList();
+            });
+        });
+    }
 
-    // ==========================================================
-    // === KONIEC TWOJEGO ORYGINALNEGO KODU ===
-    // ==========================================================
+    function initLetters(state) {
+        const form = $('letterForm'), textInput = $('letterText'), cancelBtn = $('cancelLetterEditBtn');
+        const listContainer = $('lettersList');
+        if (!form || !listContainer) return;
+        let lettersCache = [];
+        state.editId.letter = null;
+        onSnapshot(query(collection(db, 'letters'), orderBy('createdAt', 'desc')), (snapshot) => {
+            lettersCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            listContainer.innerHTML = lettersCache.length > 0 ? '' : '<div class="list-empty-state">Brak listów. Dodaj pierwszy!</div>';
+            lettersCache.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.dataset.id = item.id;
+                const excerpt = escapeHtml(item.text).replace(/\n/g, '<br>').substring(0, 150) + '...';
+                div.innerHTML = `
+                    <div style="flex-grow: 1; min-width: 0;">
+                        <p style="white-space: normal; word-wrap: break-word;">${excerpt}</p>
+                    </div>
+                    <div class="row" style="flex-shrink: 0;">
+                        <button class="ghost small" data-action="edit" title="Edytuj"><i class="fa-solid fa-pen"></i></button>
+                        <button class="ghost small danger" data-action="del" title="Usuń"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                listContainer.appendChild(div);
+            });
+        });
+        listContainer.addEventListener('click', async e => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const itemId = itemEl?.dataset.id;
+            const item = lettersCache.find(i => i.id === itemId);
+            if (!item) return;
+            const action = button.dataset.action;
+            if (action === 'edit') {
+                state.editId.letter = item.id;
+                textInput.value = item.text;
+                form.classList.add('is-editing');
+                cancelBtn.style.display = 'inline-block';
+                form.querySelector('button[type="submit"]').textContent = 'Zapisz zmiany';
+                textInput.focus();
+                window.scrollTo({ top: form.offsetTop - 20, behavior: 'smooth' });
+            } else if (action === 'del') {
+                if (await confirmAction({ text: `Usunąć ten list?` })) {
+                    await deleteDoc(doc(db, 'letters', item.id));
+                    toast('List usunięty');
+                }
+            }
+        });
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const text = textInput.value.trim();
+            if (!text) return;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            try {
+                if (state.editId.letter) {
+                    await updateDoc(doc(db, 'letters', state.editId.letter), { text, updatedAt: serverTimestamp() });
+                    toast('List zaktualizowany');
+                } else {
+                    await addDoc(collection(db, 'letters'), { text, createdAt: serverTimestamp() });
+                    toast('Dodano nowy list');
+                }
+                form.reset();
+                state.editId.letter = null;
+                form.querySelector('button[type="submit"]').textContent = 'Dodaj List';
+                cancelBtn.style.display = 'none';
+            } catch (err) { toast('Błąd zapisu', false); console.error(err); }
+            finally { submitBtn.disabled = false; }
+        });
+        cancelBtn.addEventListener('click', () => {
+             form.reset();
+             state.editId.letter = null;
+             form.querySelector('button[type="submit"]').textContent = 'Dodaj List';
+             cancelBtn.style.display = 'none';
+        });
+    }
+
+    initPanel(user);
 }
