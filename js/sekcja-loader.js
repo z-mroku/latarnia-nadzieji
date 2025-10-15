@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
   authDomain: "projekt-latarnia.firebaseapp.app",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.firebasestorage.app",
+  storageBucket: "projekt-latarnia.firebasestorage.com",
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
 };
