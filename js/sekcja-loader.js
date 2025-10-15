@@ -9,7 +9,7 @@ import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDo
 // --- Konfiguracja Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.com",
+  authDomain: "projekt-latarnia.firebaseapp.app",
   projectId: "projekt-latarnia",
   storageBucket: "projekt-latarnia.firebasestorage.app",
   messagingSenderId: "244008044225",
