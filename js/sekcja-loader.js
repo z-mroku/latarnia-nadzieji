@@ -9,9 +9,9 @@ import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDo
 // --- Konfiguracja Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.app",
+  authDomain: "projekt-latarnia.firebaseapp.com",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.firebasestorage.com",
+  storageBucket: "projekt-latarnia.firebasestorage.app",
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
 };
@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ========================================
-// Moduł Lektora (TWÓJ ORYGINALNY)
+// Moduł Lektora
 // ========================================
 const lektor = (() => {
     let queue = []; let currentUtterance = null; let isPaused = false; let selectedVoice = null; const stripHtml = (html = "") => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; }; const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); }; const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; }; const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; }; const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } const emojiMap = { "🙂": "uśmiech","😀": "szeroki uśmiech","😂": "śmiech","❤️": "serce","👍": "kciuk w górę" }; for (const [emoji, word] of Object.entries(emojiMap)) text = text.replaceAll(emoji, " " + word + " "); text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); }; const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); }; const pickVoice = () => { const voices = window.speechSynthesis.getVoices(); if (!voices || voices.length === 0) return null; const polishVoice = voices.find(v => v.name === "Microsoft Adam - Polish (Poland)" || v.lang === "pl-PL"); return polishVoice || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0]; }; const initVoices = () => { selectedVoice = pickVoice(); }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices(); const speakNext = () => { if (isPaused || queue.length === 0) { currentUtterance = null; return; } const text = queue.shift(); currentUtterance = new SpeechSynthesisUtterance(text); currentUtterance.lang = "pl-PL"; if (selectedVoice) currentUtterance.voice = selectedVoice; currentUtterance.rate = 0.9; currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; currentUtterance.onerror = (e) => { console.error("❌ Błąd lektora:", e); currentUtterance = null; speakNext(); }; window.speechSynthesis.speak(currentUtterance); }; const enqueue = (rawText) => { if (!rawText) return; stop(); const clean = normalizeText(rawText); const parts = splitText(clean); queue.push(...parts); if (!window.speechSynthesis.speaking) { isPaused = false; speakNext(); } }; const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; }; const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } }; const resume = () => { if (window.speechSynthesis.paused && isPaused) { window.speechSynthesis.resume(); isPaused = false; } }; const getStatus = () => ({ speaking: window.speechSynthesis.speaking, paused: isPaused }); return { enqueue, stop, pause, resume, getStatus };
@@ -56,10 +56,17 @@ const SectionLoader = {
             const params = new URLSearchParams(window.location.search);
             this.state.sectionName = decodeURIComponent(params.get('nazwa') || 'Kronika').trim();
             const routeConfig = this.router[this.state.sectionName] || this.router['__default__'];
+            
+            if (!routeConfig) {
+                throw new Error(`Brak konfiguracji dla sekcji: "${this.state.sectionName}"`);
+            }
+
             document.documentElement.className = routeConfig.theme;
             document.title = `${this.utils.escapeHtml(this.state.sectionName)} — Latarnia Nadziei`;
+            
             const data = await this.fetch[routeConfig.fetcher].call(this, routeConfig.queryOptions);
             this.render[routeConfig.renderer].call(this, data);
+
         } catch (error) {
             console.error('Błąd krytyczny w SectionLoader:', error);
             this.render.renderError.call(this, 'Błąd Krytyczny', 'Wystąpił problem z ładowaniem sekcji.');
@@ -70,9 +77,11 @@ const SectionLoader = {
         this.elements.wrapper.addEventListener('click', async (event) => {
             const button = event.target.closest('[data-action]');
             if (!button) return;
+
             const action = button.dataset.action;
             const article = button.closest('[data-doc-id]');
             const docId = article ? article.dataset.docId : null;
+
             switch (action) {
                 case 'like':
                     if (button.disabled) return;
@@ -119,12 +128,14 @@ const SectionLoader = {
             }
         });
     },
+    
     fetch: {
         async fetchNoOp() { return null; },
         async fetchSingleEntry() { const ref = collection(db, 'sekcje', this.state.sectionName, 'entries'); const q = query(ref, limit(1)); const snapshot = await getDocs(q); return snapshot.empty ? null : snapshot.docs[0]; },
         async fetchAllEntries(queryOptions = []) { const ref = collection(db, `sekcje/${this.state.sectionName}/entries`); const q = query(ref, ...queryOptions); const snapshot = await getDocs(q); return snapshot.docs; },
         async fetchAllHelpEntries() { const q = query(collection(db, 'help'), orderBy('name', 'asc')); const snapshot = await getDocs(q); return snapshot.docs; }
     },
+
     async incrementViews(docId) { if (!docId) return; const ref = doc(db, 'sekcje', this.state.sectionName, 'entries', docId); try { await updateDoc(ref, { views: increment(1) }); } catch (e) {} },
     async incrementLikes(docId) { if (!docId) return; const ref = doc(db, 'sekcje', this.state.sectionName, 'entries', docId); try { await updateDoc(ref, { likes: increment(1) }); } catch (error) { console.error("Błąd przy polubieniu:", error.message); alert("Aby polubić, musisz być zalogowany."); throw error; } },
 
@@ -146,19 +157,45 @@ const SectionLoader = {
               .note{color:rgba(255,255,255,0.85);font-size:.92rem}
               .btn{background:linear-gradient(180deg,#ffd97b,#ffd16a);color:#000;border:0;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 10px 36px rgba(255,217,123,0.12);transition:all .12s}
               .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; } .btn:active{transform:translateY(1px)}
-              .feed{width:100%;max-width:1100px;margin-top:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;z-index:12}
-              .card{background:linear-gradient(180deg, rgba(15,20,35,0.65), rgba(10,15,25,0.35));border-radius:14px;padding:18px;backdrop-filter:blur(14px) saturate(120%);box-shadow:0 14px 45px rgba(0,0,0,0.75), inset 0 0 16px rgba(255,255,255,0.03);opacity:0;transform:translateY(22px);transition:transform .6s cubic-bezier(.2,.9,.3,1),opacity .6s;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
+              
+              .feed {
+                width: 100%;
+                max-width: 1100px;
+                margin-top: 28px;
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 20px;
+                z-index: 12;
+              }
+
+              .card {
+                background: linear-gradient(180deg, rgba(15,20,35,0.65), rgba(10,15,25,0.35));
+                border-radius: 14px;
+                padding: 18px;
+                backdrop-filter: blur(14px) saturate(120%);
+                box-shadow: 0 14px 45px rgba(0,0,0,0.75), inset 0 0 16px rgba(255,255,255,0.03);
+                opacity: 0;
+                transform: translateY(22px);
+                transition: transform .6s cubic-bezier(.2,.9,.3,1), opacity .6s;
+                position: relative;
+                border: 1px solid rgba(255,255,255,0.08);
+                width: 100%;
+              }
+
               .card.show{opacity:1;transform:translateY(0)}
               .card h3{margin:0 0 8px;font-size:1.05rem;color:#ffd97b;text-shadow:0 2px 6px rgba(0,0,0,0.8)}
-              .card p{margin:0;color:rgba(255,255,255,0.96);line-height:1.45;white-space:pre-wrap;word-wrap:break-word;text-shadow:0 1px 4px rgba(0,0,0,0.8)}
-              .meta{display:flex;justify-content:space-between;margin-top:12px;color:rgba(255,255,255,0.6);font-size:.86rem}
+              .card p{margin:0;color:rgba(255,255,255,0.96);line-height:1.45;white-space:pre-wrap;word-wrap:break-word;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
+              .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:rgba(255,255,255,0.6);font-size:.86rem}
               .meta span[title="Polub"] { cursor: pointer; transition: transform .2s; user-select: none; }
               .meta span[title="Polub"]:active { transform: scale(1.2); }
-              .sound-toggle-support { position: fixed; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: rgba(255,255,255,0.4); z-index: 1002; transition: color .3s; }
-              .sound-toggle-support:hover { color: #fff; }
+              
+              .card-actions { margin-top: 15px; text-align: right; }
+              .card-action-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: background .2s; }
+              .card-action-btn:hover { background: rgba(255,255,255,0.2); }
+              .card-action-btn i { margin-right: 5px; }
+
             </style>
             <div class="support-wrap">
-              <div id="soundToggleSupport" class="sound-toggle-support" title="Włącz/Wyłącz dźwięk tła"><i class="fas fa-volume-mute"></i></div>
               <header class="support-header">
                 <h1>Oddech Światła — Sekcja Wsparcia</h1>
                 <p class="lead">Twoja historia ma znaczenie. Podziel się nią anonimowo i daj siłę innym. Twoje słowa trafią do moderacji, zanim pojawią się na ścianie.</p>
@@ -176,20 +213,34 @@ const SectionLoader = {
 
             const feed = document.getElementById('feed');
             const form = document.getElementById('supportForm');
-            const soundToggle = document.getElementById('soundToggleSupport');
-            const ambient = new Audio('https://cdn.pixabay.com/download/audio/2021/10/29/audio_8e29b8b3d9.mp3');
-            ambient.loop = true; ambient.volume = 0.2;
-            let isSoundEnabled = false;
-
             const { escapeHtml } = SectionLoader.utils;
 
-            function renderCard(item, docId) {
+            const renderCard = (item, docId) => {
                 const card = document.createElement('article');
                 card.className = 'card';
                 card.dataset.id = docId;
+                const fullTextForLector = `${item.name}. ${item.text}`;
+                card.dataset.text = fullTextForLector;
+                card.dataset.docId = docId;
+
                 const dateString = item.t ? new Date(item.t.toDate()).toLocaleString('pl-PL') : 'Przed chwilą';
-                card.innerHTML = `<h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.text)}</p><div class="meta"><span>${dateString}</span><span title="Polub">❤️ <span class="like-count">${item.likes || 0}</span></span></div>`;
-                feed.prepend(card);
+                
+                card.innerHTML = `
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <p>${escapeHtml(item.text)}</p>
+                    <div class="meta">
+                        <span>${dateString}</span>
+                        <span title="Polub">❤️ <span class="like-count">${item.likes || 0}</span></span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-action-btn" data-action="lector-play-pause" data-target="${docId}">
+                            <i class="fas fa-play"></i> Odsłuchaj
+                        </button>
+                    </div>
+                `;
+
+                feed.append(card); // ZMIANA NA APPEND
+                
                 setTimeout(() => card.classList.add('show'), 50);
 
                 const likeSpan = card.querySelector('span[title="Polub"]');
@@ -203,61 +254,48 @@ const SectionLoader = {
                       likeSpan.style.pointerEvents = 'auto';
                     }
                 });
-            }
+            };
             
-            const q = query(collection(db, "support_stories"), where("isApproved", "==", true), orderBy("t", "desc"));
+            const q = query(collection(db, "support_stories"), where("isApproved", "==", true), orderBy("t", "asc")); // ZMIANA NA ASC
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach(change => {
-                    const docData = change.doc.data();
-                    const docId = change.doc.id;
-                    const existingCard = feed.querySelector(`[data-id="${docId}"]`);
-                    if (change.type === 'added' && !existingCard) { renderCard(docData, docId); }
-                    if (change.type === 'modified' && existingCard) {
-                        existingCard.querySelector('.like-count').textContent = docData.likes || 0;
-                        existingCard.querySelector('span[title="Polub"]').style.pointerEvents = 'auto';
-                    }
-                    if (change.type === 'removed' && existingCard) { existingCard.remove(); }
+                feed.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    renderCard(doc.data(), doc.id);
                 });
-                if (feed.children.length === 0) { feed.innerHTML = `<p style="grid-column: 1 / -1; text-align: center;">Brak wpisów. Bądź pierwszą osobą, która podzieli się wsparciem!</p>`; } 
-                else { const placeholder = feed.querySelector('p'); if(placeholder) placeholder.remove(); }
+
+                if (feed.children.length === 0) {
+                    feed.innerHTML = `<p>Brak wpisów. Bądź pierwszą osobą, która podzieli się wsparciem!</p>`;
+                }
             });
 
             form.addEventListener('submit', async (ev) => {
                 ev.preventDefault();
                 const name = document.getElementById('supportName').value.trim();
                 const text = document.getElementById('supportStory').value.trim();
-                if (!name || !text) return alert("Imię i historia są wymagane.");
+                if (!name || !text) {
+                    return alert("Imię i historia są wymagane.");
+                }
                 const btn = form.querySelector('.btn');
-                btn.disabled = true; btn.textContent = 'Wysyłanie...';
+                btn.disabled = true;
+                btn.textContent = 'Wysyłanie...';
                 try {
                     await addDoc(collection(db, "support_stories"), { name, text, t: serverTimestamp(), isApproved: false, likes: 0 });
                     form.reset();
                     alert("Dziękujemy! Twój wpis został wysłany i czeka na akceptację.");
-                } catch (e) { alert('Wystąpił błąd podczas wysyłania.'); } 
-                finally { btn.disabled = false; btn.textContent = 'Opublikuj'; }
-            });
-
-            soundToggle.addEventListener('click', () => {
-                isSoundEnabled = !isSoundEnabled;
-                const icon = soundToggle.querySelector('i');
-                if (isSoundEnabled) { icon.className = 'fas fa-volume-up'; ambient.play().catch(()=>{}); } 
-                else { icon.className = 'fas fa-volume-mute'; ambient.pause(); }
+                } catch (e) {
+                    alert('Wystąpił błąd podczas wysyłania.');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Opublikuj';
+                }
             });
             
-            this.state.cleanupFunctions.push(() => {
-                unsubscribe();
-                ambient.pause();
-            });
-            
+            this.state.cleanupFunctions.push(unsubscribe);
             document.querySelector('.support-form').classList.add('enter');
         },
         
-        // --- TWOJA ORYGINALNA, W PEŁNI ZINTEGROWANA LOGIKA `renderBottleSection` ---
         renderBottleSection() {
             const contentWrapper = this.elements.wrapper;
-            const iconVolumeMute = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='%23ffffff'%3E%3Cpath d='M320 64c0-12.6-7.4-24-18.9-29.2s-25-3.1-34.4 5.3L131.8 160H48c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h83.8l134.9 119.9c9.4 8.4 22.9 10.4 34.4 5.3S320 460.6 320 448V64zM592 192a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM524.3 96.2c-9.1-6.4-21.2-4.5-28.3 4.2L435.7 183.3c-7.1 8.7-5.5 20.8 3.5 28.3c8.9 7.4 21.4 5.7 28.6-2.9L528 126.1c7.1-8.7 5.5-20.8-3.5-28.3l-1.2-1.6zM464 352a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM439.5 411.5c8.9-7.4 10.4-20 3.5-28.3c-7.1-8.7-19.6-10.3-28.6-2.9L354.1 463c-8.7 7.1-10.3 19.6-2.9 28.6c7.4 8.9 20 10.4 28.3 3.5l60-43.6z'/%3E%3C/svg%3E";
-            const iconVolumeUp = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512' fill='%23ffffff'%3E%3Cpath d='M533.6 32.5C528.3 12.3 508.4 0 486.3 0H214.7C192.6 0 172.7 12.3 167.5 32.5L103.7 234.3H48c-26.5 0-48 21.5-48 48v96c0 26.5 21.5 48 48 48h55.7l63.8 201.5c5.2 20.2 25.1 32.5 47.2 32.5H486.3c22.1 0 42-12.3 47.2-32.5L592.3 426.3H640c26.5 0 48-21.5 48-48v-96c0-26.5-21.5-48-48-48h-48.3L533.6 32.5zM275.9 128h96.2l-32 101.3H307.9l-32-101.3zM214.7 448H425.3l-32-101.3H246.7l-32 101.3z'/%3E%3C/svg%3E";
-            let isSoundEnabled = false;
             const oceanSound = new Audio('/audio/morze.mp3');
             oceanSound.loop = true;
             oceanSound.volume = 0.4;
@@ -274,12 +312,9 @@ const SectionLoader = {
                     #drawLetterBtn, #returnLetterBtn { color: #E0C56E; text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); }
                     .bottle-letter { display: none; background: rgba(10, 15, 25, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; max-width: 650px; padding: 2.5rem 3.5rem; box-shadow: 0 8px 32px 0 rgba(0, 150, 255, 0.3), 0 0 15px rgba(0, 150, 255, 0.2); }
                     .bottle-letter p { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.7rem; line-height: 1.9; color: transparent; background: linear-gradient(180deg, #FFDDE1 20%, #FFFFFF 50%, #BDBDBD 85%); -webkit-background-clip: text; background-clip: text; text-shadow: 0 1px 1px rgba(0,0,0,0.5), 0 0 15px rgba(0, 150, 255, 0.4), 0 0 40px rgba(0, 150, 255, 0.2); }
-                    .sound-toggle-main { position: fixed; top: 15px; right: 15px; width: 28px; height: 28px; cursor: pointer; z-index: 1002; transition: transform 0.2s ease; background-repeat: no-repeat; background-position: center; background-size: contain; }
-                    .sound-toggle-main:hover { transform: scale(1.15); }
                     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
                 </style>
                 <div class="bottle-section">
-                    <div id="mainSoundToggle" class="sound-toggle-main" title="Włącz/Wyłącz dźwięk otoczenia"></div>
                     <div class="bottle-container">
                         <div id="bottleIntro" class="bottle-intro">
                             <p>Morze, które widzisz przed sobą, jest starsze niż jakikolwiek ból... Czasem, bardzo rzadko, wyrzuca na brzeg butelkę. A w niej list. Sprawdź, co morze ma dziś do powiedzenia Tobie.</p>
@@ -293,10 +328,6 @@ const SectionLoader = {
                 </div>
             `;
             let lettersCache = [];
-            const mainSoundToggle = contentWrapper.querySelector('#mainSoundToggle');
-            mainSoundToggle.style.backgroundImage = `url("${iconVolumeMute}")`;
-            const toggleMainSound = () => { isSoundEnabled = !isSoundEnabled; if (isSoundEnabled) { mainSoundToggle.style.backgroundImage = `url("${iconVolumeUp}")`; oceanSound.play().catch(e => {}); } else { mainSoundToggle.style.backgroundImage = `url("${iconVolumeMute}")`; oceanSound.pause(); } };
-            mainSoundToggle.addEventListener('click', toggleMainSound);
             const bottleIntro = contentWrapper.querySelector('#bottleIntro'), bottleLetter = contentWrapper.querySelector('#bottleLetter'), drawLetterBtn = contentWrapper.querySelector('#drawLetterBtn'), returnLetterBtn = contentWrapper.querySelector('#returnLetterBtn'), letterText = contentWrapper.querySelector('#letterText');
             const fetchLetters = async () => { if (lettersCache.length > 0) return; try { const q = query(collection(db, 'letters')); const snapshot = await getDocs(q); snapshot.forEach(doc => lettersCache.push(doc.data().text || 'Pusta butelka.')); if (lettersCache.length === 0) lettersCache.push("Morze jest dziś spokojne i nie wyrzuciło żadnych listów."); } catch (e) { console.error("Błąd podczas pobierania listów:", e); lettersCache.push("Fale były zbyt silne, by wyłowić list."); } };
             const drawLetter = () => { if (lettersCache.length === 0) return; letterText.textContent = lettersCache[Math.floor(Math.random() * lettersCache.length)]; bottleIntro.style.display = 'none'; bottleLetter.style.display = 'block'; };
@@ -362,6 +393,7 @@ const SectionLoader = {
         },
         renderPomoc(docs) { this.render.renderError.call(this, "Pomoc", "Sekcja w budowie."); },
         renderGallery() { this.render.renderError.call(this, "Galeria", "Sekcja w budowie."); },
+        
         renderStandard(docs) {
           if (!docs || docs.length === 0) return this.render.renderEmpty.call(this);
           const { escapeHtml, stripHtml } = this.utils;
@@ -394,16 +426,34 @@ const SectionLoader = {
           this.elements.wrapper.innerHTML = html;
           docs.forEach(d => this.incrementViews(d.id));
         },
-        renderError(title, message) { this.elements.wrapper.innerHTML = `<div class="content-container"><h2 class="fancy-title">${title}</h2><p>${message}</p></div>`; },
-        renderEmpty(message = "Brak wpisów w tej sekcji.") { this.render.renderError.call(this, this.state.sectionName, message); }
+        
+        renderError(title, message) {
+            this.elements.wrapper.innerHTML = `<div class="content-container"><h2 class="fancy-title">${this.utils.escapeHtml(title)}</h2><p>${this.utils.escapeHtml(message)}</p></div>`;
+        },
+        
+        renderEmpty(message = "Brak wpisów w tej sekcji.") {
+            this.render.renderError.call(this, this.state.sectionName, message);
+        }
     },
     
     modules: {
         typewriter: {
             start(element, text, speed = 30) {
-                if (!element || !text) { if (element) element.innerHTML = "(Brak tekstu)"; return; }
-                let i = 0; element.innerHTML = '<span class="typing-cursor"></span>';
-                function type() { if (i < text.length) { element.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>') + '<span class="typing-cursor"></span>'; i++; setTimeout(type, speed); } else { element.innerHTML = text.replace(/\n/g, '<br>'); } }
+                if (!element || !text) {
+                    if (element) element.innerHTML = "(Brak tekstu)";
+                    return;
+                }
+                let i = 0;
+                element.innerHTML = '<span class="typing-cursor"></span>';
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>') + '<span class="typing-cursor"></span>';
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        element.innerHTML = text.replace(/\n/g, '<br>');
+                    }
+                }
                 type();
             }
         }
