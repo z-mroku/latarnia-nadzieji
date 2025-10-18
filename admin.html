@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
   <title>Centrum Dowodzenia — Latarnia</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="css/admin.css">
   <style>
     body { visibility: hidden; } 
@@ -120,6 +120,27 @@
             </div>
         </section>
 
+        <!-- ====================================================== -->
+        <!-- ### NOWY PANEL: MODERACJA KOMENTARZY ### -->
+        <!-- ====================================================== -->
+        <section id="commentModerationSection" class="card lazy-load-section" data-module="commentModeration">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-comments"></i> Moderacja Komentarzy</h2>
+            </div>
+            <div class="module-content" style="display: none;">
+                 <p class="muted-small">Zarządzaj komentarzami dodanymi przez użytkowników w sekcji "Wsparcie".</p>
+                <div class="row" style="margin-bottom: 1rem; justify-content: center; gap: 0.5rem;">
+                    <label>Filtruj:</label>
+                    <button id="filterCommentsPending" class="primary ghost small active">Oczekujące</button>
+                    <button id="filterCommentsApproved" class="primary ghost small">Zatwierdzone</button>
+                    <button id="filterCommentsAll" class="primary ghost small">Wszystkie</button>
+                </div>
+                <div id="commentModerationList" class="list-container large">
+                    <div class="list-empty-state">Wczytywanie komentarzy...</div>
+                </div>
+            </div>
+        </section>
+
         <section id="lettersSection" class="card lazy-load-section" data-module="letters">
             <div class="section-header">
                 <h3><i class="fa-solid fa-bottle-water fa-fw"></i> Listy w Butelce</h3>
@@ -168,10 +189,11 @@
         <section id="gallerySection" class="card lazy-load-section" data-module="gallery">
           <h3><i class="fa-solid fa-images"></i> Galeria</h3>
           <div class="module-content" style="display:none;">
-            <form id="galleryForm" class="form grid g2" style="align-items: flex-end;">
-                <div><label for="galleryDesc">Opis</label><input id="galleryDesc" required /></div>
-                <div><label for="galleryUpload">Plik</label><input id="galleryUpload" type="file" accept="image/*" required /></div>
-                <div class="span-2"><button type="submit" class="primary small" style="width:100%">Wyślij</button></div>
+            <form id="galleryForm" class="form">
+                <div class="form-group"><label for="galleryDesc">Opis</label><input id="galleryDesc" required /></div>
+                <div class="form-group"><label for="galleryTags">Tagi (oddzielone przecinkami)</label><input id="galleryTags" placeholder="np. twórcze zajęcia, z życia"></div>
+                <div class="form-group"><label for="galleryUpload">Plik</label><input id="galleryUpload" type="file" accept="image/*" required /></div>
+                <button type="submit" class="primary small" style="width:100%">Wyślij</button>
             </form>
             <progress id="galleryProgressBar" value="0" max="100" style="width:100%; margin-top: 10px; display: none;"></progress>
             <div class="sep"></div><div id="galleryList" class="list"></div>
@@ -251,4 +273,3 @@
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
-
