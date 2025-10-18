@@ -1,4 +1,6 @@
-// Plik: /js/admin.js (WERSJA OSTATECZNA, KOMPLETNA)
+// ========================================
+//  LATARNIA NADZIEI - ADMIN PANEL (WERSJA Z MODERACJĄ KOMENTARZY)
+// ========================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -14,9 +16,9 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.com", // Poprawka na .com
+  authDomain: "projekt-latarnia.firebaseapp.com",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.firebasestorage.app", // Poprawka na nowy format
+  storageBucket: "projekt-latarnia.appspot.com", // Poprawka na .appspot.com
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
   measurementId: "G-LNYWJD2YV7"
@@ -27,12 +29,13 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Style dla panelu moderacji wsparcia, dodane raz na starcie
+// Style dla panelu moderacji, dodane raz na starcie
 const dynamicAdminStyles = document.createElement('style');
 dynamicAdminStyles.textContent = `
     .list-item.item-pending { border-left: 3px solid var(--warning-color, #f9d423); }
     .list-item.item-approved { border-left: 3px solid var(--success-color, #4caf50); }
     .list-item p { white-space: pre-wrap; word-wrap: break-word; }
+    .comment-context { font-size: 0.8rem; color: #888; margin-top: 5px; border-left: 2px solid #444; padding-left: 8px; }
 `;
 document.head.appendChild(dynamicAdminStyles);
 
@@ -615,7 +618,9 @@ function runAdminPanel(user) {
             help: initHelp,
             notes: initNotes,
             support: initSupportModeration,
-            letters: initLetters
+            letters: initLetters,
+            // ### NOWY MODUŁ DO MODERACJI KOMENTARZY ###
+            commentModeration: initCommentModeration
         };
         if (moduleInitializers[name]) {
             moduleInitializers[name](state);
@@ -989,7 +994,7 @@ function runAdminPanel(user) {
                 if (currentFilter === 'pending') return !item.isApproved;
                 if (currentFilter === 'approved') return item.isApproved;
                 return true;
-            }).sort((a, b) => (b.t?.toMillis() || 0) - (a.t?.toMillis() || 0)); // Poprawka: sortowanie po polu 't'
+            }).sort((a, b) => (b.t?.toMillis() || 0) - (a.t?.toMillis() || 0));
             listContainer.innerHTML = filtered.length > 0 ? '' : '<div class="list-empty-state">Brak wpisów w tej kategorii.</div>';
             filtered.forEach(item => {
                 const div = document.createElement('div');
@@ -1012,7 +1017,6 @@ function runAdminPanel(user) {
                 listContainer.appendChild(div);
             });
         };
-        // ✅ POPRAWKA: Zmiana nazwy kolekcji na 'support_stories' i sortowanie po 't'
         onSnapshot(query(collection(db, 'support_stories'), orderBy('t', 'desc')), (snapshot) => {
             supportCache = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
             renderList();
@@ -1024,7 +1028,6 @@ function runAdminPanel(user) {
             const itemId = itemEl?.dataset.id;
             const action = button.dataset.action;
             if (!itemId) return;
-             // ✅ POPRAWKA: Zmiana nazwy kolekcji na 'support_stories'
             const docRef = doc(db, 'support_stories', itemId);
             try {
                 if (action === 'approve') {
@@ -1048,6 +1051,108 @@ function runAdminPanel(user) {
             pending: $('filterSupportPending'),
             approved: $('filterSupportApproved'),
             all: $('filterSupportAll')
+        };
+        Object.keys(filterBtns).forEach(key => {
+            filterBtns[key]?.addEventListener('click', () => {
+                currentFilter = key;
+                Object.values(filterBtns).forEach(btn => btn?.classList.remove('active'));
+                filterBtns[key]?.classList.add('active');
+                renderList();
+            });
+        });
+    }
+
+    // ### NOWA, KOMPLETNA FUNKCJA DO MODERACJI KOMENTARZY ###
+    function initCommentModeration(state) {
+        const listContainer = $('commentModerationList');
+        if (!listContainer) return;
+
+        let currentFilter = 'pending';
+        let commentCache = [];
+
+        const renderList = () => {
+            const filtered = commentCache.filter(item => {
+                if (currentFilter === 'pending') return !item.isApproved;
+                if (currentFilter === 'approved') return item.isApproved;
+                return true; 
+            }).sort((a, b) => (b.t?.toMillis() || 0) - (a.t?.toMillis() || 0));
+
+            listContainer.innerHTML = filtered.length > 0 ? '' : '<div class="list-empty-state">Brak komentarzy w tej kategorii.</div>';
+            
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `list-item ${item.isApproved ? 'item-approved' : 'item-pending'}`;
+                div.dataset.storyId = item.storyId;
+                div.dataset.commentId = item.id;
+                const date = item.t?.toDate().toLocaleString('pl-PL') || 'Brak daty';
+                div.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <p><strong>${escapeHtml(item.author)}:</strong> ${escapeHtml(item.text)}</p>
+                        <div class="muted-small comment-context">Do wpisu: <em>"${escapeHtml(item.parentStory.name)}"</em> • ${date}</div>
+                    </div>
+                    <div class="row" style="flex-shrink: 0; align-items: flex-start; gap: 0.5rem;">
+                        ${!item.isApproved 
+                            ? `<button class="primary small" data-action="approve-comment" title="Zatwierdź"><i class="fa-solid fa-check"></i> Zatwierdź</button>` 
+                            : `<button class="ghost small" data-action="unapprove-comment" title="Cofnij zatwierdzenie"><i class="fa-solid fa-ban"></i> Ukryj</button>`
+                        }
+                        <button class="ghost small danger" data-action="delete-comment" title="Usuń trwale"><i class="fa-solid fa-trash"></i> Usuń</button>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        };
+
+        const q = query(collectionGroup(db, 'comments'), orderBy('t', 'desc'));
+        onSnapshot(q, async (snapshot) => {
+            const promises = snapshot.docs.map(async (d) => {
+                const data = d.data();
+                const storyId = d.ref.parent.parent.id;
+                const parentStorySnap = await getDoc(doc(db, 'support_stories', storyId));
+                return {
+                    id: d.id,
+                    storyId: storyId,
+                    parentStory: parentStorySnap.exists() ? parentStorySnap.data() : { name: 'Usunięty wpis' },
+                    ...data
+                };
+            });
+            commentCache = await Promise.all(promises);
+            renderList();
+        });
+
+        listContainer.addEventListener('click', async (e) => {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            const itemEl = e.target.closest('.list-item');
+            const storyId = itemEl?.dataset.storyId;
+            const commentId = itemEl?.dataset.commentId;
+            const action = button.dataset.action;
+            if (!storyId || !commentId) return;
+            
+            const docRef = doc(db, 'support_stories', storyId, 'comments', commentId);
+
+            try {
+                if (action === 'approve-comment') {
+                    await updateDoc(docRef, { isApproved: true });
+                    toast('Komentarz zatwierdzony.');
+                } else if (action === 'unapprove-comment') {
+                    await updateDoc(docRef, { isApproved: false });
+                    toast('Cofnięto publikację komentarza.');
+                } else if (action === 'delete-comment') {
+                    if (await confirmAction({title: "Potwierdź usunięcie", text: "Czy na pewno chcesz trwale usunąć ten komentarz?", confirmText: "Usuń Trwale"})) {
+                        await deleteDoc(docRef);
+                        toast('Komentarz trwale usunięty.');
+                    }
+                }
+            } catch (err) {
+                console.error("Błąd moderacji komentarza:", err);
+                toast("Wystąpił błąd.", false);
+            }
+        });
+
+        const filterBtns = {
+            pending: $('filterCommentsPending'),
+            approved: $('filterCommentsApproved'),
+            all: $('filterCommentsAll')
         };
         Object.keys(filterBtns).forEach(key => {
             filterBtns[key]?.addEventListener('click', () => {
