@@ -16,7 +16,7 @@ import {
 
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.com",
+  authDomain: "projekt-latarnia.firebaseapp.app",
   projectId: "projekt-latarnia",
   storageBucket: "projekt-latarnia.appspot.app", // Poprawka na .appspot.com
   messagingSenderId: "244008044225",
