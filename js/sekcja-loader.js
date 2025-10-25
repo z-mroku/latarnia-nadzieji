@@ -4,9 +4,9 @@ import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDo
 // --- Konfiguracja Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.com",
+  authDomain: "projekt-latarnia.firebaseapp.app",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.appspot.com", // Poprawiona domena
+  storageBucket: "projekt-latarnia.appspot.app", // Poprawiona domena
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
 };
@@ -16,9 +16,114 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ========================================
-// Moduł Lektora (TWÓJ ORYGINALNY)
+// Moduł Lektora (WERSJA POPRAWIONA)
 // ========================================
-const lektor = (() => { let queue = []; let currentUtterance = null; let isPaused = false; let selectedVoice = null; const stripHtml = (html = "") => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; }; const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); }; const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; }; const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; }; const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } const emojiMap = { "🙂": "uśmiech","😀": "szeroki uśmiech","😂": "śmiech","❤️": "serce","👍": "kciuk w górę" }; for (const [emoji, word] of Object.entries(emojiMap)) text = text.replaceAll(emoji, " " + word + " "); text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); }; const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); }; const pickVoice = () => { const voices = window.speechSynthesis.getVoices(); if (!voices || voices.length === 0) return null; const polishVoice = voices.find(v => v.name === "Microsoft Adam - Polish (Poland)" || v.lang === "pl-PL"); return polishVoice || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0]; }; const initVoices = () => { selectedVoice = pickVoice(); }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices(); const speakNext = () => { if (isPaused || queue.length === 0) { currentUtterance = null; return; } const text = queue.shift(); currentUtterance = new SpeechSynthesisUtterance(text); currentUtterance.lang = "pl-PL"; if (selectedVoice) currentUtterance.voice = selectedVoice; currentUtterance.rate = 0.9; currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; currentUtterance.onerror = (e) => { console.error("❌ Błąd lektora:", e); currentUtterance = null; speakNext(); }; window.speechSynthesis.speak(currentUtterance); }; const enqueue = (rawText) => { if (!rawText) return; stop(); const clean = normalizeText(rawText); const parts = splitText(clean); queue.push(...parts); if (!window.speechSynthesis.speaking) { isPaused = false; speakNext(); } }; const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); currentUtterance = null; }; const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } }; const resume = () => { if (window.speechSynthesis.paused && isPaused) { window.speechSynthesis.resume(); isPaused = false; } }; const getStatus = () => ({ speaking: window.speechSynthesis.speaking, paused: isPaused }); return { enqueue, stop, pause, resume, getStatus };
+const lektor = (() => {
+    let queue = [];
+    let currentUtterance = null;
+    let isPaused = false;
+    let selectedVoice = null;
+
+    // --- Funkcje pomocnicze (bez zmian) ---
+    const stripHtml = (html = "") => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; };
+    const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); };
+    const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; };
+    const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; };
+    const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } const emojiMap = { "🙂": "uśmiech","😀": "szeroki uśmiech","😂": "śmiech","❤️": "serce","👍": "kciuk w górę" }; for (const [emoji, word] of Object.entries(emojiMap)) text = text.replaceAll(emoji, " " + word + " "); text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); };
+    const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); };
+    const pickVoice = () => { const voices = window.speechSynthesis.getVoices(); if (!voices || voices.length === 0) return null; const polishVoice = voices.find(v => v.name === "Microsoft Adam - Polish (Poland)" || v.lang === "pl-PL"); return polishVoice || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0]; };
+    const initVoices = () => { selectedVoice = pickVoice(); }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices();
+
+    // --- Główna logika lektora (ZMIANY TUTAJ) ---
+    
+    const speakNext = () => {
+        // Ta funkcja jest teraz wywoływana tylko wtedy, gdy NIE jesteśmy spauzowani
+        // lub gdy kolejka jest pusta.
+        if (isPaused || queue.length === 0) {
+            currentUtterance = null;
+            return;
+        }
+
+        const text = queue.shift();
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        currentUtterance.lang = "pl-PL";
+        if (selectedVoice) currentUtterance.voice = selectedVoice;
+        currentUtterance.rate = 0.9;
+        
+        currentUtterance.onend = () => {
+            currentUtterance = null;
+            // Ważne: sprawdzamy flagę `isPaused` ZANIM zawołamy speakNext()
+            if (!isPaused) {
+                speakNext();
+            }
+        };
+        
+        currentUtterance.onerror = (e) => {
+            console.error("❌ Błąd lektora:", e);
+            currentUtterance = null;
+            // Jak wyżej, sprawdzamy flagę, zanim pójdziemy dalej
+            if (!isPaused) {
+                speakNext();
+            }
+        };
+
+        window.speechSynthesis.speak(currentUtterance);
+    };
+
+    const enqueue = (rawText) => {
+        if (!rawText) return;
+        
+        stop(); // stop() czyści kolejkę, anuluje mowę i ustawia isPaused = false
+
+        const clean = normalizeText(rawText);
+        const parts = splitText(clean);
+        queue.push(...parts);
+
+        // Po prostu wywołujemy speakNext(). Flaga isPaused jest `false` (po stop()).
+        // speakNext() sprawdzi, czy kolejka ma elementy i czy nie jest pauza.
+        speakNext();
+    };
+
+    const stop = () => {
+        isPaused = false; // Zawsze resetuj flagę przy zatrzymaniu
+        queue = [];
+        currentUtterance = null; // Usuń referencję
+        window.speechSynthesis.cancel();
+    };
+
+    const pause = () => {
+        // Działa tylko, gdy faktycznie mówimy i nie jesteśmy już spauzowani
+        if (window.speechSynthesis.speaking && !isPaused) {
+            window.speechSynthesis.pause();
+            isPaused = true;
+        }
+    };
+
+    // === POPRAWIONA FUNKCJA `resume` ===
+    const resume = () => {
+        if (!isPaused) return; // Jeśli nie było pauzy, nic nie rób
+
+        isPaused = false; // Natychmiast ustawiamy stan na "odtwarzanie"
+
+        if (window.speechSynthesis.paused) {
+            // Przypadek 1: Przeglądarka FAKTYCZNIE jest spauzowana (ma aktywną wypowiedź)
+            window.speechSynthesis.resume();
+        } else {
+            // Przypadek 2: Wypowiedź zakończyła się, gdy byliśmy w trybie pauzy
+            // (currentUtterance jest null). Musimy ręcznie odpalić następny element z kolejki.
+            // Sprawdzamy też na wszelki wypadek, czy coś już nie gra.
+            if (queue.length > 0 && !window.speechSynthesis.speaking) {
+                speakNext();
+            }
+        }
+    };
+
+    const getStatus = () => ({
+        speaking: window.speechSynthesis.speaking,
+        paused: isPaused // Zawsze zwracaj nasz wewnętrzny stan
+    });
+
+    return { enqueue, stop, pause, resume, getStatus };
 })();
 
 // ========================================
@@ -490,4 +595,3 @@ const SectionLoader = {
 };
 
 document.addEventListener("DOMContentLoaded", () => SectionLoader.init());
-
