@@ -1,0 +1,27 @@
+# ==========================================================
+# INSTRUKCJE DLA ROBOTÓW SIECIOWYCH - LATARNIA NADZIEI
+# ==========================================================
+#
+# Wersja: Arcymistrzowska 1.0
+# Cel: Pełna indeksacja publicznej treści, blokada panelu admina.
+# ==========================================================
+
+User-agent: *
+# Powyższa linia oznacza, że instrukcje dotyczą WSZYSTKICH robotów (Google, Bing, itp.)
+
+# === BLOKADY ===
+# Kategorycznie zabraniamy wchodzenia do sekcji logowania i panelu admina.
+# To kluczowe dla bezpieczeństwa i czystości wyników wyszukiwania.
+Disallow: /login.html
+Disallow: /admin.html
+
+# === ZEZWOLENIA ===
+# Pozwalamy na wszystko inne (strony publiczne).
+# Ta linia technicznie nie jest potrzebna, jeśli nie ma "Disallow: /",
+# ale jasno określa nasze intencje.
+Allow: /
+
+# === MAPA SKARBÓW ===
+# To jest najważniejsza linia. Wskazujemy robotom, 
+# gdzie leży kompletna mapa Twojej witryny.
+Sitemap: https://latarnia-nadzieji.vercel.app/sitemap.xml
