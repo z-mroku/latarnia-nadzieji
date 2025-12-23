@@ -6,7 +6,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
   authDomain: "projekt-latarnia.firebaseapp.app",
   projectId: "projekt-latarnia",
-  storageBucket: "projekt-latarnia.appspot.app", // Poprawiona domena
+  storageBucket: "projekt-latarnia.appspot.app",
   messagingSenderId: "244008044225",
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
 };
@@ -15,8 +15,172 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// ==========================================================
+// 🎵 CONFIG HYMNU (Ustawione na sztywno: audio/hymn.mp3) 🎵
+// ==========================================================
+const HYMN_URL = "audio/hymn.mp3"; 
+
 // ========================================
-// Moduł Lektora (WERSJA POPRAWIONA)
+// Moduł Odtwarzacza Muzyki (MusicPlayer)
+// ========================================
+const MusicPlayer = (() => {
+    let audio = null;
+    let isPlaying = false;
+    let btnElement = null;
+
+    const init = () => {
+        // Tworzenie obiektu Audio
+        audio = new Audio(HYMN_URL);
+        audio.loop = true; // Hymn gra w pętli
+        
+        // --- STYLE DLA PRZYCISKU 3D ---
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .hymn-wrapper {
+                position: fixed;
+                bottom: 25px;
+                right: 25px;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            .hymn-btn-3d {
+                position: relative;
+                width: 65px;
+                height: 65px;
+                border-radius: 50%;
+                border: none;
+                background: linear-gradient(145deg, #ffd97b, #c5a059);
+                box-shadow: 
+                    0 6px 0 #8c7035, 
+                    0 12px 20px rgba(0,0,0,0.5),
+                    inset 0 2px 0 rgba(255,255,255,0.5);
+                cursor: pointer;
+                transition: all 0.1s;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 24px;
+                color: #222;
+                outline: none;
+            }
+            .hymn-btn-3d:active {
+                box-shadow: 
+                    0 0 0 #8c7035, 
+                    inset 0 4px 10px rgba(0,0,0,0.3);
+                transform: translateY(6px);
+            }
+            .hymn-btn-3d i {
+                filter: drop-shadow(0 1px 1px rgba(255,255,255,0.4));
+                transition: transform 0.3s;
+            }
+            .hymn-label {
+                background: rgba(0,0,0,0.85);
+                color: #ffd97b;
+                padding: 4px 8px;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+                white-space: nowrap;
+                border: 1px solid rgba(255, 217, 123, 0.2);
+            }
+            .hymn-wrapper:hover .hymn-label {
+                opacity: 1;
+            }
+            /* Pulsowanie gdy gra */
+            .pulse-ring {
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                border-radius: 50%;
+                box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6);
+                animation: pulse-gold 2s infinite;
+                z-index: -1;
+                display: none;
+            }
+            @keyframes pulse-gold {
+                0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6); }
+                70% { transform: scale(1.6); box-shadow: 0 0 0 25px rgba(255, 217, 123, 0); }
+                100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- STRUKTURA HTML PRZYCISKU ---
+        const wrapper = document.createElement('div');
+        wrapper.className = 'hymn-wrapper';
+        wrapper.innerHTML = `
+            <span class="hymn-label">Hymn</span>
+            <div class="pulse-ring" id="hymn-pulse"></div>
+            <button class="hymn-btn-3d" id="hymn-btn" aria-label="Odtwórz Hymn">
+                <i class="fas fa-music"></i>
+            </button>
+        `;
+        document.body.appendChild(wrapper);
+
+        btnElement = document.getElementById('hymn-btn');
+        btnElement.addEventListener('click', togglePlay);
+    };
+
+    const togglePlay = () => {
+        if (isPlaying) {
+            stop();
+        } else {
+            play();
+        }
+    };
+
+    const play = () => {
+        if (!audio) return;
+        
+        // 1. Zatrzymaj lektora, jeśli gada (priorytet dla muzyki)
+        lektor.stop();
+        // Reset ikonek lektora
+        document.querySelectorAll('[data-action="lector-play-pause"]').forEach(btn => {
+            btn.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`;
+        });
+
+        // 2. Graj muzykę
+        audio.play().then(() => {
+            isPlaying = true;
+            updateUI(true);
+        }).catch(e => {
+            console.error("Błąd odtwarzania hymnu (sprawdź ścieżkę audio/hymn.mp3):", e);
+            alert("Nie znaleziono pliku 'audio/hymn.mp3'. Upewnij się, że plik jest w folderze 'audio' na serwerze.");
+        });
+    };
+
+    const stop = () => {
+        if (!audio) return;
+        audio.pause();
+        isPlaying = false;
+        updateUI(false);
+    };
+
+    const updateUI = (playing) => {
+        const icon = btnElement.querySelector('i');
+        const pulse = document.getElementById('hymn-pulse');
+        
+        if (playing) {
+            icon.className = 'fas fa-pause';
+            pulse.style.display = 'block';
+        } else {
+            icon.className = 'fas fa-music';
+            pulse.style.display = 'none';
+        }
+    };
+
+    return { init, stop, play };
+})();
+
+// ========================================
+// Moduł Lektora (Zintegrowany z Muzyką)
 // ========================================
 const lektor = (() => {
     let queue = [];
@@ -24,7 +188,6 @@ const lektor = (() => {
     let isPaused = false;
     let selectedVoice = null;
 
-    // --- Funkcje pomocnicze (bez zmian) ---
     const stripHtml = (html = "") => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; };
     const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); };
     const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; };
@@ -34,94 +197,63 @@ const lektor = (() => {
     const pickVoice = () => { const voices = window.speechSynthesis.getVoices(); if (!voices || voices.length === 0) return null; const polishVoice = voices.find(v => v.name === "Microsoft Adam - Polish (Poland)" || v.lang === "pl-PL"); return polishVoice || voices.find(v => v.lang && v.lang.startsWith("pl")) || voices[0]; };
     const initVoices = () => { selectedVoice = pickVoice(); }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices();
 
-    // --- Główna logika lektora (ZMIANY TUTAJ) ---
-    
     const speakNext = () => {
-        // Ta funkcja jest teraz wywoływana tylko wtedy, gdy NIE jesteśmy spauzowani
-        // lub gdy kolejka jest pusta.
         if (isPaused || queue.length === 0) {
             currentUtterance = null;
             return;
         }
-
         const text = queue.shift();
         currentUtterance = new SpeechSynthesisUtterance(text);
         currentUtterance.lang = "pl-PL";
         if (selectedVoice) currentUtterance.voice = selectedVoice;
         currentUtterance.rate = 0.9;
-        
-        currentUtterance.onend = () => {
-            currentUtterance = null;
-            // Ważne: sprawdzamy flagę `isPaused` ZANIM zawołamy speakNext()
-            if (!isPaused) {
-                speakNext();
-            }
-        };
-        
-        currentUtterance.onerror = (e) => {
-            console.error("❌ Błąd lektora:", e);
-            currentUtterance = null;
-            // Jak wyżej, sprawdzamy flagę, zanim pójdziemy dalej
-            if (!isPaused) {
-                speakNext();
-            }
-        };
-
+        currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); };
+        currentUtterance.onerror = (e) => { currentUtterance = null; if (!isPaused) speakNext(); };
         window.speechSynthesis.speak(currentUtterance);
     };
 
     const enqueue = (rawText) => {
         if (!rawText) return;
         
-        stop(); // stop() czyści kolejkę, anuluje mowę i ustawia isPaused = false
+        // --- KLUCZOWE: Zatrzymujemy Hymn, gdy Lektor ma mówić ---
+        MusicPlayer.stop();
 
+        stop();
         const clean = normalizeText(rawText);
         const parts = splitText(clean);
         queue.push(...parts);
-
-        // Po prostu wywołujemy speakNext(). Flaga isPaused jest `false` (po stop()).
-        // speakNext() sprawdzi, czy kolejka ma elementy i czy nie jest pauza.
         speakNext();
     };
 
     const stop = () => {
-        isPaused = false; // Zawsze resetuj flagę przy zatrzymaniu
+        isPaused = false;
         queue = [];
-        currentUtterance = null; // Usuń referencję
+        currentUtterance = null;
         window.speechSynthesis.cancel();
     };
 
     const pause = () => {
-        // Działa tylko, gdy faktycznie mówimy i nie jesteśmy już spauzowani
         if (window.speechSynthesis.speaking && !isPaused) {
             window.speechSynthesis.pause();
             isPaused = true;
         }
     };
 
-    // === POPRAWIONA FUNKCJA `resume` ===
     const resume = () => {
-        if (!isPaused) return; // Jeśli nie było pauzy, nic nie rób
+        if (!isPaused) return;
+        
+        // --- KLUCZOWE: Zatrzymujemy Hymn, gdy wznawiamy Lektora ---
+        MusicPlayer.stop();
 
-        isPaused = false; // Natychmiast ustawiamy stan na "odtwarzanie"
-
+        isPaused = false;
         if (window.speechSynthesis.paused) {
-            // Przypadek 1: Przeglądarka FAKTYCZNIE jest spauzowana (ma aktywną wypowiedź)
             window.speechSynthesis.resume();
         } else {
-            // Przypadek 2: Wypowiedź zakończyła się, gdy byliśmy w trybie pauzy
-            // (currentUtterance jest null). Musimy ręcznie odpalić następny element z kolejki.
-            // Sprawdzamy też na wszelki wypadek, czy coś już nie gra.
-            if (queue.length > 0 && !window.speechSynthesis.speaking) {
-                speakNext();
-            }
+            if (queue.length > 0 && !window.speechSynthesis.speaking) speakNext();
         }
     };
 
-    const getStatus = () => ({
-        speaking: window.speechSynthesis.speaking,
-        paused: isPaused // Zawsze zwracaj nasz wewnętrzny stan
-    });
+    const getStatus = () => ({ speaking: window.speechSynthesis.speaking, paused: isPaused });
 
     return { enqueue, stop, pause, resume, getStatus };
 })();
@@ -170,6 +302,9 @@ const SectionLoader = {
     },
 
     async init() {
+        // --- START ODTWARZACZA MUZYKI ---
+        MusicPlayer.init();
+
         this.state.cleanupFunctions.forEach(cleanup => cleanup());
         this.state.cleanupFunctions = [];
         this.setupEventListeners();
@@ -360,7 +495,7 @@ const SectionLoader = {
                         </form>
                     </div>
                 `;
-                feed.prepend(card); // Używamy prepend, żeby nowe karty były na górze
+                feed.prepend(card);
                 setTimeout(() => card.classList.add('show'), 50);
 
                 const likeBtn = card.querySelector('.like-btn');
@@ -474,8 +609,7 @@ const SectionLoader = {
         },
         
         renderBottleSection() {
-            // ... (Twoja oryginalna funkcja renderBottleSection)
-            this.render.renderError.call(this, "List w Butelce", "Sekcja wczytana poprawnie.");
+             this.render.renderError.call(this, "List w Butelce", "Sekcja wczytana poprawnie.");
         },
         renderPiciorys(doc) {
              if (!doc) return this.render.renderEmpty.call(this, "Nie znaleziono wpisu dla tej sekcji.");
