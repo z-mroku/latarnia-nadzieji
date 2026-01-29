@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -77,7 +76,7 @@
       max-width: 800px;
       border-radius: 8px;
       background: rgba(0,0,0,0.2);
-      transition: border-color 0.5s, box-shadow 0.5s; /* Płynne przejścia */
+      transition: border-color 0.5s, box-shadow 0.5s;
     }
     .animated-warning p {
       border-right: 3px solid rgba(255, 255, 255, .75);
@@ -91,31 +90,13 @@
       line-height: 1.6;
     }
 
-    /* === NOWOŚĆ: Animacja czerwonej eksplozji === */
+    /* Animacja czerwonej eksplozji */
     @keyframes red-explosion {
-        0% {
-            border-color: gold;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        25% {
-            /* Szczyt eksplozji */
-            border-color: #ff4d4d;
-            box-shadow: 0 0 40px #ff1111, 
-                        0 0 80px #ff1111, 
-                        0 0 120px #d40000, 
-                        inset 0 0 30px rgba(255,0,0,0.6);
-        }
-        100% {
-            /* Powolne wygaszanie */
-            border-color: gold;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
+        0% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        25% { border-color: #ff4d4d; box-shadow: 0 0 40px #ff1111, 0 0 80px #ff1111, 0 0 120px #d40000, inset 0 0 30px rgba(255,0,0,0.6); }
+        100% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
     }
-    
-    /* Klasa uruchamiająca animację */
-    .explode-red {
-        animation: red-explosion 1.5s ease-out;
-    }
+    .explode-red { animation: red-explosion 1.5s ease-out; }
 
     @keyframes blink-cursor {
       from, to { border-color: transparent; }
@@ -165,20 +146,24 @@
         </nav>
 
         <main>
-            <section id="seo-alcohol-help" style="max-width:900px;margin:40px auto;padding:20px;line-height:1.6">
-                <h2>Jak radzić sobie z alkoholizmem</h2>
-                <p>
-                Alkoholizm to choroba, nie słabość charakteru. Jeśli zastanawiasz się jak przestać pić, czym jest choroba alkoholowa albo jak pomóc alkoholikowi – jesteś we właściwym miejscu.
-                Latarnia Nadziei powstała z prawdziwego dna: z uzależnienia, depresji alkoholowej, samotności i walki o życie.
-                </p>
-                <p>
-                Tutaj mówimy wprost o uzależnieniu od alkoholu, terapii uzależnień, grupach AA, współuzależnieniu, DDA, odwyku i prawdziwej drodze do trzeźwości.
-                To nie jest strona motywacyjna. To miejsce dla ludzi, którzy naprawdę walczą.
-                </p>
-                <p>
-                Jeśli Ty albo ktoś bliski potrzebuje pomocy – pamiętaj: wyjście z nałogu jest możliwe. Wsparcie istnieje. Światło wraca, nawet z najgłębszej ciemności.
-                </p>
-            </section>
+            <div class="spark-container" style="margin: 30px auto; display: block; height: auto;">
+                <div class="spark-text" style="text-align: left; font-size: 1rem; line-height: 1.6; padding: 10px;">
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #7fffd4; text-shadow: 0 0 5px rgba(127,255,212,0.5);">
+                        Jak radzić sobie z alkoholizmem
+                    </h2>
+                    <p style="margin-bottom: 15px;">
+                        Alkoholizm to choroba, nie słabość charakteru. Jeśli zastanawiasz się, jak przestać pić, czym jest choroba alkoholowa albo jak pomóc alkoholikowi – jesteś we właściwym miejscu.
+                        <strong>Latarnia Nadziei</strong> powstała z prawdziwego dna: z uzależnienia, depresji alkoholowej, samotności i walki o życie.
+                    </p>
+                    <p style="margin-bottom: 15px;">
+                        Tutaj mówimy wprost o uzależnieniu od alkoholu, terapii uzależnień, grupach AA, współuzależnieniu, DDA, odwyku i prawdziwej drodze do trzeźwości.
+                        To nie jest strona motywacyjna. To miejsce dla ludzi, którzy naprawdę walczą.
+                    </p>
+                    <p>
+                        Jeśli Ty albo ktoś bliski potrzebuje pomocy – pamiętaj: <strong>wyjście z nałogu jest możliwe</strong>. Wsparcie istnieje. Światło wraca, nawet z najgłębszej ciemności.
+                    </p>
+                </div>
+            </div>
 
             <div id="warning-box" class="animated-warning">
                 <p id="warning-text"></p>
