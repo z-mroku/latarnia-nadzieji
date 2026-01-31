@@ -170,6 +170,19 @@
         list-style-type: square;
         color: #e0f2f1;
     }
+    
+    /* Linki w tekście */
+    .text-link {
+        color: #7fffd4;
+        text-decoration: none;
+        font-weight: bold;
+        border-bottom: 1px dotted #7fffd4;
+        transition: all 0.3s;
+    }
+    .text-link:hover {
+        color: #fff;
+        border-bottom: 1px solid #fff;
+    }
     </style>
 </head>
 <body>
@@ -320,30 +333,39 @@
                     <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
                         <i class="fa-solid fa-hand-holding-heart"></i> Gdzie szukać pomocy dla alkoholika za darmo?
                     </h3>
-                    <p style="color: #ccc; line-height: 1.6;">
-                        Leczenie alkoholizmu w Polsce jest darmowe (również dla nieubezpieczonych!). Wszyztkie placówki i poradnie znajdzies, w sekcji Pomoc pod mapą. W sekcji Droga Wojownika jest opisana walka pierszego dnia i dzien po dniu do trzeźwości, a w sekcji Głos Latarni bardzo obszerny matetiał audio przez co sie zapija dużo o uczuciach i wiele wiecej
-                        Nie pytaj tylko: „jak przestać pić?”
-Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu.
-Bo alkoholizm to nie jest problem z butelką.
-To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.
-Silna wola nie wystarczy.
-Ona pęka przy pierwszym większym kryzysie.
-Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:
-– jak przetrwać pierwszy dzień bez picia
-– co robić drugiego, trzeciego i dziesiątego dnia
-– jak radzić sobie z głodem alkoholowym
-– jak nie uciekać od emocji, tylko je rozumieć
-– jak odbudować siebie krok po kroku
-– gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem
-Nie dajemy motywacyjnych haseł.
-Dajemy proces.
-Tu jest rozpisane życie po alkoholu – dzień po dniu.
-To nie jest miejsce dla tych, którzy „może kiedyś”.
-To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.
-Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” –
-to znaczy, że jeszcze możesz zawrócić.
-Latarnia świeci właśnie dla Ciebie.
-                    </p>
+                    <div style="color: #ccc; line-height: 1.6;">
+                        <p>
+                            Leczenie alkoholizmu w Polsce jest darmowe (również dla nieubezpieczonych!). Wszystkie placówki i poradnie znajdziesz w sekcji <a href="Sekcja.html?nazwa=Pomoc" class="text-link">Pomoc</a> pod mapą. 
+                        </p>
+                        <p>
+                            W sekcji <a href="Sekcja.html?nazwa=Droga Wojownika" class="text-link">Droga Wojownika</a> jest opisana walka pierwszego dnia i dzień po dniu do trzeźwości.
+                        </p>
+                        <p>
+                            A w sekcji <a href="Sekcja.html?nazwa=G%C5%82os%20Latarni" class="text-link">Głos Latarni</a> znajdziesz bardzo obszerny materiał audio – o tym, dlaczego się zapija, dużo o uczuciach i wiele więcej.
+                        </p>
+                        
+                        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+                        <p>Nie pytaj tylko: „jak przestać pić?”. Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
+                        
+                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
+                        <ul class="faq-list">
+                            <li>jak przetrwać pierwszy dzień bez picia,</li>
+                            <li>co robić drugiego, trzeciego i dziesiątego dnia,</li>
+                            <li>jak radzić sobie z głodem alkoholowym,</li>
+                            <li>jak nie uciekać od emocji, tylko je rozumieć,</li>
+                            <li>jak odbudować siebie krok po kroku,</li>
+                            <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem.</li>
+                        </ul>
+                        
+                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
+                        
+                        <p><strong>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</strong></p>
+                        
+                        <p style="color: #7fffd4; font-weight: bold; margin-top: 10px;">
+                            Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.
+                        </p>
+                    </div>
                 </article>
 
                 <article>
@@ -393,62 +415,4 @@ Latarnia świeci właśnie dla Ciebie.
                     <button id="play-pause-btn" title="Odtwarzaj" aria-label="Odtwarzaj"><i class="fas fa-play"></i></button>
                     <button id="next-btn" title="Następny" aria-label="Następny utwór"><i class="fas fa-forward"></i></button>
                 </div>
-            </div>
-        </div>
-        <div id="youtube-player" style="display: none;"></div>
 
-        <footer>
-            <div class="footer-content">
-                <span>Od Dna do Światła</span>
-                <span>&copy; Chudy</span>
-                <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
-            </div>
-        </footer>
-    </div>
-
-    <script type="module" src="js/main.js"></script>
-    
-    <script>
-    // === SKRYPT DLA PRZESTROGI ===
-    document.addEventListener('DOMContentLoaded', () => {
-      const warningBox = document.getElementById('warning-box');
-      const warningTextElement = document.getElementById('warning-text');
-      if (warningTextElement) {
-          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
-          const typingSpeed = 50;
-          const pauseDuration = 3000;
-          const explosionDuration = 1500;
-          
-          function typeWriter(text, i, onComplete) {
-            if (i < text.length) {
-              warningTextElement.innerHTML = text.substring(0, i + 1);
-              setTimeout(() => typeWriter(text, i + 1, onComplete), typingSpeed);
-            } else if (onComplete) {
-              onComplete();
-            }
-          }
-
-          function runAnimationCycle() {
-            warningBox.classList.remove('explode-red');
-            warningTextElement.innerHTML = '';
-            warningTextElement.style.borderRightColor = '';
-
-            typeWriter(fullText, 0, () => {
-              warningTextElement.style.borderRightColor = 'transparent';
-              
-              setTimeout(() => {
-                warningBox.classList.add('explode-red');
-                
-                setTimeout(() => {
-                  warningTextElement.innerHTML = '';
-                  setTimeout(runAnimationCycle, 1000);
-                }, explosionDuration);
-              }, pauseDuration);
-            });
-          }
-          runAnimationCycle();
-      }
-    });
-    </script>
-</body>
-</html>
