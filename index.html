@@ -156,8 +156,19 @@
         transform: translateY(-2px);
     }
     
-    /* Optymalizacja czytelności nagłówków */
     h1, h2, h3 { letter-spacing: 0.5px; }
+    
+    /* Styl dla listy w sekcji FAQ */
+    .faq-list {
+        margin: 15px 0;
+        padding-left: 20px;
+        color: #ccc;
+    }
+    .faq-list li {
+        margin-bottom: 8px;
+        list-style-type: square;
+        color: #e0f2f1;
+    }
     </style>
 </head>
 <body>
@@ -269,29 +280,28 @@
                     <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
                         <i class="fa-solid fa-circle-question"></i> Jak przestać pić alkohol samemu?
                     </h3>
-                    <p style="color: #ccc; line-height: 1.6;">
-                        Nie pytaj tylko: „jak przestać pić?”
-Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu.
-Bo alkoholizm to nie jest problem z butelką.
-To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.
-Silna wola nie wystarczy.
-Ona pęka przy pierwszym większym kryzysie.
-Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:
-– jak przetrwać pierwszy dzień bez picia
-– co robić drugiego, trzeciego i dziesiątego dnia
-– jak radzić sobie z głodem alkoholowym
-– jak nie uciekać od emocji, tylko je rozumieć
-– jak odbudować siebie krok po kroku
-– gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem
-Nie dajemy motywacyjnych haseł.
-Dajemy proces.
-Tu jest rozpisane życie po alkoholu – dzień po dniu.
-To nie jest miejsce dla tych, którzy „może kiedyś”.
-To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.
-Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” –
-to znaczy, że jeszcze możesz zawrócić.
-Latarnia świeci właśnie dla Ciebie.
-                    </p>
+                    <div style="color: #ccc; line-height: 1.6;">
+                        <p>Nie pytaj tylko: „jak przestać pić?”. Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
+                        
+                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
+                        
+                        <ul class="faq-list">
+                            <li>jak przetrwać pierwszy dzień bez picia,</li>
+                            <li>co robić drugiego, trzeciego i dziesiątego dnia,</li>
+                            <li>jak radzić sobie z głodem alkoholowym,</li>
+                            <li>jak nie uciekać od emocji, tylko je rozumieć,</li>
+                            <li>jak odbudować siebie krok po kroku,</li>
+                            <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem.</li>
+                        </ul>
+                        
+                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
+                        
+                        <p><strong>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</strong></p>
+                        
+                        <p style="color: #7fffd4; font-weight: bold; margin-top: 10px;">
+                            Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.
+                        </p>
+                    </div>
                 </article>
 
                 <article style="margin-bottom: 25px;">
@@ -327,11 +337,31 @@ Latarnia świeci właśnie dla Ciebie.
                     </p>
                 </article>
             </section>
-            <section id="comments" class="comments-section">
-                <h2>Podziel się swoją historią lub wesprzyj innych</h2>
-                <p>Twoje doświadczenie ma znaczenie. Anonimowo lub nie – każde słowo wsparcia jest bezcenne.</p>
-                <div id="disqus_thread"></div>
+            <section id="internal-support-link" style="
+                text-align: center;
+                margin: 40px auto;
+                padding: 30px;
+                max-width: 800px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                border: 1px solid rgba(127, 255, 212, 0.1);
+            ">
+                <h2 class="fancy-title" style="font-size: 1.5rem; margin-bottom: 15px;">Twoja Historia ma znaczenie</h2>
+                <p style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">
+                    Tutaj nie ma reklam ani śledzenia. To jest bezpieczna przystań.<br>
+                    Chcesz coś napisać? Skomentować? Wyrzucić z siebie ból?<br>
+                    Stworzyliśmy dla Ciebie specjalną, anonimową strefę.
+                </p>
+                <a href="sekcja.html?nazwa=Wsparcie" class="action-button" style="
+                    display: inline-block; 
+                    text-decoration: none; 
+                    font-size: 1.1rem; 
+                    padding: 15px 30px;
+                ">
+                    <i class="fas fa-comments"></i> Przejdź do Sekcji Wsparcia
+                </a>
             </section>
+
         </main>
 
         <div class="audio-player">
@@ -359,7 +389,7 @@ Latarnia świeci właśnie dla Ciebie.
     <script type="module" src="js/main.js"></script>
     
     <script>
-    // === SKRYPT DLA PRZESTROGI ZMODYFIKOWANY O EKSPLOZJĘ ===
+    // === SKRYPT DLA PRZESTROGI ===
     document.addEventListener('DOMContentLoaded', () => {
       const warningBox = document.getElementById('warning-box');
       const warningTextElement = document.getElementById('warning-text');
