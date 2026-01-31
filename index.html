@@ -75,18 +75,10 @@
           },
           {
             "@type": "Question",
-            "name": "Jak pomóc alkoholikowi, który nie chce pomocy?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Przestań go chronić przed konsekwencjami picia (komfort picia). Zadbaj o siebie. Tutaj dowiesz się o mechanizmach współuzależnienia i twardej miłości."
-            }
-          },
-          {
-            "@type": "Question",
             "name": "Gdzie szukać pomocy dla alkoholika za darmo?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "W Polsce leczenie odwykowe jest darmowe (NFZ), także dla nieubezpieczonych. Szukaj Poradni Leczenia Uzależnień lub mityngów AA (Anonimowych Alkoholików)."
+              "text": "W Polsce leczenie odwykowe jest darmowe. Szukaj Poradni Leczenia Uzależnień lub mityngów AA."
             }
           }
         ]
@@ -95,11 +87,7 @@
     </script>
     
     <style>
-    /* ============================================== */
-    /* == STYLE DLA PRZESTROGI I PANELU ADMINA     == */
-    /* ============================================== */
-    
-    /* 1. PRZESTROGA DLA RODZICÓW */
+    /* STYLE KRYTYCZNE */
     .animated-warning {
       border: 2px solid gold;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
@@ -121,57 +109,28 @@
       text-align: center;
       line-height: 1.6;
     }
-
-    /* Animacja czerwonej eksplozji */
     @keyframes red-explosion {
         0% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
         25% { border-color: #ff4d4d; box-shadow: 0 0 40px #ff1111, 0 0 80px #ff1111, 0 0 120px #d40000, inset 0 0 30px rgba(255,0,0,0.6); }
         100% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
     }
     .explode-red { animation: red-explosion 1.5s ease-out; }
-
-    @keyframes blink-cursor {
-      from, to { border-color: transparent; }
-      50% { border-color: rgba(255, 255, 255, .75); }
-    }
+    @keyframes blink-cursor { from, to { border-color: transparent; } 50% { border-color: rgba(255, 255, 255, .75); } }
     
-    /* 2. PRZYCISK PANELU ADMINA */
     .admin-panel-button {
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        z-index: 1001;
+        position: fixed; top: 15px; right: 15px; z-index: 1001;
         display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 20px;
-        border: 2px solid #7fffd4;
-        border-radius: 25px;
-        color: #7fffd4;
-        text-decoration: none; font-weight: bold;
-        background-color: rgba(15, 32, 39, 0.8);
-        transition: all 0.3s ease-in-out;
+        padding: 10px 20px; border: 2px solid #7fffd4; border-radius: 25px;
+        color: #7fffd4; text-decoration: none; font-weight: bold;
+        background-color: rgba(15, 32, 39, 0.8); transition: all 0.3s ease-in-out;
     }
-    .admin-panel-button:hover {
-        background-color: #7fffd4;
-        color: #0f2027;
-        box-shadow: 0 0 15px rgba(127, 255, 212, 0.7);
-        transform: translateY(-2px);
-    }
+    .admin-panel-button:hover { background-color: #7fffd4; color: #0f2027; box-shadow: 0 0 15px rgba(127, 255, 212, 0.7); }
     
     h1, h2, h3 { letter-spacing: 0.5px; }
+    .faq-list { margin: 15px 0; padding-left: 20px; color: #ccc; }
+    .faq-list li { margin-bottom: 8px; list-style-type: square; color: #e0f2f1; }
     
-    /* Styl dla listy w sekcji FAQ */
-    .faq-list {
-        margin: 15px 0;
-        padding-left: 20px;
-        color: #ccc;
-    }
-    .faq-list li {
-        margin-bottom: 8px;
-        list-style-type: square;
-        color: #e0f2f1;
-    }
-    
-    /* Linki w tekście */
+    /* LINKI W TEKŚCIE */
     .text-link {
         color: #7fffd4;
         text-decoration: none;
@@ -179,10 +138,7 @@
         border-bottom: 1px dotted #7fffd4;
         transition: all 0.3s;
     }
-    .text-link:hover {
-        color: #fff;
-        border-bottom: 1px solid #fff;
-    }
+    .text-link:hover { color: #fff; border-bottom: 1px solid #fff; }
     </style>
 </head>
 <body>
@@ -206,50 +162,24 @@
 
         <main>
             <div class="spark-container" style="
-                margin: 30px auto; 
-                display: block; 
-                height: auto;
+                margin: 30px auto; display: block; height: auto;
                 background: linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(32, 58, 67, 0.9)); 
                 border: 1px solid rgba(127, 255, 212, 0.2);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                backdrop-filter: blur(5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px);
             ">
-                <div class="spark-text" style="
-                    text-align: left; 
-                    font-size: 1.05rem; 
-                    line-height: 1.7; 
-                    padding: 15px; 
-                    color: #e0f2f1;
-                    text-shadow: none;
-                    font-weight: 400;
-                ">
-                    <h2 style="
-                        text-align: center; 
-                        margin-bottom: 25px; 
-                        font-size: 1.8rem;
-                        background: linear-gradient(90deg, #7fffd4, #ffffff, #7fffd4);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        text-shadow: 0px 0px 20px rgba(127, 255, 212, 0.4);
-                        font-weight: 700;
-                        letter-spacing: 1px;
-                    ">
+                <div class="spark-text" style="text-align: left; font-size: 1.05rem; line-height: 1.7; padding: 15px; color: #e0f2f1; text-shadow: none; font-weight: 400;">
+                    <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #7fffd4, #ffffff, #7fffd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 0px 20px rgba(127, 255, 212, 0.4); font-weight: 700; letter-spacing: 1px;">
                         Jak radzić sobie z alkoholizmem
                     </h2>
-                    
                     <p style="margin-bottom: 15px;">
                         Alkoholizm to choroba, nie słabość charakteru. Jeśli zastanawiasz się, <strong style="color: #7fffd4;">jak przestać pić</strong>, czym jest choroba alkoholowa albo jak pomóc alkoholikowi – jesteś we właściwym miejscu.
                         Latarnia Nadziei powstała z prawdziwego dna: z uzależnienia, depresji alkoholowej, samotności i walki o życie.
                     </p>
-                    
                     <p style="margin-bottom: 15px;">
                         Tutaj mówimy wprost o uzależnieniu od alkoholu, terapii uzależnień, grupach AA, współuzależnieniu, DDA, odwyku i prawdziwej drodze do trzeźwości.
                         To nie jest strona motywacyjna. <span style="color: #ffdd57; font-weight:600;">To miejsce dla ludzi, którzy naprawdę walczą.</span>
                     </p>
-                    
-                    <p>
-                        Jeśli Ty albo ktoś bliski potrzebuje pomocy – pamiętaj: <strong>wyjście z nałogu jest możliwe</strong>. Wsparcie istnieje. Światło wraca, nawet z najgłębszej ciemności.
-                    </p>
+                    <p>Jeśli Ty albo ktoś bliski potrzebuje pomocy – pamiętaj: <strong>wyjście z nałogu jest możliwe</strong>. Wsparcie istnieje.</p>
                 </div>
             </div>
 
@@ -258,19 +188,15 @@
             </div>
 
             <div style="text-align: center; margin: 40px 0;">
-                <a href="latarnia-template.html" class="index-nav-button">
-                    <span>O Latarni Nadziei</span>
-                </a>
+                <a href="latarnia-template.html" class="index-nav-button"><span>O Latarni Nadziei</span></a>
             </div>
             <div style="text-align: center; margin: 40px 0;">
-                <a href="O_Autorze.html" class="index-nav-button">
-                    <span>O Autorze</span>
-                </a>
+                <a href="O_Autorze.html" class="index-nav-button"><span>O Autorze</span></a>
             </div>
 
             <div class="spark-container">
                 <div id="sparkText" class="spark-text">...</div>
-                <button id="sparkButton" class="action-button" aria-label="Wylosuj nową myśl">💫 Daj kolejną iskrę</button>
+                <button id="sparkButton" class="action-button">💫 Daj kolejną iskrę</button>
             </div>
 
             <section id="latest-entries" class="content-section">
@@ -278,14 +204,7 @@
                 <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
             </section>
 
-            <section id="help-faq" style="
-                max-width: 800px; 
-                margin: 60px auto; 
-                padding: 20px; 
-                background: rgba(0, 0, 0, 0.4); 
-                border-left: 4px solid #7fffd4;
-                border-radius: 5px;
-            ">
+            <section id="help-faq" style="max-width: 800px; margin: 60px auto; padding: 20px; background: rgba(0, 0, 0, 0.4); border-left: 4px solid #7fffd4; border-radius: 5px;">
                 <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: #e0f2f1; text-align: center;">
                     Szukasz ratunku? Przeczytaj, zanim sięgniesz po kieliszek
                 </h2>
@@ -295,26 +214,16 @@
                         <i class="fa-solid fa-circle-question"></i> Jak przestać pić alkohol samemu?
                     </h3>
                     <div style="color: #ccc; line-height: 1.6;">
-                        <p>Nie pytaj tylko: „jak przestać pić?”. Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
-                        
-                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
-                        
+                        <p>Nie pytaj tylko: „jak przestać pić?”. Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem i z ucieczką od siebie.</p>
+                        <p>Silna wola nie wystarczy. Dlatego w Latarni Nadziei masz całą drogę:</p>
                         <ul class="faq-list">
                             <li>jak przetrwać pierwszy dzień bez picia,</li>
                             <li>co robić drugiego, trzeciego i dziesiątego dnia,</li>
                             <li>jak radzić sobie z głodem alkoholowym,</li>
                             <li>jak nie uciekać od emocji, tylko je rozumieć,</li>
-                            <li>jak odbudować siebie krok po kroku,</li>
                             <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem.</li>
                         </ul>
-                        
-                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
-                        
                         <p><strong>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</strong></p>
-                        
-                        <p style="color: #7fffd4; font-weight: bold; margin-top: 10px;">
-                            Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.
-                        </p>
                     </div>
                 </article>
 
@@ -323,9 +232,7 @@
                         <i class="fa-solid fa-triangle-exclamation"></i> Jakie są objawy alkoholizmu?
                     </h3>
                     <p style="color: #ccc; line-height: 1.6;">
-                        Myślisz, że alkoholik to tylko menel pod sklepem? Błąd. 
-                        Jeśli pijesz, by zasnąć, pijesz, by się rozluźnić, ukrywasz butelki, masz "luki w pamięci" (urwany film) albo czujesz lęk, gdy w domu brakuje alkoholu – to są <strong>objawy uzależnienia</strong>. 
-                        Ciągi alkoholowe, picie klinem (na kaca) i zaniedbywanie rodziny to ostatni dzwonek przed dnem.
+                        Myślisz, że alkoholik to tylko menel pod sklepem? Błąd. Jeśli pijesz, by zasnąć, ukrywasz butelki, masz "luki w pamięci" – to są <strong>objawy uzależnienia</strong>. Ciągi alkoholowe i picie klinem to ostatni dzwonek.
                     </p>
                 </article>
 
@@ -335,36 +242,18 @@
                     </h3>
                     <div style="color: #ccc; line-height: 1.6;">
                         <p>
-                            Leczenie alkoholizmu w Polsce jest darmowe (również dla nieubezpieczonych!). Wszystkie placówki i poradnie znajdziesz w sekcji <a href="Sekcja.html?nazwa=Pomoc" class="text-link">Pomoc</a> pod mapą. 
+                            Leczenie alkoholizmu w Polsce jest darmowe (również dla nieubezpieczonych!). Wszystkie placówki i poradnie znajdziesz w sekcji <a href="sekcja.html?nazwa=Pomoc" class="text-link">Pomoc</a> pod mapą. 
                         </p>
                         <p>
-                            W sekcji <a href="Sekcja.html?nazwa=Droga Wojownika" class="text-link">Droga Wojownika</a> jest opisana walka pierwszego dnia i dzień po dniu do trzeźwości.
+                            W sekcji <a href="sekcja.html?nazwa=Droga%20Wojownika" class="text-link">Droga Wojownika</a> jest opisana walka pierwszego dnia i dzień po dniu do trzeźwości.
                         </p>
                         <p>
-                            A w sekcji <a href="Sekcja.html?nazwa=G%C5%82os%20Latarni" class="text-link">Głos Latarni</a> znajdziesz bardzo obszerny materiał audio – o tym, dlaczego się zapija, dużo o uczuciach i wiele więcej.
+                            A w sekcji <a href="sekcja.html?nazwa=G%C5%82os%20Latarni" class="text-link">Głos Latarni</a> znajdziesz bardzo obszerny materiał audio – o tym, dlaczego się zapija, dużo o uczuciach i wiele więcej.
                         </p>
                         
                         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
-                        <p>Nie pytaj tylko: „jak przestać pić?”. Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
-                        
-                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
-                        <ul class="faq-list">
-                            <li>jak przetrwać pierwszy dzień bez picia,</li>
-                            <li>co robić drugiego, trzeciego i dziesiątego dnia,</li>
-                            <li>jak radzić sobie z głodem alkoholowym,</li>
-                            <li>jak nie uciekać od emocji, tylko je rozumieć,</li>
-                            <li>jak odbudować siebie krok po kroku,</li>
-                            <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem.</li>
-                        </ul>
-                        
-                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
-                        
-                        <p><strong>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</strong></p>
-                        
-                        <p style="color: #7fffd4; font-weight: bold; margin-top: 10px;">
-                            Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.
-                        </p>
+                        <p><strong>Latarnia świeci właśnie dla Ciebie.</strong> Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić.</p>
                     </div>
                 </article>
 
@@ -373,37 +262,22 @@
                         <i class="fa-solid fa-skull"></i> Czym jest padaczka alkoholowa i delirium?
                     </h3>
                     <p style="color: #ccc; line-height: 1.6;">
-                        Nagłe odstawienie alkoholu po długim ciągu może zabić. Delirium tremens (majaczenie) i padaczka to stan zagrożenia życia. 
-                        Jeśli trzęsą Ci się ręce, słyszysz głosy, widzisz rzeczy, których nie ma – <strong>wzywaj pogotowie</strong>. 
-                        Nie wstydź się. Ratownicy widzieli to tysiące razy. Twoje życie jest ważniejsze niż wstyd.
+                        Nagłe odstawienie alkoholu może zabić. Delirium tremens (majaczenie) i padaczka to stan zagrożenia życia. Jeśli trzęsą Ci się ręce, słyszysz głosy – <strong>wzywaj pogotowie</strong>.
                     </p>
                 </article>
             </section>
-            <section id="internal-support-link" style="
-                text-align: center;
-                margin: 40px auto;
-                padding: 30px;
-                max-width: 800px;
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 12px;
-                border: 1px solid rgba(127, 255, 212, 0.1);
-            ">
+            
+            <section id="internal-support-link" style="text-align: center; margin: 40px auto; padding: 30px; max-width: 800px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(127, 255, 212, 0.1);">
                 <h2 class="fancy-title" style="font-size: 1.5rem; margin-bottom: 15px;">Twoja Historia ma znaczenie</h2>
                 <p style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">
                     Tutaj nie ma reklam ani śledzenia. To jest bezpieczna przystań.<br>
                     Chcesz coś napisać? Skomentować? Wyrzucić z siebie ból?<br>
                     Stworzyliśmy dla Ciebie specjalną, anonimową strefę.
                 </p>
-                <a href="Sekcja.html?nazwa=Wsparcie" class="action-button" style="
-                    display: inline-block; 
-                    text-decoration: none; 
-                    font-size: 1.1rem; 
-                    padding: 15px 30px;
-                ">
+                <a href="sekcja.html?nazwa=Wsparcie" class="action-button" style="display: inline-block; text-decoration: none; font-size: 1.1rem; padding: 15px 30px;">
                     <i class="fas fa-comments"></i> Przejdź do Sekcji Wsparcia
                 </a>
             </section>
-
         </main>
 
         <div class="audio-player">
@@ -411,8 +285,49 @@
             <div class="player-info">
                 <div id="current-song-title">Wczytywanie playlisty...</div>
                 <div class="player-controls">
-                    <button id="prev-btn" title="Poprzedni" aria-label="Poprzedni utwór"><i class="fas fa-backward"></i></button>
-                    <button id="play-pause-btn" title="Odtwarzaj" aria-label="Odtwarzaj"><i class="fas fa-play"></i></button>
-                    <button id="next-btn" title="Następny" aria-label="Następny utwór"><i class="fas fa-forward"></i></button>
+                    <button id="prev-btn"><i class="fas fa-backward"></i></button>
+                    <button id="play-pause-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn"><i class="fas fa-forward"></i></button>
                 </div>
+            </div>
+        </div>
+        <div id="youtube-player" style="display: none;"></div>
+
+        <footer>
+            <div class="footer-content">
+                <span>Od Dna do Światła</span>
+                <span>&copy; Chudy</span>
+                <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+            </div>
+        </footer>
+    </div>
+    
+    <div id="content-wrapper" style="display: none;"></div>
+
+    <script type="module" src="js/main.js"></script>
+    
+    <script>
+    // SKRYPT BEZPIECZEŃSTWA: USUWA PRELOADER JEŚLI JS ZAWIEDZIE
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var p = document.getElementById('preloader');
+            if(p) p.style.display = 'none';
+        }, 1000); // Czeka 1 sekundę i siłowo usuwa spinner
+    });
+
+    // SKRYPT DLA PRZESTROGI
+    document.addEventListener('DOMContentLoaded', () => {
+      const warningBox = document.getElementById('warning-box');
+      const warningTextElement = document.getElementById('warning-text');
+      if (warningTextElement) {
+          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
+          const typingSpeed = 50; const pauseDuration = 3000; const explosionDuration = 1500;
+          function typeWriter(text, i, onComplete) { if (i < text.length) { warningTextElement.innerHTML = text.substring(0, i + 1); setTimeout(() => typeWriter(text, i + 1, onComplete), typingSpeed); } else if (onComplete) { onComplete(); } }
+          function runAnimationCycle() { warningBox.classList.remove('explode-red'); warningTextElement.innerHTML = ''; warningTextElement.style.borderRightColor = ''; typeWriter(fullText, 0, () => { warningTextElement.style.borderRightColor = 'transparent'; setTimeout(() => { warningBox.classList.add('explode-red'); setTimeout(() => { warningTextElement.innerHTML = ''; setTimeout(runAnimationCycle, 1000); }, explosionDuration); }, pauseDuration); }); }
+          runAnimationCycle();
+      }
+    });
+    </script>
+</body>
+</html>
 
