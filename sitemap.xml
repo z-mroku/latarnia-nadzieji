@@ -1,56 +1,46 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
     <url>
         <loc>https://latarnia-nadzieji.vercel.app/index.html</loc>
-        <lastmod>2025-01-31</lastmod>
+        <lastmod>2026-02-03</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
 
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/O_Autorze.html</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/pomoc.html</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/latarnia-template.html</loc><priority>0.7</priority></url>
 
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/O_Autorze.html</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/latarnia-template.html</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Piciorys%20Chudego</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Z%20punktu%20widzenia%20ksi%C4%99%C5%BCniczki</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Pomoc</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Galeria</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Piciorys%20Chudego</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Z%20punktu%20widzenia%20Ksi%C4%99%C5%BCniczki</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Kronika</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Choroba%20Duszy%20i%20Emocji</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Opowie%C5%9Bci</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Galeria</loc><priority>0.5</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Dzie%C5%84%20po%20dniu..</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Ma%C5%82ymi%20krokami%20do%20zwyci%C4%99stwa</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Droga%20do%20grobu</loc><priority>1.0</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Z%20punktu%20widzenia%20dziecka%20po%20doros%C5%82o%C5%9B%C4%87</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Prawdziwe%20historie</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Z%20punktu%20widzenia%20chorego%20alkoholika</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=G%C5%82osy%20tej%20strony</loc><priority>0.7</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=W%20ho%C5%82dzie%20dla%20tych%2C%20co%20przegrali</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=List%20w%20Butelce</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Wsparcie</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=G%C5%82osy%20z%20drugiego%20brzegu</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=A%20kiedy%20mnie%20ju%C5%BC%20nie%20B%C4%99dzie</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=G%C5%82%C4%99bia%20Ciszy</loc><priority>0.8</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Kielich%20Zbrodni</loc><priority>1.0</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Droga%20Wojownika</loc><priority>1.0</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Glos%20Latarni</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Architektura%20wolno%C5%9Bci%20do%20Drogi%20Wojownika</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Delirium%20Tremens</loc><priority>0.9</priority></url>
+    <url><loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Objawy%20Alkoholizmu</loc><priority>1.0</priority></url>
 
 </urlset>
+
