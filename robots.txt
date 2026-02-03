@@ -1,83 +1,13 @@
-# ==========================================================
-# INSTRUKCJE DLA ROBOTÓW SIECIOWYCH - LATARNIA NADZIEI
-# ==========================================================
-#
-# Wersja: Arcymistrzowska 1.0
-# Cel: Pełna indeksacja publicznej treści, blokada panelu admina.
-# ==========================================================
-
+# Robots.txt dla Latarni Nadziei - Arcymistrzowskie SEO
 User-agent: *
-# Powyższa linia oznacza, że instrukcje dotyczą WSZYSTKICH robotów (Google, Bing, itp.)
-
-# === BLOKADY ===
-# Kategorycznie zabraniamy wchodzenia do sekcji logowania i panelu admina.
-# To kluczowe dla bezpieczeństwa i czystości wyników wyszukiwania.
-Disallow: /login.html
-Disallow: /admin.html
-
-# === ZEZWOLENIA ===
-# Pozwalamy na wszystko inne (strony publiczne).
-# Ta linia technicznie nie jest potrzebna, jeśli nie ma "Disallow: /",
-# ale jasno określa nasze intencje.
 Allow: /
+Allow: /index.html
+Allow: /sekcja.html?nazwa=*
 
-# === MAPA SKARBÓW ===
-# To jest najważniejsza linia. Wskazujemy robotom, 
-# gdzie leży kompletna mapa Twojej witryny.
+# Blokada panelu admina i logowania - bezpieczeństwo i czystość indeksu
+Disallow: /login.html
+Disallow: /admin/
+Disallow: /config/
+
+# Wskazanie mapy witryny
 Sitemap: https://latarnia-nadzieji.vercel.app/sitemap.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/index.html</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/O_Autorze.html</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/latarnia-template.html</loc>
-        <lastmod>2025-01-31</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Piciorys%20Chudego</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Z%20punktu%20widzenia%20ksi%C4%99%C5%BCniczki</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Pomoc</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    
-    <url>
-        <loc>https://latarnia-nadzieji.vercel.app/sekcja.html?nazwa=Galeria</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
-
-</urlset>
