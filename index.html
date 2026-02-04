@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Latarnia Nadziei – Jak wyjść z alkoholizmu? Brutalna Prawda i Pomoc</title>
+    
+    <link rel="canonical" href="https://latarnia-nadzieji.vercel.app/" />
+
+    <meta name="description" content="Nie wiesz jak przestać pić? Latarnia Nadziei to darmowe wsparcie, historie z samego dna i droga do trzeźwości. Bez wykładów. Prawda o chorobie alkoholowej." />
+
+    <meta name="keywords" content="alkoholizm, jak przestać pić, leczenie uzależnień, objawy alkoholizmu, pomoc alkoholikowi, AA, DDA, depresja alkoholowa, trzeźwość, Latarnia Nadziei, Chudy Godlewski, delirium tremens" />
+    
+    <meta name="author" content="Krzysztof 'Chudy' Godlewski" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    
+    <meta name="theme-color" content="#0f2027">
+    
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <meta property="og:title" content="Latarnia Nadziei – Manifest z Piekła do Światła" />
+    <meta property="og:description" content="Tu nie ma litości. Jest brutalna prawda i światło dla tych, którzy walczą z demonami. Zobacz, że da się wyjść z najgłębszego bagna." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://latarnia-nadzieji.vercel.app/" />
+    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/img/latarnia.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:site_name" content="Latarnia Nadziei" />
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Latarnia Nadziei – Walka z Nałogiem">
+    <meta name="twitter:description" content="Prawdziwe wsparcie w walce z alkoholizmem. Zero ściemy.">
+    <meta name="twitter:image" content="https://latarnia-nadzieji.vercel.app/img/latarnia.jpg">
+
+    <link rel="stylesheet" href="/css/style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Latarnia Nadziei",
+        "url": "https://latarnia-nadzieji.vercel.app/",
+        "description": "Wsparcie w walce z chorobą alkoholową, prawdziwe historie i droga do trzeźwości.",
+        "inLanguage": "pl-PL",
+        "author": {
+          "@type": "Person",
+          "name": "Krzysztof 'Chudy' Godlewski"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Latarnia Nadziei",
+        "url": "https://latarnia-nadzieji.vercel.app/",
+        "logo": "https://latarnia-nadzieji.vercel.app/img/latarnia.jpg"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Czy z alkoholizmu da się wyjść?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Tak. Latarnia Nadziei to dowód, że można wyjść nawet z najgłębszego dna. Nie ma sytuacji bez wyjścia, dopóki żyjesz. Potrzebna jest brutalna szczerość i chęć przyjęcia pomocy (AA, terapia)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Gdzie szukać pomocy dla alkoholika za darmo?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "W Polsce leczenie odwykowe jest darmowe. Szukaj Poradni Leczenia Uzależnień lub mityngów AA."
+            }
+          }
+        ]
+      }
+    ]
+    </script>
+    
+    <style>
+    /* STYLE KRYTYCZNE */
+    #preloader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #0f2027; z-index: 9999; display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.5s ease;
+    }
+    #app-wrapper { opacity: 0; transition: opacity 0.5s ease; }
+    
+    .animated-warning {
+      border: 2px solid gold;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      padding: 20px;
+      margin: 20px auto 40px auto;
+      max-width: 800px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.2);
+      transition: border-color 0.5s, box-shadow 0.5s;
+    }
+    .animated-warning p {
+      border-right: 3px solid rgba(255, 255, 255, .75);
+      white-space: pre-wrap;
+      overflow: hidden;
+      min-height: 1.2em;
+      animation: blink-cursor .75s step-end infinite;
+      color: #f0e6d2;
+      font-size: 1.1em;
+      text-align: center;
+      line-height: 1.6;
+    }
+    @keyframes red-explosion {
+        0% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        25% { border-color: #ff4d4d; box-shadow: 0 0 40px #ff1111, 0 0 80px #ff1111, 0 0 120px #d40000, inset 0 0 30px rgba(255,0,0,0.6); }
+        100% { border-color: gold; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+    }
+    .explode-red { animation: red-explosion 1.5s ease-out; }
+    @keyframes blink-cursor { from, to { border-color: transparent; } 50% { border-color: rgba(255, 255, 255, .75); } }
+    
+    .admin-panel-button {
+        position: fixed; top: 15px; right: 15px; z-index: 1001;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 20px; border: 2px solid #7fffd4; border-radius: 25px;
+        color: #7fffd4; text-decoration: none; font-weight: bold;
+        background-color: rgba(15, 32, 39, 0.8); transition: all 0.3s ease-in-out;
+    }
+    .admin-panel-button:hover { background-color: #7fffd4; color: #0f2027; box-shadow: 0 0 15px rgba(127, 255, 212, 0.7); }
+    
+    h1, h2, h3 { letter-spacing: 0.5px; }
+    .faq-list { margin: 15px 0; padding-left: 20px; color: #ccc; }
+    .faq-list li { margin-bottom: 8px; list-style-type: square; color: #e0f2f1; }
+    
+    .text-link {
+        color: #7fffd4;
+        text-decoration: none;
+        font-weight: bold;
+        border-bottom: 1px dotted #7fffd4;
+        transition: all 0.3s;
+    }
+    .text-link:hover { color: #fff; border-bottom: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <div id="preloader"><div class="spinner"></div></div>
+    <div id="app-wrapper">
+        
+        <a href="login.html" class="admin-panel-button" rel="nofollow">
+            <i class="fa-solid fa-satellite-dish"></i> <span>Panel</span>
+        </a>
+
+        <header>
+            <h1>Jak radzić sobie z alkoholizmem – Latarnia Nadziei</h1>
+            <div class="scrolling-subtitle-container">
+                <p class="special-subtitle">To miejsce dla ubrudzonych życiem – i dla tych, którzy szukają światła</p>
+            </div>
+        </header>
+
+        <nav>
+            <ul id="main-menu"><li><a>Wczytywanie menu...</a></li></ul>
+        </nav>
+
+        <main>
+            <div class="spark-container" style="
+                margin: 30px auto; display: block; height: auto;
+                background: linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(32, 58, 67, 0.9)); 
+                border: 1px solid rgba(127, 255, 212, 0.2);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            ">
+                <div class="spark-text" style="text-align: left; font-size: 1.05rem; line-height: 1.7; padding: 15px; color: #e0f2f1; text-shadow: none; font-weight: 400;">
+                    <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8rem; background: linear-gradient(90deg, #7fffd4, #ffffff, #7fffd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 0px 20px rgba(127, 255, 212, 0.4); font-weight: 700; letter-spacing: 1px;">
+                        Jak radzić sobie z alkoholizmem
+                    </h2>
+                    <p style="margin-bottom: 15px;">
+                        Alkoholizm to choroba, nie słabość charakteru. Jeśli zastanawiasz się, <strong style="color: #7fffd4;">jak przestać pić</strong>, czym jest choroba alkoholowa albo jak pomóc alkoholikowi – jesteś we właściwym miejscu.
+                        Latarnia Nadziei powstała z prawdziwego dna: z uzależnienia, depresji alkoholowej, samotności i walki o życie.
+                    </p>
+                    <p style="margin-bottom: 15px;">
+                        Tutaj mówimy wprost o uzależnieniu od alkoholu, terapii uzależnień, grupach AA, współuzależnieniu, DDA, odwyku i prawdziwej drodze do trzeźwości.
+                        To nie jest strona motywacyjna. <span style="color: #ffdd57; font-weight:600;">To miejsce dla ludzi, którzy naprawdę walczą.</span>
+                    </p>
+                    <p>Jeśli Ty albo ktoś bliski potrzebuje pomocy – pamiętaj: <strong>wyjście z nałogu jest możliwe</strong>. Wsparcie istnieje.</p>
+                </div>
+            </div>
+
+            <div id="warning-box" class="animated-warning">
+                <p id="warning-text"></p>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="latarnia-template.html" class="index-nav-button"><span>O Latarni Nadziei</span></a>
+            </div>
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="O_Autorze.html" class="index-nav-button"><span>O Autorze</span></a>
+            </div>
+
+            <div class="spark-container">
+                <div id="sparkText" class="spark-text">...</div>
+                <button id="sparkButton" class="action-button">💫 Daj kolejną iskrę</button>
+            </div>
+
+            <section id="latest-entries" class="content-section">
+                <h2 class="fancy-title">Ostatnia Latarnia Nadziei</h2>
+                <div id="entries-container"><p>Wczytywanie wpisów...</p></div>
+            </section>
+
+            <section id="help-faq" style="max-width: 800px; margin: 60px auto; padding: 20px; background: rgba(0, 0, 0, 0.4); border-left: 4px solid #7fffd4; border-radius: 5px;">
+                <h2 style="font-size: 1.8rem; margin-bottom: 30px; color: #e0f2f1; text-align: center;">
+                    Szukasz ratunku? Przeczytaj, zanim sięgniesz po kieliszek
+                </h2>
+
+                <article style="margin-bottom: 25px;">
+                    <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
+                        <i class="fa-solid fa-circle-question"></i> Jak przestać pić alkohol samemu?
+                    </h3>
+                    <div style="color: #ccc; line-height: 1.6;">
+                        <p>Nie pytaj tylko: „jak przestać pić?” Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
+                        <ul class="faq-list">
+                            <li>jak przetrwać pierwszy dzień bez picia</li>
+                            <li>co robić drugiego, trzeciego i dziesiątego dnia</li>
+                            <li>jak radzić sobie z głodem alkoholowym</li>
+                            <li>jak nie uciekać od emocji, tylko je rozumieć</li>
+                            <li>jak odbudować siebie krok po kroku</li>
+                            <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <article style="margin-bottom: 25px;">
+                    <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Jakie są objawy alkoholizmu?
+                    </h3>
+                    <p style="color: #ccc; line-height: 1.6;">
+                        Myślisz, że alkoholik to tylko menel pod sklepem? Błąd. Jeśli pijesz, by się rozluźnić, ukrywasz butelki, masz "luki w pamięci" albo czujesz lęk, gdy brakuje alkoholu – to są <strong>objawy uzależnienia</strong>.
+                    </p>
+                </article>
+
+                <article style="margin-bottom: 25px;">
+                    <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
+                        <i class="fa-solid fa-hand-holding-heart"></i> Gdzie szukać pomocy dla alkoholika za darmo?
+                    </h3>
+                    <div style="color: #ccc; line-height: 1.6;">
+                        <p>
+                            Leczenie alkoholizmu w Polsce jest darmowe. Wszystkie placówki znajdziesz w sekcji <a href="pomoc.html" class="text-link">Pomoc</a>.
+                            W sekcji <a href="Sekcja.html?nazwa=Droga%20Wojownika" class="text-link">Droga Wojownika</a> opisaliśmy walkę dzień po dniu.
+                        </p>
+                    </div>
+                </article>
+
+                <article>
+                    <h3 style="color: #7fffd4; font-size: 1.3rem; margin-bottom: 10px;">
+                        <i class="fa-solid fa-skull"></i> Czym jest padaczka alkoholowa i delirium?
+                    </h3>
+                    <p style="color: #ccc; line-height: 1.6;">
+                        Nagłe odstawienie alkoholu może zabić. Jeśli trzęsą Ci się ręce lub słyszysz głosy – <strong>wzywaj pogotowie</strong>. Twoje życie jest najważniejsze.
+                    </p>
+                </article>
+            </section>
+            
+            <section id="internal-support-link" style="text-align: center; margin: 40px auto; padding: 30px; max-width: 800px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(127, 255, 212, 0.1);">
+                <h2 class="fancy-title" style="font-size: 1.5rem; margin-bottom: 15px;">Twoja Historia ma znaczenie</h2>
+                <p style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">Chcesz coś napisać? Skomentować? Wyrzucić z siebie ból? Stworzyliśmy dla Ciebie specjalną strefę.</p>
+                <a href="Sekcja.html?nazwa=Wsparcie" class="action-button" style="display: inline-block; text-decoration: none; font-size: 1.1rem; padding: 15px 30px;">
+                    <i class="fas fa-comments"></i> Przejdź do Sekcji Wsparcia
+                </a>
+            </section>
+        </main>
+
+        <div class="audio-player">
+            <div class="album-art"><i class="fas fa-music"></i></div>
+            <div class="player-info">
+                <div id="current-song-title">Wczytywanie playlisty...</div>
+                <div class="player-controls">
+                    <button id="prev-btn"><i class="fas fa-backward"></i></button>
+                    <button id="play-pause-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn"><i class="fas fa-forward"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="youtube-player" style="display: none;"></div>
+
+        <footer>
+            <div class="footer-content">
+                <span>Od Dna do Światła</span> | <span>&copy; Chudy</span> | <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+            </div>
+        </footer>
+    </div>
+    
+    <div id="content-wrapper" style="display: none;"></div>
+
+    <script type="module" src="/js/main.js"></script>
+    
+    <script>
+    // BEZPIECZNIK PRELOADERA I APP-WRAPPERA
+    function reveal() {
+        var p = document.getElementById('preloader');
+        var app = document.getElementById('app-wrapper');
+        if(p) {
+            p.style.opacity = '0';
+            setTimeout(function() { p.style.display = 'none'; }, 500);
+        }
+        if(app) {
+            app.style.opacity = '1';
+        }
+    }
+    
+    // Podwójne wywołanie dla pewności
+    window.addEventListener('load', reveal);
+    setTimeout(reveal, 3500); // Krytyczny czas dla powolnych łącz mobilnych
+
+    // Animacja tekstu warning
+    document.addEventListener('DOMContentLoaded', () => {
+      const warningTextElement = document.getElementById('warning-text');
+      if (warningTextElement) {
+          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, zrobi to alkohol – bezlitośnie.”";
+          function typeWriter(text, i) { 
+            if (i < text.length) { 
+              warningTextElement.innerHTML = text.substring(0, i + 1); 
+              setTimeout(() => typeWriter(text, i + 1), 50); 
+            } 
+          }
+          typeWriter(fullText, 0);
+      }
+    });
+    </script>
+</body>
+</html>
