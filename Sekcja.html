@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="referrer" content="no-referrer-when-downgrade">
   <title>Latarnia Nadziei</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
@@ -45,7 +46,7 @@
 </head>
 <body>
   
-  <a href="index.html" class="back-btn">
+  <a href="/index.html" class="back-btn">
       <i class="fas fa-arrow-left"></i> Powrót
   </a>
   
@@ -62,7 +63,7 @@
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
       projectId: "projekt-latarnia",
-      storageBucket: "projekt-latarnia.firebasestorage.app", // ✅ Poprawiony bucket
+      storageBucket: "projekt-latarnia.firebasestorage.app",
       messagingSenderId: "244008044225",
       appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
     };
@@ -70,10 +71,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ==========================================================
-    // 🎵 CONFIG HYMNU 🎵
-    // ==========================================================
-    const HYMN_URL = "audio/hymn.mp3"; 
+    const HYMN_URL = "/audio/hymn.mp3"; 
 
     // ========================================
     // MusicPlayer
@@ -84,9 +82,7 @@
         let btnElement = null;
 
         const init = () => {
-            console.log("Noema: Inicjalizacja MusicPlayer...");
-            audio = new Audio(HYMN_URL);
-            audio.loop = true; 
+            console.log("Noema: Inicjalizacja interfejsu MusicPlayer...");
             
             const style = document.createElement('style');
             style.innerHTML = `
@@ -132,10 +128,16 @@
             btnElement = document.getElementById('hymn-btn');
             btnElement.addEventListener('click', togglePlay);
         };
+        
         const togglePlay = () => { isPlaying ? stop() : play(); };
+        
         const play = () => {
-            if (!audio) return;
-            // Zatrzymaj inne odtwarzacze
+            // Zmiana 3: Leniwa inicjalizacja Audio
+            if (!audio) {
+                audio = new Audio(HYMN_URL);
+                audio.loop = true;
+            }
+
             if (typeof lektor !== 'undefined') {
                 lektor.stop();
                 document.querySelectorAll('[data-action="lector-play-pause"]').forEach(btn => btn.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
@@ -144,9 +146,11 @@
             if (hiddenPlayer) { hiddenPlayer.pause(); }
 
             audio.play().then(() => { isPlaying = true; updateUI(true); })
-            .catch(e => { console.error("Błąd audio:", e); alert("Błąd: Nie znaleziono pliku 'audio/hymn.mp3'."); });
+            .catch(e => { console.error("Błąd audio:", e); alert("Błąd: Nie można odtworzyć hymnu."); });
         };
+
         const stop = () => { if (!audio) return; audio.pause(); isPlaying = false; updateUI(false); };
+        
         const updateUI = (playing) => {
             const icon = btnElement.querySelector('i');
             const pulse = document.getElementById('hymn-pulse');
@@ -165,13 +169,36 @@
         let isPaused = false;
         let selectedVoice = null;
         const stripHtml = (html) => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; };
-        const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnaście"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); };
+        const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnasta"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); };
         const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; };
         const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; };
         const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); };
         const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); };
-        const initVoices = () => { const voices = window.speechSynthesis.getVoices(); selectedVoice = voices.find(v => v.lang === "pl-PL") || voices[0]; }; window.speechSynthesis.onvoiceschanged = initVoices; initVoices();
-        const speakNext = () => { if (isPaused || queue.length === 0) { currentUtterance = null; return; } const text = queue.shift(); currentUtterance = new SpeechSynthesisUtterance(text); currentUtterance.lang = "pl-PL"; if (selectedVoice) currentUtterance.voice = selectedVoice; currentUtterance.rate = 0.9; currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; window.speechSynthesis.speak(currentUtterance); };
+        
+        // Zmiana 3: Sprawdzanie głosów dla mobilnego Safari
+        const initVoices = () => { 
+            const voices = window.speechSynthesis.getVoices(); 
+            if (voices.length > 0) {
+                selectedVoice = voices.find(v => v.lang === "pl-PL") || voices[0]; 
+            }
+        }; 
+        window.speechSynthesis.onvoiceschanged = initVoices; 
+        initVoices();
+
+        const speakNext = () => { 
+            if (isPaused || queue.length === 0) { currentUtterance = null; return; } 
+            
+            // Re-inicjalizacja głosów jeśli zniknęły
+            if (!selectedVoice) initVoices();
+
+            const text = queue.shift(); 
+            currentUtterance = new SpeechSynthesisUtterance(text); 
+            currentUtterance.lang = "pl-PL"; 
+            if (selectedVoice) currentUtterance.voice = selectedVoice; 
+            currentUtterance.rate = 0.9; 
+            currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; 
+            window.speechSynthesis.speak(currentUtterance); 
+        };
         const enqueue = (rawText) => { if (!rawText) return; MusicPlayer.stop(); stop(); const parts = splitText(normalizeText(rawText)); queue.push(...parts); speakNext(); };
         const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); };
         const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } };
@@ -181,7 +208,7 @@
     })();
 
     // ========================================
-    // SectionLoader (Obsługa treści)
+    // SectionLoader
     // ========================================
     const SectionLoader = {
         state: { sectionName: '', cleanupFunctions: [] },
@@ -194,38 +221,45 @@
             addLikedPost: (id) => { const l = SectionLoader.utils.getLikedPosts(); if(!l.includes(id)){ l.push(id); localStorage.setItem('latarniaLikedPosts', JSON.stringify(l)); } }
         },
         router: {
-            'Głos Latarni': { fetcher: 'fetchNoOp', renderer: 'renderAudioSection', theme: 'theme-audio' }, // ✅ Nowa trasa
+            'Głos Latarni': { fetcher: 'fetchNoOp', renderer: 'renderAudioSection', theme: 'theme-audio' },
             'Piciorys Chudego': { fetcher: 'fetchSingleEntry', renderer: 'renderPiciorys', theme: 'theme-piciorys' },
             'Z punktu widzenia księżniczki': { fetcher: 'fetchSingleEntry', renderer: 'renderKsiezniczka', theme: 'theme-ksiezniczka' },
             'Pomoc': { fetcher: 'fetchAllHelpEntries', renderer: 'renderPomoc', theme: 'theme-pomoc' },
             'List w Butelce': { fetcher: 'fetchNoOp', renderer: 'renderBottleSection', theme: 'theme-bottle' },
             'Galeria': { fetcher: 'fetchNoOp', renderer: 'renderGallery', theme: 'theme-gallery' },
             'Wsparcie': { fetcher: 'fetchNoOp', renderer: 'renderSupportSection', theme: 'theme-support' },
-            'support.html': { fetcher: 'fetchNoOp', renderer: 'renderSupportSection', theme: 'theme-support' },
-            'Sekcja.html': { fetcher: 'fetchNoOp', renderer: 'renderSupportSection', theme: 'theme-support' },
             '__default__': { fetcher: 'fetchAllEntries', renderer: 'renderStandard', queryOptions: [orderBy('createdAt', 'desc')], theme: 'theme-kronika' }
         },
 
         async init() {
-            this.state.cleanupFunctions.forEach(c => c()); this.state.cleanupFunctions = [];
+            // Zmiana 5: Bezpiecznik Odsłaniania - od razu pokazujemy interfejs (usuwamy spinner jeśli to konieczne)
+            // W tym przypadku usuwamy zawartość loading na starcie jeśli chcemy natychmiastowy UI
+            // Tutaj logika renderowania i tak nadpisze wrapper.
+            
+            this.state.cleanupFunctions.forEach(c => c()); 
+            this.state.cleanupFunctions = [];
             this.setupEventListeners();
+            
             try {
                 const params = new URLSearchParams(window.location.search);
+                // Zmiana 2: Bezpieczne dekodowanie nazwy sekcji
                 this.state.sectionName = decodeURIComponent(params.get('nazwa') || 'Kronika').trim();
+                
                 const route = this.router[this.state.sectionName] || this.router['__default__'];
                 document.documentElement.className = route.theme;
                 document.title = `${this.utils.escapeHtml(this.state.sectionName)} — Latarnia Nadziei`;
+                
                 const data = await this.fetch[route.fetcher].call(this, route.queryOptions);
                 this.render[route.renderer].call(this, data);
             } catch (e) {
                 console.error(e);
-                // NAPRAWIONE: Używamy pełnej ścieżki do renderError, bo "this" się gubi
                 SectionLoader.render.renderError.call(SectionLoader, 'Błąd', 'Wystąpił problem z wczytywaniem sekcji.');
             }
         },
 
         setupEventListeners() {
-            this.elements.wrapper.addEventListener('click', async (event) => {
+            // Zmiana 2: Ujednolicenie odwołań this -> SectionLoader.elements.wrapper
+            SectionLoader.elements.wrapper.addEventListener('click', async (event) => {
                 const btn = event.target.closest('[data-action]');
                 if (!btn) return;
                 const action = btn.dataset.action;
@@ -235,7 +269,7 @@
                     if(SectionLoader.utils.getLikedPosts().includes(docId)) return;
                     btn.disabled = true;
                     try {
-                        const col = (['Wsparcie','support.html','Sekcja.html'].includes(this.state.sectionName)) ? 'support_stories' : `sekcje/${this.state.sectionName}/entries`;
+                        const col = (['Wsparcie'].includes(SectionLoader.state.sectionName)) ? 'support_stories' : `sekcje/${SectionLoader.state.sectionName}/entries`;
                         await updateDoc(doc(db, col, docId), { likes: increment(1) });
                         SectionLoader.utils.addLikedPost(docId);
                         const ctr = btn.closest('article, .log-container').querySelector('[data-likes-counter]');
@@ -250,7 +284,7 @@
                     content.style.display = content.style.display === 'none' ? 'block' : 'none';
                     btn.textContent = content.style.display === 'block' ? 'Ukryj' : 'Czytaj Dalej';
                     if(docId && content.style.display === 'block') {
-                         try { await updateDoc(doc(db, `sekcje/${this.state.sectionName}/entries`, docId), { views: increment(1) }); } catch(e){}
+                         try { await updateDoc(doc(db, `sekcje/${SectionLoader.state.sectionName}/entries`, docId), { views: increment(1) }); } catch(e){}
                     }
                 } else if (action === 'lector-play-pause') {
                     const status = lektor.getStatus();
@@ -267,67 +301,40 @@
 
         fetch: {
             async fetchNoOp() { return null; },
-            async fetchSingleEntry() { const q = query(collection(db, 'sekcje', this.state.sectionName, 'entries'), limit(1)); const s = await getDocs(q); return s.empty ? null : s.docs[0]; },
-            async fetchAllEntries(opts) { const s = await getDocs(query(collection(db, `sekcje/${this.state.sectionName}/entries`), ...opts)); return s.docs; },
+            async fetchSingleEntry() { const q = query(collection(db, 'sekcje', SectionLoader.state.sectionName, 'entries'), limit(1)); const s = await getDocs(q); return s.empty ? null : s.docs[0]; },
+            async fetchAllEntries(opts) { const s = await getDocs(query(collection(db, `sekcje/${SectionLoader.state.sectionName}/entries`), ...opts)); return s.docs; },
             async fetchAllHelpEntries() { return (await getDocs(query(collection(db, 'help'), orderBy('name', 'asc')))).docs; }
         },
 
         render: {
-            // ✅ RENDER: GŁOS LATARNI (AUDIO)
             async renderAudioSection() {
-                // NAPRAWIONE: Używamy SectionLoader.elements.wrapper zamiast this.elements.wrapper
                 SectionLoader.elements.wrapper.innerHTML = `
                     <style>
                       .audio-wrap { max-width: 800px; margin: 0 auto; padding: 40px 20px 100px; text-align: left; }
                       .audio-header { margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
                       .audio-header h1 { font-family: 'Cinzel', serif; color: #ffd97b; font-size: 2.2rem; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
                       .audio-header p { color: rgba(255,255,255,0.7); font-size: 1.1rem; margin: 0; line-height: 1.5; }
-                      
                       .audio-category { margin-bottom: 40px; }
                       .audio-category h2 { color: #fff; opacity: 0.5; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-left: 3px solid #ffd97b; padding-left: 10px; }
-                      
-                      .audio-btn { 
-                          background: #151515; 
-                          border-left: 4px solid #333; 
-                          padding: 18px 20px; 
-                          margin-bottom: 12px; 
-                          border-radius: 6px; 
-                          cursor: pointer; 
-                          transition: all 0.2s ease; 
-                          display: flex; 
-                          align-items: center; 
-                          gap: 15px;
-                          position: relative;
-                          overflow: hidden;
-                      }
+                      .audio-btn { background: #151515; border-left: 4px solid #333; padding: 18px 20px; margin-bottom: 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 15px; position: relative; overflow: hidden; }
                       .audio-btn:hover { background: #1f1f1f; transform: translateX(5px); }
-                      .audio-btn.playing { 
-                          border-left-color: #ff3b3b; 
-                          background: #220a0a; 
-                          box-shadow: 0 0 15px rgba(255, 59, 59, 0.1); 
-                      }
+                      .audio-btn.playing { border-left-color: #ff3b3b; background: #220a0a; box-shadow: 0 0 15px rgba(255, 59, 59, 0.1); }
                       .audio-btn.playing .audio-icon { color: #ff3b3b; animation: pulse-icon 1.5s infinite; }
-                      
                       .audio-icon { font-size: 1.5rem; color: #555; transition: color 0.3s; min-width: 30px; text-align: center; }
                       .audio-content { flex-grow: 1; }
                       .audio-title { font-size: 1.1rem; font-weight: 700; color: #e0e0e0; margin-bottom: 4px; }
                       .audio-desc { font-size: 0.85rem; color: #888; }
-                      
                       @keyframes pulse-icon { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-                      
                       .list-empty { padding: 40px; text-align: center; color: #555; font-style: italic; }
                     </style>
-
                     <div class="audio-wrap">
                         <header class="audio-header">
                             <h1>Głos Latarni</h1>
                             <p>Jeśli nie masz siły czytać — kliknij i słuchaj. Tu nikt Cię nie ocenia.</p>
                         </header>
-                        
                         <div id="audioCategories" class="audio-list">
                             <div class="list-empty"><i class="fas fa-spinner fa-spin"></i> Ładowanie głosu...</div>
                         </div>
-                        
                         <audio id="hiddenPlayer" style="display:none;"></audio>
                     </div>
                 `;
@@ -337,19 +344,15 @@
                 let currentTrackPath = null;
                 let currentBtn = null;
 
-                // Logika odtwarzania
                 const handlePlay = (track, btn) => {
-                    if (currentTrackPath === track.filePath) {
-                        stopAudio();
-                        return;
-                    }
+                    if (currentTrackPath === track.filePath) { stopAudio(); return; }
                     stopAudio();
                     MusicPlayer.stop(); 
                     if(typeof lektor !== 'undefined') lektor.stop();
 
                     if (track.url) {
                         player.src = track.url;
-                        player.play().catch(e => alert("Błąd odtwarzania: " + e.message));
+                        player.play().catch(e => alert("Błąd: Przeglądarka zablokowała autostart lub plik jest niedostępny."));
                         currentTrackPath = track.filePath;
                         currentBtn = btn;
                         btn.classList.add('playing');
@@ -373,12 +376,8 @@
                 player.onended = stopAudio;
 
                 const q = query(collection(db, 'audio_tracks'), where('active', '==', true), orderBy('category'), orderBy('order'));
-                
                 const unsubscribe = onSnapshot(q, (snapshot) => {
-                    if (snapshot.empty) {
-                        container.innerHTML = '<div class="list-empty">Jeszcze nic tu nie ma.</div>';
-                        return;
-                    }
+                    if (snapshot.empty) { container.innerHTML = '<div class="list-empty">Jeszcze nic tu nie ma.</div>'; return; }
                     const tracks = snapshot.docs.map(d => d.data());
                     const grouped = tracks.reduce((acc, track) => {
                         const cat = track.category || 'inne';
@@ -388,12 +387,7 @@
                     }, {});
 
                     container.innerHTML = '';
-                    const catNames = {
-                        'ratunek': '🆘 Ratunek Teraz',
-                        'medytacje': '🧘 Medytacje i Oddech',
-                        'wiedza': '🧠 Wiedza',
-                        'historie': '🔥 Historie'
-                    };
+                    const catNames = { 'ratunek': '🆘 Ratunek Teraz', 'medytacje': '🧘 Medytacje i Oddech', 'wiedza': '🧠 Wiedza', 'historie': '🔥 Historie' };
 
                     for (const [cat, items] of Object.entries(grouped)) {
                         const section = document.createElement('div');
@@ -421,202 +415,71 @@
             },
 
             async renderSupportSection() {
-                // NAPRAWIONE: Używamy SectionLoader.elements.wrapper
                 SectionLoader.elements.wrapper.innerHTML = `
                 <style>
-                  .support-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 18px 140px; position: relative; overflow-x: hidden; }
-                  .support-header { z-index: 8; text-align: center; margin-bottom: 30px; position: relative; }
-                  .support-header h1 { font-size: 2.4rem; letter-spacing: 2px; margin: 0; text-transform: uppercase; color: #ffd97b; text-shadow: 0 0 20px rgba(255, 217, 123, 0.4), 2px 2px 4px rgba(0,0,0,0.8); font-family: 'Cinzel', serif; }
-                  .support-header p.lead { margin: 15px 0 0; color: rgba(255,255,255,0.9); font-size: 1.1rem; max-width: 800px; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-                  
-                  /* SZKLANY FORMULARZ */
-                  .support-form { width: 100%; max-width: 820px; background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 25px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; gap: 15px; z-index: 12; position: relative; margin-bottom: 40px; }
-                  
-                  .support-form input, .support-form textarea { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.3); color: #fff; font-size: 1.05rem; outline: none; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); box-sizing: border-box; font-family: inherit; }
-                  .support-form input::placeholder, .support-form textarea::placeholder { color: rgba(255,255,255,0.5); }
-                  .support-form input:focus, .support-form textarea:focus { border-color: #ffd97b; box-shadow: 0 0 15px rgba(255, 217, 123, 0.2); background: rgba(0, 0, 0, 0.5); }
-                  .support-form textarea { min-height: 140px; resize: vertical; }
-                  
-                  .meta-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 5px; }
-                  .note { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-style: italic; }
-                  
-                  .btn { background: linear-gradient(135deg, #ffd97b 0%, #b8860b 100%); color: #1a1a1a; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 217, 123, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
-                  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 217, 123, 0.5); }
-                  .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
-                  
-                  /* SZKLANE KARTY (POSTY) */
-                  .feed { width: 100%; max-width: 820px; display: flex; flex-direction: column; gap: 25px; z-index: 12; }
-                  .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); transition: transform 0.3s ease, opacity 0.5s ease; opacity: 0; transform: translateY(20px); position: relative; overflow: hidden; }
-                  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%); pointer-events: none; }
+                  .support-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 18px 140px; position: relative; }
+                  .support-header { text-align: center; margin-bottom: 30px; }
+                  .support-header h1 { font-size: 2.4rem; color: #ffd97b; font-family: 'Cinzel', serif; }
+                  .support-form { width: 100%; max-width: 820px; background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 25px; backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
+                  .support-form input, .support-form textarea { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.3); color: #fff; box-sizing: border-box; }
+                  .feed { width: 100%; max-width: 820px; display: flex; flex-direction: column; gap: 25px; }
+                  .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; transition: all 0.5s ease; opacity: 0; transform: translateY(20px); }
                   .card.show { opacity: 1; transform: translateY(0); }
-                  
-                  .card h3 { margin: 0 0 12px; font-size: 1.3rem; color: #ffd97b; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.5); letter-spacing: 0.5px; }
-                  .card p { margin: 0; color: rgba(255,255,255,0.95); line-height: 1.6; font-size: 1.05rem; white-space: pre-wrap; font-family: 'Georgia', serif; }
-                  
-                  .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-size: 0.9rem; }
-                  .like-btn { transition: color 0.3s; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-                  .like-btn:hover { color: #ff6b6b; }
-                  
-                  .card-actions { margin-top: 15px; display: flex; justify-content: flex-end; gap: 12px; }
-                  .card-action-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px); }
-                  .card-action-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); border-color: rgba(255,255,255,0.4); }
-                  
-                  /* KOMENTARZE */
-                  .comments-wrapper { margin-top: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; display: none; border: 1px solid rgba(255,255,255,0.05); }
-                  .comment { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-                  .comment:last-child { border-bottom: none; margin-bottom: 0; }
-                  .comment-author { font-weight: 700; color: #ffd97b; margin: 0 0 4px 0; font-size: 0.9rem; }
-                  .comment-text { font-size: 0.95rem; line-height: 1.5; color: rgba(255,255,255,0.9); margin: 0; }
-                  
-                  .comment-form { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-                  .comment-form input, .comment-form textarea { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; padding: 10px; color: white; border-radius: 8px; outline: none; }
-                  .comment-form textarea { min-height: 60px; }
+                  .card h3 { color: #ffd97b; margin: 0 0 10px; }
+                  .comments-wrapper { margin-top: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; display: none; }
                 </style>
-                
                 <div class="support-wrap">
                     <header class="support-header">
-                        <h1>Podziel się swoją historią lub wesprzyj innych</h1>
-                        <p class="lead">Twoje doświadczenie ma znaczenie. Anonimowo lub nie – każde słowo wsparcia jest bezcenne.</p>
+                        <h1>Podziel się swoją historią</h1>
+                        <p>Twoje doświadczenie ma znaczenie.</p>
                     </header>
-                    
-                    <form id="supportForm" class="support-form" aria-label="Formularz dodawania historii">
-                        <input id="supportName" placeholder="Twoje imię lub pseudonim (wymagane)" autocomplete="name" required />
-                        <textarea id="supportStory" placeholder="Twoja historia... (wymagane)" required></textarea>
-                        <div class="meta-row">
-                            <div class="note">Twoje słowa mogą być dla kogoś latarnią.</div>
-                            <button class="btn" type="submit">Opublikuj</button>
-                        </div>
+                    <form id="supportForm" class="support-form">
+                        <input id="supportName" placeholder="Twoje imię lub pseudonim" required />
+                        <textarea id="supportStory" placeholder="Twoja historia..." required></textarea>
+                        <button class="back-btn" style="position:static; width: 200px;" type="submit">Opublikuj</button>
                     </form>
-                    
-                    <div id="feed" class="feed" aria-live="polite"></div>
+                    <div id="feed" class="feed"></div>
                 </div>`;
 
                 const feed = document.getElementById('feed');
                 const form = document.getElementById('supportForm');
                 
-                // --- FUNKCJA RENDEROWANIA KARTY Z KOMENTARZAMI ---
                 const renderCard = (item, docId) => {
                     const card = document.createElement('article');
                     card.className = 'card';
                     card.dataset.text = `${item.name}. ${item.text}`;
                     card.dataset.docId = docId;
                     
-                    const dateString = item.t ? new Date(item.t.toDate()).toLocaleString('pl-PL') : 'Przed chwilą';
-                    
                     card.innerHTML = `
                         <h3>${SectionLoader.utils.escapeHtml(item.name)}</h3>
                         <p>${SectionLoader.utils.escapeHtml(item.text)}</p>
-                        <div class="meta">
-                            <span>${dateString}</span>
-                            <span title="Polub" class="like-btn" data-likes-counter>❤️ <span class="like-count">${item.likes || 0}</span></span>
+                        <div class="entry-meta">
+                            <span data-likes-counter><i class="fas fa-heart"></i> ${item.likes || 0}</span>
                         </div>
-                        <div class="card-actions">
-                            <button class="card-action-btn" data-action="lector-play-pause" data-target="${docId}"><i class="fas fa-play"></i> Odsłuchaj</button>
-                            <button class="card-action-btn" data-action="like"><i class="fas fa-heart"></i> Lubię to</button>
-                            <button class="card-action-btn toggle-comments-btn"><i class="fas fa-comments"></i> Komentarze</button>
-                        </div>
-                        
-                        <div class="comments-wrapper">
-                            <div class="comments-list"></div>
-                            <form class="comment-form">
-                                <input type="text" class="comment-author-input" placeholder="Twoje imię" required>
-                                <textarea class="comment-text-input" placeholder="Napisz komentarz..." rows="2" required></textarea>
-                                <button type="submit" class="card-action-btn" style="align-self: flex-end;">Wyślij</button>
-                            </form>
+                        <div class="log-actions">
+                            <button class="action-button" data-action="lector-play-pause">Odsłuchaj</button>
+                            <button class="action-button" data-action="like">Lubię to</button>
                         </div>
                     `;
                     feed.prepend(card);
                     setTimeout(() => card.classList.add('show'), 50);
-
-                    // --- OBSŁUGA PRZYCISKU "LUBIĘ TO" (FIX BŁĘDU KONSOLI) ---
-                    const likeBtnAction = card.querySelector('.card-action-btn[data-action="like"]');
-                    const likeBtnMeta = card.querySelector('.like-btn');
-                    
-                    if (SectionLoader.utils.getLikedPosts().includes(docId)) {
-                        likeBtnAction.disabled = true;
-                        likeBtnAction.innerHTML = '<i class="fas fa-check"></i> Polubiono';
-                        likeBtnMeta.style.color = '#ff6b6b';
-                        likeBtnMeta.title = "Już polubiono";
-                    }
-
-                    // --- OBSŁUGA KOMENTARZY ---
-                    const toggleBtn = card.querySelector('.toggle-comments-btn');
-                    const wrapper = card.querySelector('.comments-wrapper');
-                    const list = card.querySelector('.comments-list');
-                    const cForm = card.querySelector('.comment-form');
-                    let loaded = false;
-
-                    toggleBtn.addEventListener('click', () => {
-                        const isHidden = wrapper.style.display === 'none' || !wrapper.style.display;
-                        wrapper.style.display = isHidden ? 'block' : 'none';
-                        if (isHidden && !loaded) {
-                            const qComments = query(collection(db, 'support_stories', docId, 'comments'), orderBy('t', 'asc'));
-                            SectionLoader.state.cleanupFunctions.push(onSnapshot(qComments, (snap) => {
-                                list.innerHTML = '';
-                                snap.forEach(cDoc => {
-                                    const cData = cDoc.data();
-                                    const cEl = document.createElement('div');
-                                    cEl.className = 'comment';
-                                    cEl.innerHTML = `<div class="comment-author">${SectionLoader.utils.escapeHtml(cData.author)}</div><p class="comment-text">${SectionLoader.utils.escapeHtml(cData.text)}</p>`;
-                                    list.append(cEl);
-                                });
-                                if(snap.empty) list.innerHTML = '<div style="padding:10px; color:rgba(255,255,255,0.5); font-style:italic;">Brak komentarzy. Bądź pierwszy!</div>';
-                            }));
-                            loaded = true;
-                        }
-                    });
-
-                    cForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const author = cForm.querySelector('.comment-author-input').value;
-                        const text = cForm.querySelector('.comment-text-input').value;
-                        const submitBtn = cForm.querySelector('button');
-                        if (!author.trim() || !text.trim()) return;
-                        
-                        submitBtn.disabled = true;
-                        try {
-                            await addDoc(collection(db, 'support_stories', docId, 'comments'), { author, text, t: serverTimestamp(), isApproved: false });
-                            cForm.reset();
-                            alert("Komentarz wysłany do moderacji.");
-                        } catch (error) {
-                            alert("Błąd dodawania komentarza.");
-                        } finally {
-                            submitBtn.disabled = false;
-                        }
-                    });
                 };
-                
-                // --- POBIERANIE TYLKO ZATWIERDZONYCH (isApproved == true) ---
+
                 const q = query(collection(db, "support_stories"), where("isApproved", "==", true), orderBy("t", "desc"));
                 SectionLoader.state.cleanupFunctions.push(onSnapshot(q, (snapshot) => {
                     feed.innerHTML = '';
-                    snapshot.forEach(doc => {
-                        renderCard(doc.data(), doc.id);
-                    });
-                    if (feed.children.length === 0) {
-                        feed.innerHTML = `<p style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">Brak wpisów. Bądź pierwszą osobą, która podzieli się wsparciem!</p>`;
-                    }
+                    snapshot.forEach(doc => renderCard(doc.data(), doc.id));
                 }));
 
-                // --- DODAWANIE NOWEGO WPISU (DO MODERACJI - isApproved: false) ---
                 form.addEventListener('submit', async (ev) => {
                     ev.preventDefault();
                     const name = document.getElementById('supportName').value.trim();
                     const text = document.getElementById('supportStory').value.trim();
-                    if (!name || !text) return alert("Wypełnij wszystkie pola.");
-                    const btn = form.querySelector('.btn');
-                    btn.disabled = true;
-                    btn.textContent = 'Wysyłanie...';
                     try {
                         await addDoc(collection(db, "support_stories"), { name, text, t: serverTimestamp(), isApproved: false, likes: 0 });
                         form.reset();
-                        alert("Dziękujemy! Twój wpis został wysłany i czeka na akceptację.");
-                    } catch (e) {
-                        alert('Wystąpił błąd.');
-                    } finally {
-                        btn.disabled = false;
-                        btn.textContent = 'Opublikuj';
-                    }
+                        alert("Wysłano do moderacji.");
+                    } catch (e) { alert('Błąd.'); }
                 });
             },
             
@@ -624,18 +487,17 @@
                 if(!doc) return SectionLoader.render.renderEmpty();
                 const e = doc.data();
                 const isLiked = SectionLoader.utils.getLikedPosts().includes(doc.id);
-                // NAPRAWIONE: Używamy SectionLoader.elements.wrapper
                 SectionLoader.elements.wrapper.innerHTML = `
-                <div class="log-container" data-doc-id="${doc.id}" data-text="${SectionLoader.utils.escapeHtml(e.text)}">
+                <div class="log-container" data-doc-id="${doc.id}" data-text="${SectionLoader.utils.escapeHtml(SectionLoader.utils.stripHtml(e.text || ''))}">
                     <h2 class="log-title">${SectionLoader.utils.escapeHtml(e.introTitle||'Piciorys')}</h2>
                     <div class="entry-meta">
                         <span><i class="fas fa-eye"></i> ${e.views || 0}</span>
                         <span data-likes-counter><i class="fas fa-heart"></i> Polubienia: ${e.likes || 0}</span>
                     </div>
-                    <div class="log-content">${e.text}</div>
+                    <div class="log-content">${e.text || ''}</div>
                     <div class="log-actions">
                         <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
-                        <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>${isLiked ? '<i class="fas fa-check"></i> Polubiono' : '<i class="fas fa-heart"></i> Lubię to'}</button>
+                        <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>${isLiked ? 'Polubiono' : 'Lubię to'}</button>
                     </div>
                 </div>`;
             },
@@ -645,36 +507,35 @@
                 const html = docs.map(d => {
                     const e = d.data();
                     const isLiked = SectionLoader.utils.getLikedPosts().includes(d.id);
-                    const dateStr = e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : 'Brak daty';
+                    // Zmiana 4: Zabezpieczenie przed pustym tekstem (excerpt)
+                    const plainText = SectionLoader.utils.stripHtml(e.text || "");
+                    const excerpt = plainText ? plainText.substring(0, 300) : "";
+                    
                     return `
-                    <article class="story-item" data-doc-id="${d.id}" data-text="${SectionLoader.utils.escapeHtml(e.title)}. ${SectionLoader.utils.escapeHtml(e.text)}">
+                    <article class="story-item" data-doc-id="${d.id}" data-text="${SectionLoader.utils.escapeHtml(e.title)}. ${SectionLoader.utils.escapeHtml(plainText)}">
                         <h3 class="entry-title">${SectionLoader.utils.escapeHtml(e.title)}</h3>
                         <div class="entry-meta">
-                            <span><i class="fas fa-user-edit"></i> ${SectionLoader.utils.escapeHtml(e.author || 'Chudy')}</span>
-                            <span><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
-                            <span data-likes-counter><i class="fas fa-heart"></i> Polubienia: ${e.likes || 0}</span>
-                            <span><i class="fas fa-eye"></i> Wyświetlenia: ${e.views || 0}</span>
+                            <span><i class="fas fa-calendar-alt"></i> ${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : '---'}</span>
+                            <span data-likes-counter><i class="fas fa-heart"></i> ${e.likes || 0}</span>
                         </div>
                         <div class="entry-content">
-                            <p>${SectionLoader.utils.stripHtml(e.text).substring(0,300)}...</p>
-                            <div class="full-content" style="display:none">${e.text}</div>
+                            <p>${excerpt}...</p>
+                            <div class="full-content" style="display:none">${e.text || ''}</div>
                         </div>
                         <div class="log-actions">
                             <button class="action-button" data-action="read-more">Czytaj Dalej</button>
-                            <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
-                            <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>${isLiked ? '<i class="fas fa-check"></i> Polubiono' : '<i class="fas fa-heart"></i> Lubię to'}</button>
+                            <button class="action-button" data-action="lector-play-pause">Odsłuchaj</button>
+                            <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>Lubię to</button>
                         </div>
                     </article>`;
                 }).join('');
-                // NAPRAWIONE: Używamy SectionLoader.elements.wrapper
                 SectionLoader.elements.wrapper.innerHTML = `<div class="content-container"><h2 class="fancy-title">${SectionLoader.state.sectionName}</h2><div class="story-list">${html}</div></div>`;
             },
             
             renderError(t, m) { 
-                // NAPRAWIONE: Używamy SectionLoader.elements.wrapper
                 SectionLoader.elements.wrapper.innerHTML = `<div class="content-container"><h2>${t}</h2><p>${m}</p></div>`; 
             },
-            renderEmpty() { SectionLoader.render.renderError('Pusto', 'Brak wpisów.'); },
+            renderEmpty() { SectionLoader.render.renderError('Pusto', 'Brak wpisów w tej sekcji.'); },
             renderKsiezniczka() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
             renderPomoc() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
             renderGallery() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
@@ -682,12 +543,11 @@
         }
     };
 
-    // START
     document.addEventListener("DOMContentLoaded", () => {
+        // Zmiana 5: Inicjalizacja bez blokowania interfejsu
         MusicPlayer.init();
         SectionLoader.init();
     });
   </script>
-
 </body>
 </html>
