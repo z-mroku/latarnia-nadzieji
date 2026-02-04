@@ -1,13 +1,11 @@
 // Plik: /js/main.js (WERSJA DO REPO - PEŁNA OPTYMALIZACJA MOBILNA)
 
-// --- Importy Firebase ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, increment 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { ModalModule } from '/js/modules.js';
 
-// --- Firebase config ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
   authDomain: "projekt-latarnia.firebaseapp.app",
@@ -20,10 +18,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- Zmienne Globalne ---
 let sparksFromDB = [], player, playlist = [], currentIndex = 0;
 
-// --- Funkcje Pomocnicze ---
 function escapeHtml(s = '') { 
   return String(s).replace(/[&<>"']/g, c => ({ 
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' 
@@ -44,7 +40,7 @@ async function fetchAndRenderMenu(container) {
       const data = doc.data();
       let finalUrl = escapeHtml(data.url);
       if (finalUrl.toLowerCase() === 'sekcja.html') {
-        finalUrl = `Sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
+        finalUrl = `/Sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
       }
       return `<li><a href="${finalUrl}" class="index-nav-button">${escapeHtml(data.text)}</a></li>`;
     }).join('') || '<li><a class="index-nav-button">Brak menu</a></li>';
@@ -88,7 +84,7 @@ async function fetchLatarniaNadziei(container) {
       const author = escapeHtml(e.author || 'Chudy');
       const date = e.createdAt?.toDate ? e.createdAt.toDate().toLocaleDateString('pl-PL') : 'Brak daty';
       const fullContent = e.text || '';
-      const excerpt = stripHtml(fullContent).substring(0, 200) + '...';
+      const excerpt = fullContent ? stripHtml(fullContent).substring(0, 200) + '...' : '';
 
       return `
         <article class="story-item" data-section="${e.section}" data-id="${e.id}"
@@ -103,7 +99,7 @@ async function fetchLatarniaNadziei(container) {
             <span><i class="fas fa-eye"></i> Wyświetlenia: <span class="view-count">${e.views || 0}</span></span>
           </div>
           <div class="entry-content">
-            <p>${escapeHtml(excerpt)}</p>
+            <p>${excerpt}</p>
             <div class="full-content" style="display: none;">${fullContent}</div>
           </div>
           <button class="action-button read-more-btn">Czytaj dalej</button>
@@ -222,22 +218,10 @@ function initializeDisqus() {
 
 // ==================== START APP ====================
 document.addEventListener("DOMContentLoaded", () => {
-  const preloader = document.getElementById('preloader');
-  const appWrapper = document.getElementById('app-wrapper');
-  
-  // 1. REVEAL NA START (Gwarancja zniknięcia czarnej zasłony)
-  if (preloader) {
-    preloader.style.opacity = '0';
-    setTimeout(() => { preloader.style.display = 'none'; }, 500);
-  }
-  if (appWrapper) { appWrapper.style.opacity = '1'; }
-
-  // 2. Obsługa parametrów URL (Naprawa polskich znaków z FB)
   const urlParams = new URLSearchParams(window.location.search);
   let rawSection = urlParams.get('nazwa');
   const sectionName = rawSection ? decodeURIComponent(rawSection) : null;
 
-  // 3. ŁADOWANIE DANYCH z małym opóźnieniem dla stabilności na telefonach
   setTimeout(() => {
     const menuContainer = document.getElementById('main-menu');
     const entriesContainer = document.getElementById('entries-container');
@@ -261,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    // Inicjalizacja modala
     if (typeof ModalModule !== 'undefined' && ModalModule.init) {
       ModalModule.init();
     }
