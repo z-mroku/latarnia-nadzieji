@@ -1,11 +1,10 @@
-// Plik: /js/main.js (WERSJA DO REPO - KULOODPORNA NA MOBILNE PRZEGLĄDARKI)
+// Plik: /js/main.js (WERSJA DO REPO - PEŁNA OPTYMALIZACJA MOBILNA)
 
 // --- Importy Firebase ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, increment 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-// ZMIANA: Pełna ścieżka bezwzględna dla pewności ładowania
 import { ModalModule } from '/js/modules.js';
 
 // --- Firebase config ---
@@ -45,7 +44,7 @@ async function fetchAndRenderMenu(container) {
       const data = doc.data();
       let finalUrl = escapeHtml(data.url);
       if (finalUrl.toLowerCase() === 'sekcja.html') {
-        finalUrl = `sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
+        finalUrl = `Sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
       }
       return `<li><a href="${finalUrl}" class="index-nav-button">${escapeHtml(data.text)}</a></li>`;
     }).join('') || '<li><a class="index-nav-button">Brak menu</a></li>';
@@ -55,7 +54,7 @@ async function fetchAndRenderMenu(container) {
   }
 }
 
-// ==================== LatarniA NADZIEI ====================
+// ==================== LATARNIA NADZIEI ====================
 async function fetchLatarniaNadziei(container) {
   try {
     const sectionsToExclude = ['Piciorys Chudego', 'Z punktu widzenia księżniczki', 'Pomoc', 'Galeria'];
@@ -88,7 +87,8 @@ async function fetchLatarniaNadziei(container) {
       const title = escapeHtml(e.title || 'Bez tytułu');
       const author = escapeHtml(e.author || 'Chudy');
       const date = e.createdAt?.toDate ? e.createdAt.toDate().toLocaleDateString('pl-PL') : 'Brak daty';
-      const excerpt = stripHtml(e.text || '').substring(0, 200) + '...';
+      const fullContent = e.text || '';
+      const excerpt = stripHtml(fullContent).substring(0, 200) + '...';
 
       return `
         <article class="story-item" data-section="${e.section}" data-id="${e.id}"
@@ -104,7 +104,7 @@ async function fetchLatarniaNadziei(container) {
           </div>
           <div class="entry-content">
             <p>${escapeHtml(excerpt)}</p>
-            <div class="full-content" style="display: none;">${e.text || ''}</div>
+            <div class="full-content" style="display: none;">${fullContent}</div>
           </div>
           <button class="action-button read-more-btn">Czytaj dalej</button>
           <button class="action-button like-btn">❤️ Polub</button>
@@ -180,7 +180,7 @@ async function onPlayerReady() {
     const snap = await getDocs(query(collection(db, "playlist"), orderBy("createdAt", "asc")));
     playlist = snap.docs.map(d => ({ title: d.data().title, videoId: getVideoId(d.data().link) })).filter(s => s.videoId);
     if (playlist.length > 0) loadCurrentSong(false);
-    else if (songTitle) songTitle.innerText = "Brak utworów.";
+    else if (songTitle) songTitle.innerText = "Brak utworów w playliście.";
   } catch (e) {
     console.error("Błąd playlisty:", e);
   }
@@ -212,7 +212,7 @@ function initializeDisqus() {
   if (!disqusThread) return;
   window.disqus_config = function () {
     this.page.url = window.location.href;
-    this.page.identifier = 'strona-glowna-latarnia';
+    this.page.identifier = 'strona-glowna-od-dna-do-swiatla';
   };
   const d = document, s = d.createElement('script');
   s.src = 'https://od-dna-do-swiatla.disqus.com/embed.js';
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let rawSection = urlParams.get('nazwa');
   const sectionName = rawSection ? decodeURIComponent(rawSection) : null;
 
-  // 3. ŁADOWANIE DANYCH z opóźnieniem dla stabilności mobilnej
+  // 3. ŁADOWANIE DANYCH z małym opóźnieniem dla stabilności na telefonach
   setTimeout(() => {
     const menuContainer = document.getElementById('main-menu');
     const entriesContainer = document.getElementById('entries-container');
@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    // Inicjalizacja modala z zabezpieczeniem
+    // Inicjalizacja modala
     if (typeof ModalModule !== 'undefined' && ModalModule.init) {
       ModalModule.init();
     }
