@@ -28,6 +28,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://latarnia-nadzieji.vercel.app/" />
     <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/img/latarnia.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="pl_PL" />
     <meta property="og:site_name" content="Latarnia Nadziei" />
 
@@ -36,7 +38,7 @@
     <meta name="twitter:description" content="Prawdziwe wsparcie w walce z alkoholizmem. Zero ściemy.">
     <meta name="twitter:image" content="https://latarnia-nadzieji.vercel.app/img/latarnia.jpg">
 
-    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="/css/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <script type="application/ld+json">
@@ -87,6 +89,11 @@
     
     <style>
     /* STYLE KRYTYCZNE */
+    #preloader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #0f2027; z-index: 9999; display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.5s ease;
+    }
     .animated-warning {
       border: 2px solid gold;
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
@@ -129,7 +136,6 @@
     .faq-list { margin: 15px 0; padding-left: 20px; color: #ccc; }
     .faq-list li { margin-bottom: 8px; list-style-type: square; color: #e0f2f1; }
     
-    /* LINKI W TEKŚCIE */
     .text-link {
         color: #7fffd4;
         text-decoration: none;
@@ -214,7 +220,6 @@
                     </h3>
                     <div style="color: #ccc; line-height: 1.6;">
                         <p>Nie pytaj tylko: „jak przestać pić?” Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
-                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
                         <ul class="faq-list">
                             <li>jak przetrwać pierwszy dzień bez picia</li>
                             <li>co robić drugiego, trzeciego i dziesiątego dnia</li>
@@ -223,9 +228,6 @@
                             <li>jak odbudować siebie krok po kroku</li>
                             <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem</li>
                         </ul>
-                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
-                        <p>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</p>
-                        <p><strong>Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.</strong></p>
                     </div>
                 </article>
 
@@ -234,9 +236,7 @@
                         <i class="fa-solid fa-triangle-exclamation"></i> Jakie są objawy alkoholizmu?
                     </h3>
                     <p style="color: #ccc; line-height: 1.6;">
-                        Myślisz, że alkoholik to tylko menel pod sklepem? Błąd. 
-                        Jeśli pijesz, by zasnąć, pijesz, by się rozluźnić, ukrywasz butelki, masz "luki w pamięci" (urwany film) albo czujesz lęk, gdy w domu brakuje alkoholu – to są <strong>objawy uzależnienia</strong>. 
-                        Ciągi alkoholowe, picie klinem (na kaca) i zaniedbywanie rodziny to ostatni dzwonek przed dnem.
+                        Myślisz, że alkoholik to tylko menel pod sklepem? Błąd. Jeśli pijesz, by się rozluźnić, ukrywasz butelki, masz "luki w pamięci" albo czujesz lęk, gdy brakuje alkoholu – to są <strong>objawy uzależnienia</strong>.
                     </p>
                 </article>
 
@@ -246,25 +246,9 @@
                     </h3>
                     <div style="color: #ccc; line-height: 1.6;">
                         <p>
-                            Leczenie alkoholizmu w Polsce jest darmowe (również dla nieubezpieczonych!). Wszystkie placówki i poradnie znajdziesz, w sekcji <a href="pomoc.html" class="text-link">Pomoc</a> pod mapą.
+                            Leczenie alkoholizmu w Polsce jest darmowe. Wszystkie placówki znajdziesz w sekcji <a href="pomoc.html" class="text-link">Pomoc</a>.
+                            W sekcji <a href="Sekcja.html?nazwa=Droga%20Wojownika" class="text-link">Droga Wojownika</a> opisaliśmy walkę dzień po dniu.
                         </p>
-                        <p>
-                            W sekcji <a href="Sekcja.html?nazwa=Droga%20Wojownika" class="text-link">Droga Wojownika</a> jest opisana walka pierwszego dnia i dzien po dniu do trzeźwości, a w sekcji <a href="Sekcja.html?nazwa=G%C5%82os%20Latarni" class="text-link">Głos Latarni</a> bardzo obszerny materiał audio przez co sie zapija dużo o uczuciach i wiele wiecej.
-                        </p>
-                        
-                        <p>Nie pytaj tylko: „jak przestać pić?” Zapytaj: jak nauczyć się żyć bez alkoholu – dzień po dniu. Bo alkoholizm to nie jest problem z butelką. To jest problem z emocjami, z bólem, z poczuciem własnej wartości i z ucieczką od siebie.</p>
-                        <p>Silna wola nie wystarczy. Ona pęka przy pierwszym większym kryzysie. Dlatego w Latarni Nadziei masz całą drogę, a nie fragment:</p>
-                        <ul class="faq-list">
-                            <li>jak przetrwać pierwszy dzień bez picia</li>
-                            <li>co robić drugiego, trzeciego i dziesiątego dnia</li>
-                            <li>jak radzić sobie z głodem alkoholowym</li>
-                            <li>jak nie uciekać od emocji, tylko je rozumieć</li>
-                            <li>jak odbudować siebie krok po kroku</li>
-                            <li>gdzie szukać realnej pomocy: terapia, AA, ludzie z doświadczeniem</li>
-                        </ul>
-                        <p>Nie dajemy motywacyjnych haseł. Dajemy proces. Tu jest rozpisane życie po alkoholu – dzień po dniu.</p>
-                        <p>To nie jest miejsce dla tych, którzy „może kiedyś”. To jest miejsce dla tych, którzy są zmęczeni własnym piekłem.</p>
-                        <p><strong>Jeśli jeszcze masz w sobie myśl: „tak dalej nie chcę” – to znaczy, że jeszcze możesz zawrócić. Latarnia świeci właśnie dla Ciebie.</strong></p>
                     </div>
                 </article>
 
@@ -273,20 +257,14 @@
                         <i class="fa-solid fa-skull"></i> Czym jest padaczka alkoholowa i delirium?
                     </h3>
                     <p style="color: #ccc; line-height: 1.6;">
-                        Nagłe odstawienie alkoholu po długim ciągu może zabić. Delirium tremens (majaczenie) i padaczka to stan zagrożenia życia. 
-                        Jeśli trzęsą Ci się ręce, słyszysz głosy, widzisz rzeczy, których nie ma – <strong>wzywaj pogotowie</strong>. 
-                        Nie wstydź się. Ratownicy widzieli to tysiące razy. Twoje życie jest ważniejsze niż wstyd.
+                        Nagłe odstawienie alkoholu może zabić. Jeśli trzęsą Ci się ręce lub słyszysz głosy – <strong>wzywaj pogotowie</strong>. Twoje życie jest najważniejsze.
                     </p>
                 </article>
             </section>
             
             <section id="internal-support-link" style="text-align: center; margin: 40px auto; padding: 30px; max-width: 800px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(127, 255, 212, 0.1);">
                 <h2 class="fancy-title" style="font-size: 1.5rem; margin-bottom: 15px;">Twoja Historia ma znaczenie</h2>
-                <p style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">
-                    Tutaj nie ma reklam ani śledzenia. To jest bezpieczna przystań.<br>
-                    Chcesz coś napisać? Skomentować? Wyrzucić z siebie ból?<br>
-                    Stworzyliśmy dla Ciebie specjalną, anonimową strefę.
-                </p>
+                <p style="color: #ccc; margin-bottom: 25px; line-height: 1.6;">Chcesz coś napisać? Skomentować? Wyrzucić z siebie ból? Stworzyliśmy dla Ciebie specjalną strefę.</p>
                 <a href="Sekcja.html?nazwa=Wsparcie" class="action-button" style="display: inline-block; text-decoration: none; font-size: 1.1rem; padding: 15px 30px;">
                     <i class="fas fa-comments"></i> Przejdź do Sekcji Wsparcia
                 </a>
@@ -308,39 +286,42 @@
 
         <footer>
             <div class="footer-content">
-                <span>Od Dna do Światła</span>
-                <span>&copy; Chudy</span>
-                <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
+                <span>Od Dna do Światła</span> | <span>&copy; Chudy</span> | <span>Kontakt: <a href="mailto:asatro@interia.pl">asatro@interia.pl</a></span>
             </div>
         </footer>
     </div>
     
     <div id="content-wrapper" style="display: none;"></div>
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="/js/main.js"></script>
     
     <script>
-    // SKRYPT BEZPIECZEŃSTWA: USUWA PRELOADER JEŚLI JS ZAWIEDZIE
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            var p = document.getElementById('preloader');
-            if(p) p.style.display = 'none';
-        }, 1000); // Czeka 1 sekundę i siłowo usuwa spinner
-    });
+    // BEZPIECZNIK PRELOADERA - Naprawa błędu na telefonach (Facebook)
+    function hidePreloader() {
+        var p = document.getElementById('preloader');
+        if(p) {
+            p.style.opacity = '0';
+            setTimeout(function() { p.style.display = 'none'; }, 500);
+        }
+    }
+    window.addEventListener('load', hidePreloader);
+    setTimeout(hidePreloader, 3000); // Po 3 sek. zawsze usuwa czarny ekran
 
-    // SKRYPT DLA PRZESTROGI
+    // Animacja tekstu warning
     document.addEventListener('DOMContentLoaded', () => {
       const warningBox = document.getElementById('warning-box');
       const warningTextElement = document.getElementById('warning-text');
       if (warningTextElement) {
-          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, jak je przeżywać i radzić sobie z nimi, zrobi to alkohol – bezlitośnie i bez skrupułów.”";
-          const typingSpeed = 50; const pauseDuration = 3000; const explosionDuration = 1500;
-          function typeWriter(text, i, onComplete) { if (i < text.length) { warningTextElement.innerHTML = text.substring(0, i + 1); setTimeout(() => typeWriter(text, i + 1, onComplete), typingSpeed); } else if (onComplete) { onComplete(); } }
-          function runAnimationCycle() { warningBox.classList.remove('explode-red'); warningTextElement.innerHTML = ''; warningTextElement.style.borderRightColor = ''; typeWriter(fullText, 0, () => { warningTextElement.style.borderRightColor = 'transparent'; setTimeout(() => { warningBox.classList.add('explode-red'); setTimeout(() => { warningTextElement.innerHTML = ''; setTimeout(runAnimationCycle, 1000); }, explosionDuration); }, pauseDuration); }); }
-          runAnimationCycle();
+          const fullText = "„Drodzy rodzice, jeśli wy zaniedbacie i nie nauczycie swoich dzieci, czym i po co są uczucia, zrobi to alkohol – bezlitośnie.”";
+          function typeWriter(text, i) { 
+            if (i < text.length) { 
+              warningTextElement.innerHTML = text.substring(0, i + 1); 
+              setTimeout(() => typeWriter(text, i + 1), 50); 
+            } 
+          }
+          typeWriter(fullText, 0);
       }
     });
     </script>
 </body>
 </html>
-
