@@ -1,11 +1,12 @@
-// Plik: /js/main.js (WERSJA DO REPO - ZOPTYMALIZOWANE ŁADOWANIE)
+// Plik: /js/main.js (WERSJA DO REPO - KULOODPORNA NA MOBILNE PRZEGLĄDARKI)
 
 // --- Importy Firebase ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, increment 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { ModalModule } from './modules.js';
+// ZMIANA: Pełna ścieżka bezwzględna dla pewności ładowania
+import { ModalModule } from '/js/modules.js';
 
 // --- Firebase config ---
 const firebaseConfig = {
@@ -43,7 +44,7 @@ async function fetchAndRenderMenu(container) {
     container.innerHTML = snap.docs.map(doc => {
       const data = doc.data();
       let finalUrl = escapeHtml(data.url);
-      if (finalUrl === 'sekcja.html' || finalUrl === 'Sekcja.html') {
+      if (finalUrl.toLowerCase() === 'sekcja.html') {
         finalUrl = `sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
       }
       return `<li><a href="${finalUrl}" class="index-nav-button">${escapeHtml(data.text)}</a></li>`;
@@ -76,7 +77,7 @@ async function fetchLatarniaNadziei(container) {
         });
       }
     });
-    allEntries.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+    allEntries.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
     if (!allEntries.length) {
       container.innerHTML = "<p style='text-align:center;'>Brak wpisów w Ostatniej Latarni Nadziei.</p>";
@@ -87,10 +88,7 @@ async function fetchLatarniaNadziei(container) {
       const title = escapeHtml(e.title || 'Bez tytułu');
       const author = escapeHtml(e.author || 'Chudy');
       const date = e.createdAt?.toDate ? e.createdAt.toDate().toLocaleDateString('pl-PL') : 'Brak daty';
-      const likes = e.likes || 0;
-      const views = e.views || 0;
-      const fullContent = e.text || '';
-      const excerpt = stripHtml(fullContent).substring(0, 200) + '...';
+      const excerpt = stripHtml(e.text || '').substring(0, 200) + '...';
 
       return `
         <article class="story-item" data-section="${e.section}" data-id="${e.id}"
@@ -101,26 +99,17 @@ async function fetchLatarniaNadziei(container) {
           <div class="entry-meta">
             <span><i class="fas fa-user-edit"></i> Autor: ${author}</span>
             <span><i class="fas fa-calendar-alt"></i> ${date}</span>
-            <span><i class="fas fa-heart"></i> Polubienia: <span class="like-count">${likes}</span></span>
-            <span><i class="fas fa-eye"></i> Wyświetlenia: <span class="view-count">${views}</span></span>
+            <span><i class="fas fa-heart"></i> Polubienia: <span class="like-count">${e.likes || 0}</span></span>
+            <span><i class="fas fa-eye"></i> Wyświetlenia: <span class="view-count">${e.views || 0}</span></span>
           </div>
           <div class="entry-content">
             <p>${escapeHtml(excerpt)}</p>
-            <div class="full-content" style="display: none;">${fullContent}</div>
+            <div class="full-content" style="display: none;">${e.text || ''}</div>
           </div>
           <button class="action-button read-more-btn">Czytaj dalej</button>
           <button class="action-button like-btn">❤️ Polub</button>
         </article>`;
     }).join('');
-
-    container.querySelectorAll('.read-more-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const article = e.target.closest('.story-item');
-        const fullContent = article.querySelector('.full-content');
-        fullContent.style.display = fullContent.style.display === 'none' ? 'block' : 'none';
-        await incrementField(article, 'views', '.view-count');
-      });
-    });
 
     container.querySelectorAll('.like-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -173,14 +162,13 @@ function changeSpark(textEl) {
 
 // ==================== ODTWARZACZ YT ====================
 function initYTPlayer() {
-  if (!document.getElementById('youtube-player')) return;
+  if (!document.getElementById('youtube-player') || window.YT) return;
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
   window.onYouTubeIframeAPIReady = () => {
     player = new YT.Player('youtube-player', {
-      height: '0',
-      width: '0',
+      height: '0', width: '0',
       playerVars: { 'playsinline': 1, 'origin': window.location.origin },
       events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
     });
@@ -190,13 +178,11 @@ async function onPlayerReady() {
   const songTitle = document.getElementById("current-song-title");
   try {
     const snap = await getDocs(query(collection(db, "playlist"), orderBy("createdAt", "asc")));
-    playlist = snap.docs.map(d => ({ title: d.data().title, videoId: getVideoId(d.data().link) }))
-      .filter(s => s.videoId);
+    playlist = snap.docs.map(d => ({ title: d.data().title, videoId: getVideoId(d.data().link) })).filter(s => s.videoId);
     if (playlist.length > 0) loadCurrentSong(false);
-    else if (songTitle) songTitle.innerText = "Brak utworów w playliście.";
+    else if (songTitle) songTitle.innerText = "Brak utworów.";
   } catch (e) {
     console.error("Błąd playlisty:", e);
-    if (songTitle) songTitle.innerText = "Błąd ładowania playlisty";
   }
 }
 function onPlayerStateChange(e) {
@@ -210,17 +196,12 @@ function togglePlayPause() {
 }
 function loadCurrentSong(autoplay = true) {
   if (!playlist.length || !player) return;
-  const song = playlist[currentIndex];
   const songTitleEl = document.getElementById("current-song-title");
   if (songTitleEl) {
-    songTitleEl.style.opacity = 0;
-    setTimeout(() => {
-      songTitleEl.innerText = song.title;
-      songTitleEl.style.opacity = 1;
-    }, 300);
+    songTitleEl.innerText = playlist[currentIndex].title;
   }
-  if (autoplay) player.loadVideoById(song.videoId);
-  else player.cueVideoById(song.videoId);
+  if (autoplay) player.loadVideoById(playlist[currentIndex].videoId);
+  else player.cueVideoById(playlist[currentIndex].videoId);
 }
 function nextSong() { if (!playlist.length) return; currentIndex = (currentIndex + 1) % playlist.length; loadCurrentSong(true); }
 function prevSong() { if (!playlist.length) return; currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadCurrentSong(true); }
@@ -231,7 +212,7 @@ function initializeDisqus() {
   if (!disqusThread) return;
   window.disqus_config = function () {
     this.page.url = window.location.href;
-    this.page.identifier = 'strona-glowna-od-dna-do-swiatla';
+    this.page.identifier = 'strona-glowna-latarnia';
   };
   const d = document, s = d.createElement('script');
   s.src = 'https://od-dna-do-swiatla.disqus.com/embed.js';
@@ -243,41 +224,46 @@ function initializeDisqus() {
 document.addEventListener("DOMContentLoaded", () => {
   const preloader = document.getElementById('preloader');
   const appWrapper = document.getElementById('app-wrapper');
-  const menuContainer = document.getElementById('main-menu');
-  const entriesContainer = document.getElementById('entries-container');
-  const sparkText = document.getElementById('sparkText');
-  const sparkButton = document.getElementById('sparkButton');
-  const playPauseBtn = document.getElementById('play-pause-btn');
-  const nextBtn = document.getElementById('next-btn');
-  const prevBtn = document.getElementById('prev-btn');
-
-  // --- REVEAL NA START (Bez czekania na dane) ---
+  
+  // 1. REVEAL NA START (Gwarancja zniknięcia czarnej zasłony)
   if (preloader) {
     preloader.style.opacity = '0';
     setTimeout(() => { preloader.style.display = 'none'; }, 500);
   }
   if (appWrapper) { appWrapper.style.opacity = '1'; }
 
-  // --- ŁADOWANIE ASYNCHRONICZNE (Nie blokuje strony) ---
-  Promise.allSettled([
-    menuContainer ? fetchAndRenderMenu(menuContainer) : Promise.resolve(),
-    entriesContainer ? fetchLatarniaNadziei(entriesContainer) : Promise.resolve(),
-    sparkText ? fetchSparks(sparkText) : Promise.resolve()
-  ]);
+  // 2. Obsługa parametrów URL (Naprawa polskich znaków z FB)
+  const urlParams = new URLSearchParams(window.location.search);
+  let rawSection = urlParams.get('nazwa');
+  const sectionName = rawSection ? decodeURIComponent(rawSection) : null;
 
-  if (sparkButton && sparkText) {
-    sparkButton.addEventListener('click', () => changeSpark(sparkText));
-  }
-  
-  initYTPlayer();
-  
-  if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
-  if (nextBtn) nextBtn.addEventListener('click', nextSong);
-  if (prevBtn) prevBtn.addEventListener('click', prevSong);
-  
-  if (document.getElementById('disqus_thread')) {
-    initializeDisqus();
-  }
+  // 3. ŁADOWANIE DANYCH z opóźnieniem dla stabilności mobilnej
+  setTimeout(() => {
+    const menuContainer = document.getElementById('main-menu');
+    const entriesContainer = document.getElementById('entries-container');
+    const sparkText = document.getElementById('sparkText');
+    const sparkButton = document.getElementById('sparkButton');
 
-  ModalModule.init();
+    if (menuContainer) fetchAndRenderMenu(menuContainer);
+    if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
+    if (sparkText) fetchSparks(sparkText);
+    
+    if (sparkButton && sparkText) {
+      sparkButton.addEventListener('click', () => changeSpark(sparkText));
+    }
+    
+    initYTPlayer();
+    
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
+    if (document.getElementById('next-btn')) document.getElementById('next-btn').addEventListener('click', nextSong);
+    if (document.getElementById('prev-btn')) document.getElementById('prev-btn').addEventListener('click', prevSong);
+    
+    if (document.getElementById('disqus_thread')) initializeDisqus();
+
+    // Inicjalizacja modala z zabezpieczeniem
+    if (typeof ModalModule !== 'undefined' && ModalModule.init) {
+      ModalModule.init();
+    }
+  }, 100);
 });
