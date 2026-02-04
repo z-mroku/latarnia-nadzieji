@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer-when-downgrade">
 
     <title>Latarnia Nadziei – Jak wyjść z alkoholizmu? Brutalna Prawda i Pomoc</title>
     
@@ -95,6 +95,7 @@
         background: #0f2027; z-index: 9999; display: flex; align-items: center; justify-content: center;
         transition: opacity 0.5s ease;
     }
+    /* Poprawka: Wymuszenie przezroczystości na start */
     #app-wrapper { opacity: 0; transition: opacity 0.5s ease; }
     
     .animated-warning {
@@ -299,7 +300,7 @@
     <script type="module" src="/js/main.js"></script>
     
     <script>
-    // BEZPIECZNIK PRELOADERA I APP-WRAPPERA
+    // BEZPIECZNIK PRELOADERA I APP-WRAPPERA (Poprawka nr 2)
     function reveal() {
         var p = document.getElementById('preloader');
         var app = document.getElementById('app-wrapper');
@@ -314,9 +315,10 @@
     
     // Podwójne wywołanie dla pewności
     window.addEventListener('load', reveal);
-    setTimeout(reveal, 3500); // Krytyczny czas dla powolnych łącz mobilnych
+    // Krytyczny czas 3.5s dla powolnych łącz (Poprawka nr 2)
+    setTimeout(reveal, 3500);
 
-    // Animacja tekstu warning
+    // Animacja tekstu warning (Oryginał)
     document.addEventListener('DOMContentLoaded', () => {
       const warningTextElement = document.getElementById('warning-text');
       if (warningTextElement) {
