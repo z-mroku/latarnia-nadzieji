@@ -1,4 +1,4 @@
-// Plik: /js/main.js (PEŁNA WERSJA POPRAWIONA DLA FACEBOOKA)
+// Plik: /js/main.js (WERSJA KOMPLETNA - ANTI-CRASH)
 
 // --- Importy Firebase ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -66,7 +66,7 @@ async function fetchLatarniaNadziei(container) {
     const queries = sectionsToQuery.map(sectionName =>
       getDocs(query(collection(db, 'sekcje', sectionName, 'entries'), orderBy("createdAt", "desc"), limit(2)))
     );
-    const results = await Promise.allSettled(queries); // Zmienione na settled dla bezpieczeństwa FB
+    const results = await Promise.allSettled(queries);
 
     let allEntries = [];
     results.forEach((res, index) => {
@@ -114,7 +114,6 @@ async function fetchLatarniaNadziei(container) {
         </article>`;
     }).join('');
 
-    // Eventy
     container.querySelectorAll('.read-more-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const article = e.target.closest('.story-item');
@@ -227,31 +226,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const preloader = document.getElementById('preloader');
   const appWrapper = document.getElementById('app-wrapper');
 
-  const revealSite = () => {
+  // NATYCHMIASTOWE ODSŁONIĘCIE (Najważniejsze dla FB)
+  const reveal = () => {
     if (preloader) {
       preloader.style.opacity = '0';
-      setTimeout(() => { preloader.style.display = 'none'; }, 500);
+      setTimeout(() => { preloader.style.display = 'none'; }, 600);
     }
     if (appWrapper) appWrapper.style.opacity = '1';
   };
+  
+  // Najpierw odsłaniamy tło i szkielet
+  reveal();
 
+  // Potem ładujemy dane z Firebase
   const menuContainer = document.getElementById('main-menu');
   const entriesContainer = document.getElementById('entries-container');
   const sparkText = document.getElementById('sparkText');
 
-  // Bezpieczne ładowanie - Promise.allSettled nie blokuje strony przy błędzie
-  Promise.allSettled([
-    menuContainer ? fetchAndRenderMenu(menuContainer) : Promise.resolve(),
-    entriesContainer ? fetchLatarniaNadziei(entriesContainer) : Promise.resolve(),
-    sparkText ? fetchSparks(sparkText) : Promise.resolve()
-  ]).then(() => {
-    revealSite();
-  });
+  fetchAndRenderMenu(menuContainer);
+  fetchLatarniaNadziei(entriesContainer);
+  fetchSparks(sparkText);
 
-  // GŁÓWNY BEZPIECZNIK DLA FACEBOOKA - zawsze odkryje stronę po 3 sek.
-  setTimeout(revealSite, 3000);
-
-  // Inicjalizacja reszty
+  // Reszta eventów
   const sparkButton = document.getElementById('sparkButton');
   if (sparkButton && sparkText) sparkButton.addEventListener('click', () => changeSpark(sparkText));
   
@@ -265,5 +261,5 @@ document.addEventListener("DOMContentLoaded", () => {
   
   if (document.getElementById('disqus_thread')) initializeDisqus();
   
-  try { ModalModule.init(); } catch(e) { console.log("Błąd modali"); }
+  try { ModalModule.init(); } catch(e) { console.log("Modale nieaktywne"); }
 });
