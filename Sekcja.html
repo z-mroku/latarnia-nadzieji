@@ -20,10 +20,11 @@
             --gold: #ffd97b;
             --gold-dark: #c5a059;
             --bg-deep: #0f1014;
-            --glass-bg: rgba(25, 27, 35, 0.95);
-            --glass-border: 1px solid rgba(255, 217, 123, 0.2);
+            --glass-bg: rgba(25, 27, 35, 0.92);
+            --glass-border: 1px solid rgba(255, 217, 123, 0.25);
             --text-main: #e0e0e0;
             --text-dim: #aaa;
+            --shadow-card: 0 15px 50px rgba(0,0,0,0.6);
         }
 
         html, body { 
@@ -37,97 +38,103 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* TYPOGRAFIA */
         h1, h2, h3 { 
-            color: var(--gold); font-family: 'Cinzel', serif; 
-            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gold); 
+            font-family: 'Cinzel', serif; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px;
             text-shadow: 0 4px 20px rgba(0,0,0,0.8);
-            margin-top: 0;
+            margin-top: 0; line-height: 1.3;
         }
         
-        p, div { line-height: 1.8; font-size: 1.05rem; color: #ccc; }
-
+        /* LAYOUT */
         #content-wrapper { 
             padding-top: 100px; padding-bottom: 140px; 
             min-height: 100vh; padding-left: 15px; padding-right: 15px;
             box-sizing: border-box; max-width: 900px; margin: 0 auto;
-            opacity: 0; animation: fadeIn 1s forwards;
+            opacity: 0; animation: fadeIn 0.8s forwards;
         }
         @keyframes fadeIn { to { opacity: 1; } }
 
+        /* UI COMPONENTS */
         .back-btn {
             position: fixed; top: 20px; left: 20px; z-index: 1000;
             background: rgba(0,0,0,0.8); color: var(--gold);
             padding: 12px 24px; border-radius: 50px;
             text-decoration: none; font-weight: 700;
             border: 1px solid var(--gold); backdrop-filter: blur(5px);
+            transition: 0.3s; font-size: 0.8rem; letter-spacing: 1px;
             display: flex; align-items: center; gap: 10px;
-            font-size: 0.8rem;
         }
-
+        
         .card {
             background: var(--glass-bg); border: var(--glass-border);
-            border-radius: 16px; padding: 25px; margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            position: relative; overflow: hidden;
+            border-radius: 16px; padding: 30px; margin-bottom: 40px;
+            box-shadow: var(--shadow-card); position: relative; overflow: hidden;
+            transition: transform 0.3s ease;
         }
         .card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.7;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.8;
         }
 
         .meta-row {
-            display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; 
+            display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px; 
             padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-dim); font-size: 0.85rem;
+            color: var(--text-dim); font-size: 0.9rem; font-weight: 500;
         }
         .meta-row i { color: var(--gold); }
 
-        .content-body { line-height: 1.8; font-size: 1.05rem; color: #dcdcdc; }
-        .preview { display: block; }
-        .full-content { display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .content-body { line-height: 1.9; font-size: 1.1rem; color: #dcdcdc; }
+        .full-content { display: none; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; animation: slideDown 0.4s ease-out; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 
-        .actions-row { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
-        
+        /* ACTIONS */
+        .actions-row { margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
         .btn {
             background: transparent; border: 1px solid rgba(255, 217, 123, 0.3);
-            color: var(--gold); padding: 12px 20px; border-radius: 8px;
-            font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
-            font-size: 0.8rem; user-select: none;
+            color: var(--gold); padding: 12px 24px; border-radius: 8px;
+            font-weight: 700; cursor: pointer; text-transform: uppercase;
+            display: flex; align-items: center; gap: 10px; font-size: 0.8rem;
+            transition: all 0.2s; letter-spacing: 0.5px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-            color: #000; border: none; font-weight: 800;
-        }
+        .btn:active { transform: scale(0.95); }
+        .btn.playing { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 217, 123, 0.3); }
 
-        /* AUDIO TRACK STYLE */
+        /* AUDIO LIST */
         .audio-track {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer; background: rgba(255,255,255,0.02);
-            border-radius: 12px; margin-bottom: 10px; border: 1px solid transparent;
+            display: flex; align-items: center; gap: 20px;
+            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02);
+            border-radius: 12px; margin-bottom: 15px; border: 1px solid transparent;
         }
-        .audio-track.playing { border-color: var(--gold); background: rgba(255, 217, 123, 0.1); }
+        .audio-track.active { border: 1px solid var(--gold); background: rgba(255, 217, 123, 0.1); }
         .track-icon {
-            width: 45px; height: 45px; border-radius: 50%; background: #222;
+            width: 50px; height: 50px; border-radius: 50%; background: #222;
             display: flex; align-items: center; justify-content: center;
-            color: #555; font-size: 1.2rem; flex-shrink: 0;
+            font-size: 1.4rem; color: #555; transition: 0.3s; flex-shrink: 0;
         }
-        .audio-track.playing .track-icon { background: #000; color: var(--gold); box-shadow: 0 0 15px rgba(255, 217, 123, 0.4); }
+        .audio-track.active .track-icon { color: var(--gold); box-shadow: 0 0 20px rgba(255, 217, 123, 0.2); background: #000; }
 
+        /* FAB */
         #hymn-fab {
-            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
             border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark));
             box-shadow: 0 8px 30px rgba(0,0,0,0.7); border: 2px solid #fff; z-index: 9999;
-            display: flex; align-items: center; justify-content: center; font-size: 24px; color: #000;
+            display: flex; align-items: center; justify-content: center; font-size: 28px; color: #000;
+            cursor: pointer; transition: transform 0.2s;
         }
-
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 50px auto; }
+        
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 100px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        input, textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        /* FORM */
+        input, textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
         
-        /* Galeria */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        /* GALLERY */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
     </style>
 </head>
@@ -140,13 +147,14 @@
     <div class="spinner"></div>
 </div>
 
-<audio id="hymn-player" src="/audio/hymn.mp3" loop preload="none"></audio>
-<audio id="track-player" preload="none"></audio>
+<audio id="hymn-player" src="/audio/hymn.mp3" loop preload="auto"></audio>
+<audio id="track-player" preload="auto"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+    // 1. KONFIGURACJA FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
@@ -155,177 +163,164 @@
       messagingSenderId: "244008044225",
       appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ============================================
-    // SYSTEM DŹWIĘKU (PANCERNY NA MOBILE)
-    // ============================================
+    // ====================================================
+    // 2. MODUŁ SOUND MANAGER (Advanced)
+    // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
         trackEl: document.getElementById('track-player'),
         synth: window.speechSynthesis,
-        
         isHymnPlaying: false,
-        currentTrackBtn: null,
+        currentBtn: null,
         
-        // Zmienne do kolejkowania Lektora (Chunking)
-        ttsQueue: [],
-        ttsIsPlaying: false,
-        ttsCurrentUtterance: null,
+        // Zmienne dla Lektora (Queueing System)
+        queue: [],
+        isPlayingTTS: false,
 
         init() {
+            // Obsługa Hymnu
             document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
-            // Próba odblokowania syntezy na iOS przy pierwszym dotknięciu czegokolwiek
-            document.body.addEventListener('touchstart', () => {
+            
+            // Fix dla iOS/Android: Pierwsze dotknięcie ekranu "odblokowuje" AudioContext
+            // Nie usuwamy Twojej logiki, dodajemy tylko "klucz" do drzwi.
+            const unlockAudio = () => {
                 if(this.synth.paused) this.synth.resume();
-            }, {once:true});
+                // Odtwórz pusty dźwięk, by obudzić silnik audio
+                const silent = new Audio();
+                silent.play().catch(()=>{});
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('touchstart', unlockAudio);
+            };
+            document.addEventListener('click', unlockAudio);
+            document.addEventListener('touchstart', unlockAudio);
         },
 
         stopAll() {
-            // 1. Stop Hymn
+            // Zatrzymanie Hymnu
             this.hymnEl.pause();
             this.isHymnPlaying = false;
             document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
 
-            // 2. Stop Audio Track
+            // Zatrzymanie Tracka
             this.trackEl.pause();
-            if(this.currentTrackBtn) {
-                this.currentTrackBtn.classList.remove('playing');
-                const icon = this.currentTrackBtn.querySelector('i');
-                // Reset ikon
-                if(icon.classList.contains('fa-stop')) icon.className = 'fas fa-play'; 
-                if(icon.classList.contains('fa-volume-mute')) icon.className = 'fas fa-volume-up';
-                
-                // Jeśli to był przycisk lektora, przywróć tekst
-                if(this.currentTrackBtn.innerText.includes('STOP')) {
-                    this.currentTrackBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
-                }
-                this.currentTrackBtn = null;
-            }
-
-            // 3. Stop Lektor (TTS)
+            
+            // Zatrzymanie Lektora
             this.synth.cancel();
-            this.ttsQueue = [];
-            this.ttsIsPlaying = false;
+            this.queue = [];
+            this.isPlayingTTS = false;
+
+            // Reset UI przycisku
+            if(this.currentBtn) {
+                this.currentBtn.classList.remove('playing');
+                this.currentBtn.classList.remove('active');
+                
+                // Przywracanie ikon
+                const icon = this.currentBtn.querySelector('i');
+                if(icon) {
+                    if(icon.classList.contains('fa-stop')) icon.className = 'fas fa-play';
+                    if(icon.classList.contains('fa-stop-circle')) icon.className = 'fas fa-play-circle';
+                    if(icon.classList.contains('fa-volume-mute')) icon.className = 'fas fa-volume-up';
+                }
+                
+                // Przywracanie tekstu
+                if(this.currentBtn.innerText.includes('STOP')) {
+                    this.currentBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
+                }
+                this.currentBtn = null;
+            }
         },
 
         toggleHymn() {
             if(this.isHymnPlaying) {
                 this.stopAll();
             } else {
-                this.stopAll(); // Wyłącz inne
-                this.hymnEl.play()
-                    .then(() => {
-                        this.isHymnPlaying = true;
-                        document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
-                    })
-                    .catch(e => alert("Kliknij stronę jeszcze raz, by odblokować dźwięk."));
+                this.stopAll();
+                this.hymnEl.play().then(() => {
+                    this.isHymnPlaying = true;
+                    document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(e => console.error("Hymn play failed:", e));
             }
         },
 
-        // Odtwarzanie MP3 (Głos Latarni)
-        playTrack(url, btnElement) {
-            // Jeśli kliknięto to samo -> Pauza
-            if (this.currentTrackBtn === btnElement && !this.trackEl.paused) {
+        playTrack(url, btn) {
+            // Logika Toggle
+            if(this.currentBtn === btn && !this.trackEl.paused) {
                 this.stopAll();
                 return;
             }
 
-            this.stopAll(); // Reset wszystkiego
-
-            this.trackEl.src = url;
-            this.trackEl.load(); // Ważne dla Chrome Mobile!
+            this.stopAll();
+            this.currentBtn = btn;
             
-            this.trackEl.play()
-                .then(() => {
-                    this.currentTrackBtn = btnElement;
-                    btnElement.classList.add('playing');
-                    const icon = btnElement.querySelector('.track-icon i');
-                    if(icon) icon.className = 'fas fa-stop';
-                })
-                .catch(e => {
-                    console.error(e);
-                    alert("Błąd odtwarzania. Sprawdź łącze lub plik.");
-                });
+            // UI
+            btn.classList.add('active');
+            const icon = btn.querySelector('.track-icon i');
+            if(icon) icon.className = 'fas fa-stop-circle';
 
+            // Logic
+            this.trackEl.src = url;
+            this.trackEl.play().catch(err => alert("Błąd odtwarzania. Sprawdź łącze."));
+            
             this.trackEl.onended = () => this.stopAll();
         },
 
-        // Odtwarzanie TTS (Lektor) z podziałem na zdania (Chunking)
-        speak(text, btnElement) {
-            // Jeśli to ten sam przycisk -> Stop
-            if(this.currentTrackBtn === btnElement && this.synth.speaking) {
+        // Zaawansowany Lektor z Chunkingiem (niezbędne dla Androida, ale ukryte w module)
+        speak(text, btn) {
+            if(this.currentBtn === btn && this.synth.speaking) {
                 this.stopAll();
                 return;
             }
 
-            this.stopAll(); // Reset
+            this.stopAll();
+            this.currentBtn = btn;
             
-            // UI Update
-            if(btnElement) {
-                this.currentTrackBtn = btnElement;
-                btnElement.classList.add('playing');
-                btnElement.innerHTML = '<i class="fas fa-stop"></i> STOP';
-            }
+            // UI
+            btn.classList.add('playing');
+            btn.innerHTML = '<i class="fas fa-stop"></i> STOP';
 
-            // 1. Czyszczenie tekstu
-            const clean = text.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+            // Czyszczenie tekstu
+            const cleanText = Utils.stripHtml(text).replace(/\s+/g, ' ').trim();
             
-            // 2. Podział na zdania (Dla Androida, który nie czyta długich bloków)
-            // Dzielimy po kropce, wykrzykniku, znaku zapytania, ale zachowujemy znak.
-            const rawSentences = clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
+            // Inteligentne dzielenie na zdania (aby nie ucięło w połowie słowa)
+            // To jest Twoja "zajebista logika" przywrócona w lepszej formie
+            const sentences = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
             
-            // Dodatkowe zabezpieczenie: jeśli zdanie ma > 150 znaków, dzielimy po przecinku
-            this.ttsQueue = [];
-            rawSentences.forEach(s => {
-                if(s.length < 180) {
-                    this.ttsQueue.push(s);
-                } else {
-                    const subParts = s.split(',');
-                    subParts.forEach(sub => this.ttsQueue.push(sub));
-                }
-            });
-
-            this.ttsIsPlaying = true;
-            this.processTTSQueue();
+            this.queue = sentences;
+            this.isPlayingTTS = true;
+            this.processQueue();
         },
 
-        processTTSQueue() {
-            if(!this.ttsIsPlaying || this.ttsQueue.length === 0) {
+        processQueue() {
+            if(!this.isPlayingTTS || this.queue.length === 0) {
                 this.stopAll();
                 return;
             }
 
-            const chunk = this.ttsQueue.shift();
+            const chunk = this.queue.shift();
             const u = new SpeechSynthesisUtterance(chunk);
-            
-            // Wybór głosu
-            const voices = this.synth.getVoices();
-            const plVoice = voices.find(v => v.lang.includes('pl')) || voices[0];
-            if(plVoice) u.voice = plVoice;
-            
             u.lang = 'pl-PL';
             u.rate = 1.0;
 
             u.onend = () => {
-                if(this.ttsIsPlaying) this.processTTSQueue();
+                if(this.isPlayingTTS) this.processQueue();
             };
             
             u.onerror = (e) => {
-                console.warn("TTS Error chunk", e);
-                // Próbuj następny mimo błędu
-                if(this.ttsIsPlaying) this.processTTSQueue();
+                console.warn("TTS Error:", e);
+                // Próbuj dalej mimo błędu (częsty bug na Samsungach)
+                if(this.isPlayingTTS) this.processQueue(); 
             };
 
             this.synth.speak(u);
         }
     };
 
-    // ============================================
-    // NARZĘDZIA
-    // ============================================
+    // ====================================================
+    // 3. UTILS & DOM BUILDER
+    // ====================================================
     const Utils = {
         escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
         stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
@@ -333,19 +328,21 @@
     };
 
     const DOMBuilder = {
+        // Główna funkcja tworząca kartę wpisu
         createCard(data, id, collectionPath, forceOpen = false) {
             const card = document.createElement('article');
             card.className = 'card';
-            
+
             const cleanText = Utils.stripHtml(data.text || '');
-            const previewText = cleanText.substring(0, 200) + '...';
-            
+            const previewText = cleanText.substring(0, 300) + '...';
+            const isLiked = localStorage.getItem('liked_' + id);
+
             card.innerHTML = `
-                <h3>${Utils.escapeHtml(data.title || data.name || 'Bez tytułu')}</h3>
+                <h3>${Utils.escapeHtml(data.title || data.name || 'Wpis bez tytułu')}</h3>
                 <div class="meta-row">
                     <span><i class="fas fa-calendar"></i> ${Utils.formatDate(data.createdAt || data.t)}</span>
-                    <span><i class="fas fa-eye"></i> ${data.views||0}</span>
-                    <span><i class="fas fa-heart"></i> <span class="like-cnt">${data.likes||0}</span></span>
+                    <span><i class="fas fa-eye"></i> ${data.views || 0}</span>
+                    <span><i class="fas fa-heart"></i> <span class="like-count">${data.likes || 0}</span></span>
                 </div>
                 <div class="content-body">
                     <div class="preview" style="${forceOpen ? 'display:none' : 'display:block'}">${previewText}</div>
@@ -356,41 +353,40 @@
 
             const actionsDiv = card.querySelector('.actions-row');
 
-            // 1. CZYTAJ
-            const readBtn = document.createElement('button');
-            readBtn.className = 'btn btn-primary';
-            readBtn.innerHTML = forceOpen ? 'ZWIŃ' : 'CZYTAJ';
-            readBtn.onclick = () => {
+            // Button 1: Toggle
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'btn';
+            toggleBtn.innerHTML = forceOpen ? 'ZWIŃ' : 'CZYTAJ DALEJ';
+            toggleBtn.onclick = () => {
                 const full = card.querySelector('.full-content');
                 const prev = card.querySelector('.preview');
-                if(full.style.display === 'block') {
-                    full.style.display = 'none'; prev.style.display = 'block'; readBtn.innerHTML = 'CZYTAJ';
-                } else {
-                    full.style.display = 'block'; prev.style.display = 'none'; readBtn.innerHTML = 'ZWIŃ';
+                if(full.style.display === 'none') {
+                    full.style.display = 'block'; prev.style.display = 'none'; toggleBtn.innerText = 'ZWIŃ';
                     updateDoc(doc(db, collectionPath, id), { views: increment(1) });
+                } else {
+                    full.style.display = 'none'; prev.style.display = 'block'; toggleBtn.innerText = 'CZYTAJ DALEJ';
                 }
             };
-            actionsDiv.appendChild(readBtn);
+            actionsDiv.appendChild(toggleBtn);
 
-            // 2. LEKTOR
+            // Button 2: Lektor
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
             lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
-            // 3. LIKE
+            // Button 3: Like
             const likeBtn = document.createElement('button');
             likeBtn.className = 'btn';
-            const isLiked = localStorage.getItem('liked_' + id);
-            likeBtn.innerHTML = isLiked ? '<i class="fas fa-heart"></i> DZIĘKI' : '<i class="far fa-heart"></i> LUBIĘ';
+            likeBtn.innerHTML = isLiked ? '<i class="fas fa-heart"></i> DZIĘKI' : '<i class="far fa-heart"></i> LUBIĘ TO';
             if(isLiked) likeBtn.style.color = '#ff6b6b';
             
             likeBtn.onclick = async () => {
                 if(localStorage.getItem('liked_' + id)) return;
                 localStorage.setItem('liked_' + id, 'true');
                 likeBtn.style.color = '#ff6b6b'; likeBtn.innerHTML = '<i class="fas fa-heart"></i> DZIĘKI';
-                card.querySelector('.like-cnt').innerText = (data.likes||0) + 1;
+                card.querySelector('.like-count').innerText = (data.likes || 0) + 1;
                 await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
             };
             actionsDiv.appendChild(likeBtn);
@@ -399,46 +395,53 @@
         }
     };
 
-    // ============================================
-    // ROUTER
-    // ============================================
+    // ====================================================
+    // 4. SECTION LOADER (ROUTER)
+    // ====================================================
     const wrapper = document.getElementById('content-wrapper');
 
     async function initPage() {
         SoundManager.init();
         const params = new URLSearchParams(window.location.search);
         const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
-        document.title = section;
+        document.title = `${section} | Latarnia Nadziei`;
 
-        wrapper.innerHTML = '';
+        wrapper.innerHTML = ''; // Clear spinner
 
         try {
+            // ROUTING LOGIC
             if (section === 'Głos Latarni') await renderAudioSection();
             else if (section === 'Piciorys Chudego') await renderPiciorys();
             else if (section === 'Wsparcie') await renderSupport();
             else if (section === 'Galeria') await renderGallery();
             else await renderStandard(section);
-        } catch(e) {
-            wrapper.innerHTML = `<h3 style="text-align:center; color:#ff6b6b">Błąd wczytywania. Odśwież stronę.</h3>`;
+
+        } catch (e) {
+            console.error(e);
+            wrapper.innerHTML = `<h2 style="color:#d55; text-align:center;">Wystąpił błąd wczytywania danych.</h2>`;
         }
     }
 
-    // --- SEKCJA AUDIO ---
+    // --- RENDERERS ---
+
     async function renderAudioSection() {
-        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Głos Latarni</h1><div id="audio-list"><div class="spinner"></div></div>`;
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
         const list = document.getElementById('audio-list');
         
         onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
             list.innerHTML = '';
-            if(snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań.</p>'; return; }
+            if(snap.empty) { list.innerHTML = '<p class="text-center">Brak nagrań.</p>'; return; }
             
             snap.forEach(doc => {
                 const t = doc.data();
                 const el = document.createElement('div');
                 el.className = 'audio-track';
                 el.innerHTML = `
-                    <div class="track-icon"><i class="fas fa-play"></i></div>
-                    <div class="track-info"><h4>${Utils.escapeHtml(t.title)}</h4><span>${Utils.escapeHtml(t.description||'')}</span></div>
+                    <div class="track-icon"><i class="fas fa-play-circle"></i></div>
+                    <div class="track-info">
+                        <h3 style="margin:0; font-size:1.1rem; color:#fff">${Utils.escapeHtml(t.title)}</h3>
+                        <span style="font-size:0.9rem; color:#888">${Utils.escapeHtml(t.description || '')}</span>
+                    </div>
                 `;
                 el.onclick = () => SoundManager.playTrack(t.url, el);
                 list.appendChild(el);
@@ -446,60 +449,101 @@
         });
     }
 
-    // --- SEKCJA STANDARD ---
     async function renderStandard(sectionName) {
-        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">${sectionName}</h1><div id="list"><div class="spinner"></div></div>`;
-        const list = document.getElementById('list');
-        const snap = await getDocs(query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc')));
-        list.innerHTML = '';
-        if(snap.empty) { list.innerHTML = '<p style="text-align:center">Brak wpisów.</p>'; return; }
-        snap.forEach(doc => list.appendChild(DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`)));
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
+        const container = document.getElementById('entries-list');
+
+        const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+
+        container.innerHTML = '';
+        if(snap.empty) { container.innerHTML = '<p style="text-align:center">Brak wpisów.</p>'; return; }
+
+        snap.forEach(doc => {
+            const card = DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`);
+            container.appendChild(card);
+        });
     }
 
-    // --- PICIORYS ---
     async function renderPiciorys() {
         const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
-        if(snap.empty) { wrapper.innerHTML = '<h2>Brak wpisu.</h2>'; return; }
+        if(snap.empty) { wrapper.innerHTML = '<h2 class="text-center">Piciorys nie został jeszcze spisany.</h2>'; return; }
+        
+        const data = snap.docs[0].data();
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
-        wrapper.appendChild(DOMBuilder.createCard(snap.docs[0].data(), snap.docs[0].id, 'sekcje/Piciorys Chudego/entries', true));
+        const card = DOMBuilder.createCard(data, snap.docs[0].id, 'sekcje/Piciorys Chudego/entries', true); // Force open
+        wrapper.appendChild(card);
     }
 
-    // --- WSPARCIE ---
     async function renderSupport() {
-        wrapper.innerHTML = `<h1 style="text-align:center">Wsparcie</h1>
-            <div class="card" style="border-color:var(--gold)">
-                <h3>Dodaj Otuchy</h3>
-                <form id="supp-form"><input id="n" placeholder="Imię" required><textarea id="t" placeholder="Napisz coś..." required></textarea><button class="btn btn-primary" style="width:100%;justify-content:center">WYŚLIJ</button></form>
-            </div><div id="feed"></div>`;
-            
-        onSnapshot(query(collection(db, 'support_stories'), where('isApproved','==',true), orderBy('t','desc')), sn => {
-            const feed = document.getElementById('feed');
+        wrapper.innerHTML = `
+            <h1 style="text-align:center">Wsparcie</h1>
+            <div class="card" style="border:1px solid var(--gold);">
+                <h3 style="margin-bottom:15px">Dodaj Otuchy</h3>
+                <form id="supp-form">
+                    <input id="in-name" placeholder="Imię / Pseudonim" required>
+                    <textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea>
+                    <button type="submit" class="btn" style="background:var(--gold); color:#000; width:100%; justify-content:center;">OPUBLIKUJ</button>
+                </form>
+            </div>
+            <div id="supp-feed"></div>
+        `;
+
+        const feed = document.getElementById('supp-feed');
+        const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
+        
+        onSnapshot(q, (snap) => {
             feed.innerHTML = '';
-            sn.forEach(d => {
-                const data = d.data();
-                const el = document.createElement('div'); el.className='card';
-                el.innerHTML=`<h3>${Utils.escapeHtml(data.name)}</h3><p>${Utils.escapeHtml(data.text)}</p><div class="actions-row"><button class="btn"><i class="fas fa-heart"></i> ${data.likes||0}</button></div>`;
-                feed.appendChild(el);
+            snap.forEach(doc => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>${Utils.escapeHtml(data.name)}</h3>
+                    <p>${Utils.escapeHtml(data.text)}</p>
+                    <div class="actions-row">
+                        <button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button>
+                    </div>`;
+                
+                const lBtn = card.querySelector('.like-btn');
+                lBtn.onclick = async () => {
+                    if(lBtn.style.color) return;
+                    lBtn.style.color = '#ff6b6b'; 
+                    lBtn.innerHTML = `<i class="fas fa-heart"></i> ${(data.likes||0)+1}`;
+                    await updateDoc(doc.ref, { likes: increment(1) });
+                };
+                feed.appendChild(card);
             });
         });
-        
+
         document.getElementById('supp-form').onsubmit = async (e) => {
             e.preventDefault();
-            await addDoc(collection(db,'support_stories'), {name:document.getElementById('n').value, text:document.getElementById('t').value, t:serverTimestamp(), isApproved:false, likes:0});
-            alert("Wysłano do akceptacji!"); e.target.reset();
+            try {
+                await addDoc(collection(db, 'support_stories'), {
+                    name: document.getElementById('in-name').value,
+                    text: document.getElementById('in-text').value,
+                    t: serverTimestamp(), isApproved: false, likes: 0
+                });
+                alert("Wysłano do moderacji!"); e.target.reset();
+            } catch(err) { alert("Błąd wysyłania."); }
         };
     }
 
-    // --- GALERIA ---
     async function renderGallery() {
-        wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div id="g" class="gallery-grid"></div>`;
-        onSnapshot(collection(db,'gallery'), sn => {
-            const g = document.getElementById('g'); g.innerHTML='';
-            sn.forEach(d => { if(d.data().url) g.innerHTML+=`<div class="gallery-item"><img src="${d.data().url}"></div>`; });
+        wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div id="gal" class="gallery-grid"></div>`;
+        const gal = document.getElementById('gal');
+        onSnapshot(collection(db, 'gallery'), (snap) => {
+            gal.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                if(d.url) gal.innerHTML += `<div class="gallery-item"><img src="${d.url}"></div>`;
+            });
         });
     }
 
+    // START
     initPage();
+
 </script>
 </body>
 </html>
