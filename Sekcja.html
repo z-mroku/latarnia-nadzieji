@@ -38,7 +38,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* TYPOGRAFIA */
         h1, h2, h3 { 
             color: var(--gold); 
             font-family: 'Cinzel', serif; 
@@ -48,7 +47,6 @@
             margin-top: 0; line-height: 1.3;
         }
         
-        /* LAYOUT */
         #content-wrapper { 
             padding-top: 100px; padding-bottom: 140px; 
             min-height: 100vh; padding-left: 15px; padding-right: 15px;
@@ -57,7 +55,6 @@
         }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* UI COMPONENTS */
         .back-btn {
             position: fixed; top: 20px; left: 20px; z-index: 1000;
             background: rgba(0,0,0,0.8); color: var(--gold);
@@ -90,7 +87,6 @@
         .full-content { display: none; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; animation: slideDown 0.4s ease-out; }
         @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* ACTIONS */
         .actions-row { margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
         .btn {
             background: transparent; border: 1px solid rgba(255, 217, 123, 0.3);
@@ -102,7 +98,6 @@
         .btn:active { transform: scale(0.95); }
         .btn.playing { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 217, 123, 0.3); }
 
-        /* AUDIO LIST */
         .audio-track {
             display: flex; align-items: center; gap: 20px;
             padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -117,7 +112,6 @@
         }
         .audio-track.active .track-icon { color: var(--gold); box-shadow: 0 0 20px rgba(255, 217, 123, 0.2); background: #000; }
 
-        /* FAB */
         #hymn-fab {
             position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px;
             border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark));
@@ -129,11 +123,9 @@
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 100px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* FORM */
         input, textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: inherit; }
         input:focus, textarea:focus { border-color: var(--gold); outline: none; }
         
-        /* GALLERY */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
     </style>
@@ -155,10 +147,10 @@
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-    // 1. KONFIGURACJA FIREBASE
+    // Zgodnie z zaleceniami supportu: nowa domena .firebasestorage.app
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-      authDomain: "projekt-latarnia.firebaseapp.app",
+      authDomain: "projekt-latarnia.firebaseapp.com",
       projectId: "projekt-latarnia",
       storageBucket: "projekt-latarnia.firebasestorage.app",
       messagingSenderId: "244008044225",
@@ -168,59 +160,44 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // ====================================================
-    // 2. MODUŁ SOUND MANAGER
-    // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
         trackEl: document.getElementById('track-player'),
         synth: window.speechSynthesis,
         isHymnPlaying: false,
         currentBtn: null,
-        
         queue: [],
         isPlayingTTS: false,
 
         async init() {
-            // Obsługa Hymnu
             try {
                 const hymnUrl = await getDownloadURL(ref(storage, 'audio/hymn.mp3'));
                 this.hymnEl.src = hymnUrl;
             } catch (e) {
                 this.hymnEl.src = "/audio/hymn.mp3"; 
             }
-
             document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
-            
-            const unlockAudio = () => {
-                if(this.synth.paused) this.synth.resume();
-                const silent = new Audio();
-                silent.play().catch(()=>{});
-                document.removeEventListener('click', unlockAudio);
-                document.removeEventListener('touchstart', unlockAudio);
-            };
-            document.addEventListener('click', unlockAudio);
-            document.addEventListener('touchstart', unlockAudio);
         },
 
         stopAll() {
-            this.hymnEl.pause();
-            this.isHymnPlaying = false;
-            document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
+            // Zatrzymujemy odtwarzacz audio
             this.trackEl.pause();
+            this.trackEl.src = "";
+            
+            // Zatrzymujemy TTS
             this.synth.cancel();
-            this.queue = [];
             this.isPlayingTTS = false;
+            this.queue = [];
 
+            // Resetujemy wizualny stan przycisku lektora
             if(this.currentBtn) {
                 this.currentBtn.classList.remove('playing');
                 this.currentBtn.classList.remove('active');
                 
-                const icon = this.currentBtn.querySelector('i');
+                const icon = this.currentBtn.querySelector('i') || this.currentBtn.querySelector('.track-icon i');
                 if(icon) {
-                    if(icon.classList.contains('fa-stop')) icon.className = 'fas fa-play';
+                    if(icon.classList.contains('fa-stop')) icon.className = 'fas fa-volume-up';
                     if(icon.classList.contains('fa-stop-circle')) icon.className = 'fas fa-play-circle';
-                    if(icon.classList.contains('fa-volume-mute')) icon.className = 'fas fa-volume-up';
                     if(icon.classList.contains('fa-spinner')) icon.className = 'fas fa-play-circle';
                 }
                 
@@ -233,83 +210,60 @@
 
         toggleHymn() {
             if(this.isHymnPlaying) {
-                this.stopAll();
+                this.hymnEl.pause();
+                this.isHymnPlaying = false;
+                document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
             } else {
-                this.stopAll();
                 this.hymnEl.play().then(() => {
                     this.isHymnPlaying = true;
                     document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
-                }).catch(e => alert("Kliknij stronę, aby odblokować dźwięk."));
+                }).catch(e => console.log("User interaction required"));
             }
         },
 
-        // --- PANCERNA FUNKCJA ODTWARZANIA ---
         async playTrack(trackData, btn) {
-            if(this.currentBtn === btn && !this.trackEl.paused) {
+            if(this.currentBtn === btn) {
                 this.stopAll();
                 return;
             }
 
             this.stopAll();
             this.currentBtn = btn;
-            
             btn.classList.add('active');
             const icon = btn.querySelector('.track-icon i');
             if(icon) icon.className = 'fas fa-spinner fa-spin';
 
             try {
-                // Wyciągamy URL z bazy i usuwamy białe znaki
                 let finalUrl = trackData.url ? trackData.url.trim() : '';
-
-                // KROK 1: Jeśli to już jest link HTTP/HTTPS - UŻYWAJ GO BEZ ZMIAN!
-                if (finalUrl.toLowerCase().startsWith('http')) {
-                    console.log("Używam bezpośredniego linku:", finalUrl);
-                    // Nie robimy nic więcej, link jest gotowy
-                } 
-                // KROK 2: Jeśli to nie link, tylko nazwa pliku - szukamy w Storage
-                else {
-                    let storagePath = '';
-                    if (trackData.category) {
-                        storagePath = `audio_tracks/${trackData.category}/${finalUrl}`;
-                    } else {
-                        storagePath = `audio_tracks/${finalUrl}`;
-                    }
-                    storagePath = storagePath.replace(/\/\//g, '/'); // Bez podwójnych slashy
-                    
-                    console.log("Szukam w Storage:", storagePath);
+                if (!finalUrl.toLowerCase().startsWith('http')) {
+                    let storagePath = trackData.category ? `audio_tracks/${trackData.category}/${finalUrl}` : `audio_tracks/${finalUrl}`;
+                    storagePath = storagePath.replace(/\/\//g, '/');
                     finalUrl = await getDownloadURL(ref(storage, storagePath));
                 }
 
-                // ODTWARZANIE
                 this.trackEl.src = finalUrl;
                 await this.trackEl.play();
-                
                 if(icon) icon.className = 'fas fa-stop-circle';
                 this.trackEl.onended = () => this.stopAll();
-
             } catch (err) {
-                console.error("Błąd Audio:", err);
-                alert(`Błąd odtwarzania. Sprawdź czy plik istnieje.\n${err.message}`);
+                console.error("Audio error:", err);
                 this.stopAll();
             }
         },
 
         speak(text, btn) {
-            if(this.currentBtn === btn && this.synth.speaking) {
+            if(this.currentBtn === btn) {
                 this.stopAll();
                 return;
             }
 
             this.stopAll();
             this.currentBtn = btn;
-            
             btn.classList.add('playing');
             btn.innerHTML = '<i class="fas fa-stop"></i> STOP';
 
             const cleanText = Utils.stripHtml(text).replace(/\s+/g, ' ').trim();
-            const sentences = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
-            
-            this.queue = sentences;
+            this.queue = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
             this.isPlayingTTS = true;
             this.processQueue();
         },
@@ -319,22 +273,15 @@
                 this.stopAll();
                 return;
             }
-
             const chunk = this.queue.shift();
             const u = new SpeechSynthesisUtterance(chunk);
             u.lang = 'pl-PL';
-            u.rate = 1.0;
-
             u.onend = () => { if(this.isPlayingTTS) this.processQueue(); };
-            u.onerror = (e) => { console.warn("TTS Error:", e); if(this.isPlayingTTS) this.processQueue(); };
-
+            u.onerror = () => this.stopAll();
             this.synth.speak(u);
         }
     };
 
-    // ====================================================
-    // 3. UTILS & DOM BUILDER
-    // ====================================================
     const Utils = {
         escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
         stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
@@ -364,7 +311,6 @@
             `;
 
             const actionsDiv = card.querySelector('.actions-row');
-
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'btn';
             toggleBtn.innerHTML = forceOpen ? 'ZWIŃ' : 'CZYTAJ DALEJ';
@@ -383,7 +329,7 @@
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
-            lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
+            lektorBtn.onclick = () => SoundManager.speak(data.text || '', lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
             const likeBtn = document.createElement('button');
@@ -404,9 +350,6 @@
         }
     };
 
-    // ====================================================
-    // 4. SECTION LOADER
-    // ====================================================
     const wrapper = document.getElementById('content-wrapper');
 
     async function initPage() {
@@ -431,11 +374,9 @@
     async function renderAudioSection() {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
         const list = document.getElementById('audio-list');
-        
         onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
             list.innerHTML = '';
-            if(snap.empty) { list.innerHTML = '<p class="text-center">Brak nagrań.</p>'; return; }
-            
+            if(snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań.</p>'; return; }
             snap.forEach(doc => {
                 const t = doc.data();
                 const el = document.createElement('div');
@@ -450,7 +391,6 @@
                         </div>
                     </div>
                 `;
-                // TU PRZEKAZUJEMY DANE, FUNKCJA playTrack SAMA ZDECYDUJE CZY TO LINK CZY PLIK
                 el.onclick = () => SoundManager.playTrack(t, el);
                 list.appendChild(el);
             });
@@ -458,18 +398,17 @@
     }
 
     async function renderStandard(sectionName) {
-        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"></div>`;
         const container = document.getElementById('entries-list');
         const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
-        container.innerHTML = '';
         if(snap.empty) { container.innerHTML = '<p style="text-align:center">Brak wpisów.</p>'; return; }
         snap.forEach(doc => { container.appendChild(DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`)); });
     }
 
     async function renderPiciorys() {
         const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
-        if(snap.empty) { wrapper.innerHTML = '<h2 class="text-center">Piciorys nie został jeszcze spisany.</h2>'; return; }
+        if(snap.empty) { wrapper.innerHTML = '<h2 style="text-align:center">Piciorys nie został jeszcze spisany.</h2>'; return; }
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
         wrapper.appendChild(DOMBuilder.createCard(snap.docs[0].data(), snap.docs[0].id, 'sekcje/Piciorys Chudego/entries', true));
     }
