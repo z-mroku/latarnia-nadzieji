@@ -169,7 +169,7 @@
     const storage = getStorage(app);
 
     // ====================================================
-    // 2. MODUŁ SOUND MANAGER (Fix dla Mixed Links)
+    // 2. MODUŁ SOUND MANAGER (Smart Link Fix)
     // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
@@ -245,7 +245,7 @@
             }
         },
 
-        // --- NAPRAWIONA FUNKCJA PLAY TRACK ---
+        // --- KLUCZOWA FUNKCJA ODTWARZANIA Z NAPRAWĄ ŚCIEŻEK ---
         async playTrack(trackData, btn) {
             if(this.currentBtn === btn && !this.trackEl.paused) {
                 this.stopAll();
@@ -255,6 +255,7 @@
             this.stopAll();
             this.currentBtn = btn;
             
+            // UI Loading
             btn.classList.add('active');
             const icon = btn.querySelector('.track-icon i');
             if(icon) icon.className = 'fas fa-spinner fa-spin';
@@ -262,14 +263,17 @@
             try {
                 let playableUrl = trackData.url ? trackData.url.trim() : '';
 
-                // === LOGIKA DECYZYJNA ===
-                // 1. Jeśli link zaczyna się od "http", oznacza to, że jest już gotowy (tak jak na Twoim błędzie).
-                //    Wtedy NIE ruszamy go, nie dodajemy folderów.
-                if (playableUrl.startsWith('http')) {
-                    // Po prostu używamy tego co jest w bazie
-                    console.log("Znaleziono gotowy link URL");
+                // === LOGIKA DECYZYJNA (NAPRAWIONA) ===
+                // 1. Czy to pełny link HTTP/HTTPS? Jeśli tak, używamy go BEZ zmian.
+                if (playableUrl.toLowerCase().startsWith('http')) {
+                     // To jest ten przypadek ze zdjęcia błędu - link jest już gotowy
+                     console.log("Wykryto gotowy link URL");
                 } 
-                // 2. Jeśli to nie jest link, zakładamy że to nazwa pliku i musimy go znaleźć w Storage
+                // 2. Czy to link "gs://"?
+                else if (playableUrl.startsWith('gs://')) {
+                     playableUrl = await getDownloadURL(ref(storage, playableUrl));
+                }
+                // 3. To jest tylko nazwa pliku - budujemy ścieżkę
                 else {
                     let storagePath = '';
                     if (trackData.category) {
@@ -277,10 +281,7 @@
                     } else {
                         storagePath = `audio_tracks/${playableUrl}`;
                     }
-                    // Usuń podwójne ukośniki
-                    storagePath = storagePath.replace('//', '/');
-                    
-                    console.log("Generowanie linku dla ścieżki:", storagePath);
+                    storagePath = storagePath.replace(/\/\//g, '/'); // Usuń podwójne ukośniki
                     playableUrl = await getDownloadURL(ref(storage, storagePath));
                 }
 
@@ -292,7 +293,7 @@
 
             } catch (err) {
                 console.error("Błąd odtwarzania:", err);
-                alert(`Nie udało się odtworzyć pliku.\n\nSzczegóły: ${err.message || err.code}`);
+                alert(`Nie udało się odtworzyć pliku.\n\nSzczegóły błędu: ${err.message || err.code}`);
                 this.stopAll();
             }
         },
@@ -310,6 +311,7 @@
             btn.innerHTML = '<i class="fas fa-stop"></i> STOP';
 
             const cleanText = Utils.stripHtml(text).replace(/\s+/g, ' ').trim();
+            // Dzielimy na zdania (Chrome Mobile fix)
             const sentences = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
             
             this.queue = sentences;
