@@ -23,10 +23,11 @@
         
         :root {
             --gold: #ffd97b;
-            --gold-dark: #b8860b;
+            --gold-dark: #c5a059;
             --bg-deep: #0f1014;
-            --glass-bg: rgba(25, 27, 35, 0.85);
-            --glass-border: 1px solid rgba(255, 217, 123, 0.2);
+            /* Ciemne szkło dla lepszej czytelności */
+            --glass-bg: rgba(25, 27, 35, 0.92);
+            --glass-border: 1px solid rgba(255, 217, 123, 0.25);
             --text-main: #e0e0e0;
             --text-dim: #aaa;
         }
@@ -42,27 +43,28 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* TYPOGRAFIA */
+        /* TYPOGRAFIA LATARNI */
         h1, h2, h3 { 
             color: var(--gold); 
             font-family: 'Cinzel', serif; 
             text-transform: uppercase; 
-            letter-spacing: 1.2px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            letter-spacing: 1.5px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
             margin-top: 0;
             line-height: 1.3;
         }
-        p { line-height: 1.8; font-size: 1.05rem; color: #ccc; margin-bottom: 1.5rem; }
+        
+        p, div { line-height: 1.8; font-size: 1.05rem; color: #ccc; }
 
         /* KONTENER GŁÓWNY */
         #content-wrapper { 
-            padding-top: 90px; 
+            padding-top: 100px; 
             padding-bottom: 140px; 
             min-height: 100vh;
             padding-left: 15px; padding-right: 15px;
             box-sizing: border-box;
             max-width: 900px; margin: 0 auto;
-            opacity: 0; animation: fadeIn 0.8s forwards;
+            opacity: 0; animation: fadeIn 1s forwards;
         }
         @keyframes fadeIn { to { opacity: 1; } }
 
@@ -71,24 +73,27 @@
             position: fixed; top: 20px; left: 20px; z-index: 1000;
             background: rgba(0,0,0,0.8);
             color: var(--gold);
-            padding: 12px 20px; border-radius: 50px;
-            text-decoration: none; font-weight: 600;
+            padding: 12px 24px; border-radius: 50px;
+            text-decoration: none; font-weight: 700;
             border: 1px solid var(--gold);
             backdrop-filter: blur(5px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             display: flex; align-items: center; gap: 10px;
             transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
         }
         .back-btn:hover { background: rgba(255, 217, 123, 0.15); transform: translateY(-2px); }
 
-        /* KARTY (WPISY) - GLASSMORPHISM */
+        /* KARTY (WPISY) - VIGOR GLASS */
         .card {
             background: var(--glass-bg);
             border: var(--glass-border);
             border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
             position: relative;
             overflow: hidden;
             transition: transform 0.3s ease;
@@ -96,44 +101,45 @@
         
         /* Złota linia na górze karty */
         .card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            opacity: 0.6;
+            opacity: 0.8;
         }
 
         /* META DANE (STATYSTYKI) */
         .meta-row {
-            display: flex; gap: 15px; flex-wrap: wrap;
-            margin-bottom: 20px; padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-dim); font-size: 0.85rem;
+            display: flex; gap: 20px; flex-wrap: wrap;
+            margin-bottom: 25px; padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim); font-size: 0.9rem; font-weight: 500;
         }
-        .meta-row span { display: flex; align-items: center; gap: 6px; }
-        .meta-row i { color: var(--gold); }
+        .meta-row span { display: flex; align-items: center; gap: 8px; }
+        .meta-row i { color: var(--gold); font-size: 1.1rem; }
 
         /* TREŚĆ */
-        .content-body { line-height: 1.8; font-size: 1.05rem; color: #d0d0d0; }
+        .content-body { line-height: 1.9; font-size: 1.1rem; color: #dcdcdc; }
         .preview { display: block; }
-        .full-content { display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; animation: slideDown 0.5s; }
+        .full-content { display: none; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; animation: slideDown 0.5s; }
         @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 
         /* PRZYCISKI AKCJI */
-        .actions-row { margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .actions-row { margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
         
         .btn {
             background: transparent;
             border: 1px solid rgba(255, 217, 123, 0.3);
             color: var(--gold);
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 10px;
             font-size: 0.85rem;
             transition: all 0.2s;
             user-select: none;
+            letter-spacing: 0.5px;
         }
         .btn:hover { background: rgba(255, 217, 123, 0.1); border-color: var(--gold); }
         .btn:active { transform: scale(0.96); }
@@ -143,57 +149,59 @@
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             color: #000;
             border: none;
-            font-weight: 700;
+            font-weight: 800;
             box-shadow: 0 4px 15px rgba(255, 217, 123, 0.2);
         }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(255, 217, 123, 0.4); color: #000; transform: translateY(-2px); }
 
         /* AUDIO PLAYER LISTA */
         .audio-track {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 20px;
+            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
             cursor: pointer; transition: 0.3s;
             background: rgba(255,255,255,0.02);
-            border-radius: 8px; margin-bottom: 10px;
+            border-radius: 12px; margin-bottom: 15px;
+            border: 1px solid transparent;
         }
         .audio-track:hover { background: rgba(255,255,255,0.08); }
         .audio-track.playing { border: 1px solid var(--gold); background: rgba(255, 217, 123, 0.1); }
-        .audio-track.playing .track-icon { color: var(--gold); box-shadow: 0 0 15px var(--gold); background: #000; }
+        .audio-track.playing .track-icon { color: var(--gold); box-shadow: 0 0 20px var(--gold); background: #000; border-color: var(--gold); }
         
         .track-icon {
-            width: 45px; height: 45px; border-radius: 50%; background: #222;
+            width: 50px; height: 50px; border-radius: 50%; background: #222;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: #555; transition: 0.3s; flex-shrink: 0;
+            font-size: 1.4rem; color: #555; transition: 0.3s; flex-shrink: 0;
+            border: 2px solid #333;
         }
-        .track-info h4 { margin: 0; color: #fff; font-size: 1rem; font-family: 'Montserrat', sans-serif; text-transform: none; letter-spacing: 0; }
-        .track-info span { font-size: 0.8rem; color: #777; }
+        .track-info h4 { margin: 0; color: #fff; font-size: 1.1rem; font-family: 'Montserrat', sans-serif; text-transform: none; letter-spacing: 0; font-weight: 600; }
+        .track-info span { font-size: 0.9rem; color: #888; }
 
         /* GALERIA */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .gallery-item { border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 1; }
+        .gallery-item { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 1; position: relative; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
         .gallery-item:hover img { transform: scale(1.1); }
 
         /* FAB HYMN */
         #hymn-fab {
-            position: fixed; bottom: 25px; right: 25px;
-            width: 65px; height: 65px; border-radius: 50%;
+            position: fixed; bottom: 30px; right: 30px;
+            width: 70px; height: 70px; border-radius: 50%;
             background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            border: 2px solid #fff; z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+            border: 3px solid #fff; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
-            font-size: 26px; color: #000; cursor: pointer;
+            font-size: 28px; color: #000; cursor: pointer;
             transition: transform 0.2s;
         }
         #hymn-fab:active { transform: scale(0.9); }
 
         /* LOADING */
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 100px auto; }
+        .spinner { border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 100px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* FORMULARZE */
-        input, textarea { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; font-family: inherit; margin-bottom: 15px; }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
+        input, textarea { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; font-family: inherit; margin-bottom: 15px; font-size: 1rem; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 15px rgba(255,217,123,0.1); }
     </style>
 </head>
 <body>
@@ -209,7 +217,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // 1. CONFIG
+    // ============================================
+    // 1. KONFIGURACJA (POŁĄCZENIE Z BAZĄ)
+    // ============================================
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
@@ -220,9 +230,13 @@
     };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // Ścieżka do hymnu (musi być poprawna)
     const HYMN_URL = "/audio/hymn.mp3";
 
+    // ============================================
     // 2. CENTRALNY MANAGER DŹWIĘKU (SoundManager)
+    // ============================================
     const SoundManager = {
         hymn: new Audio(HYMN_URL),
         track: new Audio(),
@@ -247,7 +261,15 @@
                 this.currentTrackBtn.classList.remove('playing');
                 // Przywróć ikonę play w zależności od typu przycisku
                 const icon = this.currentTrackBtn.querySelector('.track-icon i') || this.currentTrackBtn.querySelector('i');
-                if(icon) icon.className = 'fas fa-play';
+                if(icon) {
+                    if (icon.classList.contains('fa-stop')) icon.className = 'fas fa-play';
+                    if (icon.classList.contains('fa-volume-mute')) icon.className = 'fas fa-volume-up';
+                }
+                
+                // Reset napisu przycisku Lektora
+                if (this.currentTrackBtn.innerHTML.includes('STOP')) {
+                     this.currentTrackBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
+                }
                 this.currentTrackBtn = null;
             }
 
@@ -271,12 +293,12 @@
         },
 
         playTrack(url, btnElement) {
-            // Pauza jeśli to samo
-            if(this.currentTrackBtn === btnElement && !this.track.paused) {
-                this.track.pause();
-                btnElement.classList.remove('playing');
-                const icon = btnElement.querySelector('.track-icon i') || btnElement.querySelector('i');
-                if(icon) icon.className = 'fas fa-play';
+            // Jeśli gra hymn - zatrzymaj
+            if (this.state && this.state.isHymnPlaying) this.toggleHymn();
+            
+            // Jeśli kliknięto to samo - pauza
+            if (this.currentTrackBtn === btnElement && !this.track.paused) {
+                this.stopAll();
                 return;
             }
 
@@ -293,35 +315,55 @@
             if(icon) icon.className = 'fas fa-stop';
 
             this.track.onended = () => {
-                btnElement.classList.remove('playing');
-                if(icon) icon.className = 'fas fa-play';
-                this.currentTrackBtn = null;
+                this.stopAll();
             };
         },
 
-        speak(text) {
+        speak(text, btnElement) {
+            // Jeśli ten sam przycisk - STOP
+            if(this.currentTrackBtn === btnElement && this.synth.speaking) {
+                this.stopAll();
+                return;
+            }
+
             this.stopAll();
+            
             // Czyść tekst z HTML
             const clean = text.replace(/<[^>]*>?/gm, '');
             const u = new SpeechSynthesisUtterance(clean);
             u.lang = "pl-PL";
             u.rate = 0.95;
+            
+            if(btnElement) {
+                this.currentTrackBtn = btnElement;
+                btnElement.classList.add('playing'); // Dodajemy klasę dla efektu
+                btnElement.innerHTML = '<i class="fas fa-stop"></i> STOP';
+            }
+
             this.synth.speak(u);
+            
+            u.onend = () => {
+                this.stopAll();
+            };
         }
     };
 
-    // 3. UTILS (Narzędzia)
+    // ============================================
+    // 3. UTILS (Narzędzia formatowania)
+    // ============================================
     const Utils = {
         escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
         stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
-        formatDate: (ts) => ts ? new Date(ts.toDate()).toLocaleDateString() : '---'
+        formatDate: (ts) => ts ? new Date(ts.toDate()).toLocaleDateString('pl-PL') : '---'
     };
 
-    // 4. BUDOWNICZY DOM (Najważniejsza część - tworzy przyciski, które działają)
+    // ============================================
+    // 4. BUDOWNICZY DOM (Tworzenie kart)
+    // ============================================
     const DOMBuilder = {
         
-        // Tworzy Kartę Wpisu (Uniwersalną)
-        createCard(data, id, collectionPath) {
+        // Tworzy Kartę Wpisu (Uniwersalną dla Kroniki, Piciorysu, Dnia po Dniu)
+        createCard(data, id, collectionPath, forceOpen = false) {
             const card = document.createElement('article');
             card.className = 'card';
 
@@ -329,9 +371,10 @@
             const previewText = cleanText.substring(0, 300) + '...';
             const views = data.views || 0;
             const likes = data.likes || 0;
+            // Sprawdź czy użytkownik polubił lokalnie
             const isLiked = localStorage.getItem('liked_' + id);
 
-            // 1. Wstawiamy statyczną treść HTML
+            // 1. Struktura HTML
             card.innerHTML = `
                 <h3>${Utils.escapeHtml(data.title || data.name || 'Bez tytułu')}</h3>
                 <div class="meta-row">
@@ -340,19 +383,20 @@
                     <span><i class="fas fa-heart"></i> <span class="like-cnt">${likes}</span></span>
                 </div>
                 <div class="content-body">
-                    <div class="preview">${previewText}</div>
-                    <div class="full-content">${data.text || ''}</div>
+                    <div class="preview" style="${forceOpen ? 'display:none' : 'display:block'}">${previewText}</div>
+                    <div class="full-content" style="${forceOpen ? 'display:block' : 'display:none'}">${data.text || ''}</div>
                 </div>
                 <div class="actions-row"></div>
             `;
 
-            // 2. Budujemy przyciski "Ręcznie" (Bezpiecznie)
+            // 2. Budujemy przyciski (Dla pewności działania na Mobile)
             const actionsDiv = card.querySelector('.actions-row');
 
-            // Button: Czytaj Dalej
+            // === PRZYCISK: CZYTAJ DALEJ ===
             const readBtn = document.createElement('button');
             readBtn.className = 'btn btn-primary';
-            readBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
+            readBtn.innerHTML = forceOpen ? 'ZWIŃ <i class="fas fa-arrow-up"></i>' : 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
+            
             readBtn.onclick = () => {
                 const full = card.querySelector('.full-content');
                 const prev = card.querySelector('.preview');
@@ -365,7 +409,8 @@
                     full.style.display = 'block';
                     prev.style.display = 'none';
                     readBtn.innerHTML = 'ZWIŃ <i class="fas fa-arrow-up"></i>';
-                    // Aktualizacja statystyki Views
+                    
+                    // Aktualizacja statystyki Views (tylko w bazie, bez odświeżania UI dla płynności)
                     updateDoc(doc(db, collectionPath, id), { views: increment(1) });
                     const v = card.querySelector('.view-cnt');
                     v.innerText = parseInt(v.innerText) + 1;
@@ -373,14 +418,14 @@
             };
             actionsDiv.appendChild(readBtn);
 
-            // Button: Lektor
+            // === PRZYCISK: LEKTOR ===
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
-            lektorBtn.onclick = () => SoundManager.speak(cleanText);
+            lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
-            // Button: Like
+            // === PRZYCISK: LIKE ===
             const likeBtn = document.createElement('button');
             likeBtn.className = 'btn';
             
@@ -392,14 +437,16 @@
             }
 
             likeBtn.onclick = async () => {
-                if(localStorage.getItem('liked_' + id)) return;
+                if(localStorage.getItem('liked_' + id)) return; // Blokada ponownego lajka
                 
+                // Optymistyczna zmiana (od razu na ekranie)
                 localStorage.setItem('liked_' + id, 'true');
                 likeBtn.style.color = '#ff6b6b'; likeBtn.style.borderColor = '#ff6b6b';
                 likeBtn.innerHTML = '<i class="fas fa-heart"></i> LUBISZ';
                 const l = card.querySelector('.like-cnt');
                 l.innerText = parseInt(l.innerText) + 1;
 
+                // Wysłanie do bazy w tle
                 await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
             };
             actionsDiv.appendChild(likeBtn);
@@ -408,23 +455,27 @@
         }
     };
 
-    // 5. GŁÓWNY ROUTER
+    // ============================================
+    // 5. GŁÓWNY ROUTER (Sterowanie widokiem)
+    // ============================================
     const wrapper = document.getElementById('content-wrapper');
 
     async function initPage() {
         SoundManager.init();
         const params = new URLSearchParams(window.location.search);
+        // Pobieramy nazwę sekcji lub domyślnie Kronika
         const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
         document.title = `${section} | Latarnia`;
 
         try {
             wrapper.innerHTML = ''; // Czyść spinner przed renderem
             
-            if (section === 'Głos Latarni') await renderAudio();
+            // Rozdzielnia ruchu (Router)
+            if (section === 'Głos Latarni') await renderAudioSection();
             else if (section === 'Piciorys Chudego') await renderPiciorys();
             else if (section === 'Wsparcie') await renderSupport();
             else if (section === 'Galeria') await renderGallery();
-            else await renderStandard(section); // Dzień po dniu, Kronika itp.
+            else await renderStandard(section); // Obsługuje: Kronika, Dzień po dniu, Refleksje...
 
         } catch (e) {
             console.error(e);
@@ -432,12 +483,12 @@
         }
     }
 
-    // --- SEKCJA: GŁOS LATARNI ---
-    async function renderAudio() {
+    // --- A. SEKCJA: GŁOS LATARNI (AUDIO) ---
+    async function renderAudioSection() {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
         const list = document.getElementById('audio-list');
 
-        // Pobieramy wszystko bez filtra 'active'
+        // Pobieramy wszystkie mp3
         onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
             if(snap.empty) { list.innerHTML = '<p class="text-center">Brak nagrań.</p>'; return; }
             list.innerHTML = '';
@@ -453,14 +504,16 @@
                         <span>${Utils.escapeHtml(t.description || '')}</span>
                     </div>
                 `;
+                // Bezpośrednie przypisanie zdarzenia (Pancerne)
                 el.onclick = () => SoundManager.playTrack(t.url, el);
                 list.appendChild(el);
             });
         });
     }
 
-    // --- SEKCJA: PICIORYS ---
+    // --- B. SEKCJA: PICIORYS ---
     async function renderPiciorys() {
+        // Pobieramy wpis
         const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
         
         if(snap.empty) { wrapper.innerHTML = '<h2>Piciorys nie został jeszcze spisany.</h2>'; return; }
@@ -470,19 +523,20 @@
         
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
         
-        // Używamy tego samego bezpiecznego generatora kart
-        const card = DOMBuilder.createCard(data, id, 'sekcje/Piciorys Chudego/entries');
+        // Tworzymy kartę (otwartą)
+        const card = DOMBuilder.createCard(data, id, 'sekcje/Piciorys Chudego/entries', false);
         wrapper.appendChild(card);
         
-        // Zlicz wyświetlenie strony
+        // Zlicz wyświetlenie strony (od razu)
         updateDoc(snap.docs[0].ref, { views: increment(1) }).catch(()=>{});
     }
 
-    // --- SEKCJA: STANDARD (Kronika, Dzień po dniu) ---
+    // --- C. SEKCJA: STANDARD (Kronika, Dzień po dniu) ---
     async function renderStandard(sectionName) {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
         const container = document.getElementById('entries-list');
 
+        // Pobieramy wpisy
         const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
 
@@ -495,41 +549,40 @@
         });
     }
 
-    // --- SEKCJA: WSPARCIE ---
+    // --- D. SEKCJA: WSPARCIE ---
     async function renderSupport() {
         wrapper.innerHTML = `
             <h1 style="text-align:center">Wsparcie</h1>
-            <div class="card">
+            <div class="card" style="border:1px solid var(--gold);">
                 <h3 style="margin-bottom:15px">Dodaj Otuchy</h3>
                 <form id="supp-form">
-                    <input id="in-name" placeholder="Twoje imię" required>
+                    <input id="in-name" placeholder="Imię" required>
                     <textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea>
-                    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center">OPUBLIKUJ</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">OPUBLIKUJ</button>
                 </form>
             </div>
             <div id="supp-feed"></div>
         `;
 
         const feed = document.getElementById('supp-feed');
-        // Tylko zatwierdzone
+        // Tylko zatwierdzone wpisy
         const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
         
         onSnapshot(q, (snap) => {
             feed.innerHTML = '';
             snap.forEach(doc => {
                 const data = doc.data();
+                // Używamy createCard ale z inną ścieżką
                 const card = document.createElement('div');
                 card.className = 'card';
-                // Uproszczona karta dla wsparcia
                 card.innerHTML = `
-                    <h3 style="font-size:1.1rem">${Utils.escapeHtml(data.name)}</h3>
+                    <h3>${Utils.escapeHtml(data.name)}</h3>
                     <p>${Utils.escapeHtml(data.text)}</p>
                     <div class="actions-row">
                         <button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button>
-                    </div>
-                `;
+                    </div>`;
                 
-                // Lajk dla wsparcia
+                // Prosty lajk dla wsparcia
                 const lBtn = card.querySelector('.like-btn');
                 lBtn.onclick = async () => {
                     if(lBtn.style.color) return;
@@ -537,7 +590,6 @@
                     lBtn.innerHTML = `<i class="fas fa-heart"></i> ${(data.likes||0)+1}`;
                     await updateDoc(doc.ref, { likes: increment(1) });
                 };
-                
                 feed.appendChild(card);
             });
         });
@@ -555,33 +607,32 @@
         };
     }
 
-    // --- SEKCJA: GALERIA ---
+    // --- E. SEKCJA: GALERIA ---
     async function renderGallery() {
-        wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div class="gallery-grid"></div>`;
-        const grid = wrapper.querySelector('.gallery-grid');
+        wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div id="gal" class="gallery-grid"></div>`;
+        const gal = document.getElementById('gal');
         
         onSnapshot(collection(db, 'gallery'), (snap) => {
-            grid.innerHTML = '';
-            if(snap.empty) { grid.innerHTML = '<p>Brak zdjęć.</p>'; return; }
+            gal.innerHTML = '';
+            if(snap.empty) { gal.innerHTML = '<p>Brak zdjęć.</p>'; return; }
             
             snap.forEach(doc => {
                 const d = doc.data();
                 if(d.url) {
                     const img = document.createElement('img');
                     img.src = d.url;
-                    img.className = 'gallery-item';
                     const div = document.createElement('div');
                     div.className = 'gallery-item';
                     div.appendChild(img);
-                    grid.appendChild(div);
+                    gal.appendChild(div);
                 }
             });
         });
     }
 
-    // START
+    // START WSZYSTKIEGO
     initPage();
 
-  </script>
+</script>
 </body>
 </html>
