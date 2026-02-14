@@ -1,204 +1,204 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="referrer" content="no-referrer-when-downgrade">
-  
-  <meta property="og:title" content="Latarnia Nadziei">
-  <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
-  <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
-  <meta property="og:type" content="website">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="theme-color" content="#0f1014">
 
-  <title>Latarnia Nadziei</title>
-  
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-  
-  <style>
-    /* =========================================
-       STYLIZACJA PREMIUM (Latarnia Vigor Style)
-       ========================================= */
-    
-    html, body { 
-        min-height: 100vh; margin: 0; padding: 0; 
-        background-color: #0f1014; /* Głęboka czerń/granat */
-        background-image: radial-gradient(circle at 50% 0%, #1f222e 0%, #0f1014 80%);
-        color: #e0e0e0; 
-        font-family: 'Montserrat', sans-serif; 
-        overflow-x: hidden;
-    }
+    <title>Latarnia Nadziei</title>
+    <meta property="og:title" content="Latarnia Nadziei">
+    <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
+    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
+    <meta property="og:type" content="website">
 
-    /* TYPOGRAFIA */
-    h1, h2, h3 { 
-        color: #ffd97b; 
-        font-family: 'Cinzel', serif; 
-        text-transform: uppercase; 
-        letter-spacing: 1px;
-        text-shadow: 0 2px 10px rgba(255, 217, 123, 0.2);
-        margin-top: 0;
-    }
-    p { line-height: 1.6; font-size: 1rem; color: #ccc; }
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕯️</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
-    /* ŁADOWANIE */
-    .loading-spinner { 
-        border: 4px solid rgba(255, 217, 123, 0.1); 
-        border-left-color: #ffd97b; 
-        border-radius: 50%; 
-        width: 60px; height: 60px; 
-        animation: spin 1s linear infinite; 
-        margin: 150px auto; 
-        box-shadow: 0 0 20px rgba(255, 217, 123, 0.1);
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    <style>
+        /* =========================================
+           STYLIZACJA PREMIUM (Latarnia Vigor Style)
+           ========================================= */
+        
+        :root {
+            --gold: #ffd97b;
+            --gold-dark: #c5a059;
+            --bg-dark: #0f1014;
+            --glass-bg: rgba(30, 34, 45, 0.75);
+            --glass-border: 1px solid rgba(255, 217, 123, 0.15);
+            --text-main: #e0e0e0;
+        }
 
-    /* KONTENER GŁÓWNY */
-    #content-wrapper { 
-        padding-top: 90px; 
-        padding-bottom: 120px; 
-        min-height: 100vh;
-        box-sizing: border-box;
-        animation: fadeIn 0.8s ease-out;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        html, body { 
+            min-height: 100vh; margin: 0; padding: 0; 
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 0%, #1f222e 0%, #0f1014 85%);
+            background-attachment: fixed;
+            color: var(--text-main); 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* PRZYCISK POWROTU (Szklany) */
-    .back-btn {
-        position: fixed; top: 20px; left: 20px; z-index: 1001;
-        background: rgba(0, 0, 0, 0.6);
-        color: #ffd97b;
-        padding: 12px 20px;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: 600;
-        border: 1px solid rgba(255, 217, 123, 0.3);
-        backdrop-filter: blur(8px);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: flex; align-items: center; gap: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    }
-    .back-btn:hover {
-        background: rgba(255, 217, 123, 0.15);
-        color: #fff;
-        border-color: #ffd97b;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 217, 123, 0.2);
-    }
+        /* TYPOGRAFIA */
+        h1, h2, h3 { 
+            color: var(--gold); 
+            font-family: 'Cinzel', serif; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            text-shadow: 0 2px 15px rgba(255, 217, 123, 0.2);
+            margin-top: 0;
+        }
+        p { line-height: 1.7; font-size: 1.05rem; color: #ccc; margin-bottom: 1.5rem; }
 
-    /* KARTY I KONTENERY (Glassmorphism) */
-    .story-item, .card, .log-container, .audio-wrap, .support-wrap {
-        max-width: 850px;
-        margin: 0 auto 30px auto;
-        background: rgba(30, 34, 45, 0.6); /* Półprzezroczyste tło */
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 30px;
-        backdrop-filter: blur(12px); /* Rozmycie tła pod spodem */
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    /* Efekt hover na kartach (tylko na liście) */
-    .story-item:hover, .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-        border-color: rgba(255, 217, 123, 0.2);
-    }
+        /* KONTENER GŁÓWNY */
+        #content-wrapper { 
+            padding-top: 90px; 
+            padding-bottom: 120px; 
+            min-height: 100vh;
+            padding-left: 15px; padding-right: 15px;
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out;
+            max-width: 900px; margin: 0 auto;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* META DANE */
-    .entry-meta { 
-        display: flex; flex-wrap: wrap; gap: 20px; 
-        color: #888; font-size: 0.85rem; margin-bottom: 20px; 
-        border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; 
-    }
-    .entry-meta span { display: flex; align-items: center; gap: 6px; }
-    .entry-meta i { color: #ffd97b; filter: drop-shadow(0 0 5px rgba(255,217,123,0.3)); }
+        /* PRZYCISK POWROTU */
+        .back-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 1001;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(255, 217, 123, 0.3);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .back-btn:hover { background: rgba(255, 217, 123, 0.15); border-color: var(--gold); transform: translateY(-2px); }
 
-    /* PRZYCISKI AKCJI (Gold Gradient & Outline) */
-    .log-actions, .card-actions { margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; }
-    
-    .action-button {
-        background: transparent;
-        border: 1px solid rgba(255, 217, 123, 0.4);
-        color: #ffd97b;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: flex; align-items: center; gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .action-button:hover {
-        background: rgba(255, 217, 123, 0.1);
-        border-color: #ffd97b;
-        transform: translateY(-1px);
-        box-shadow: 0 0 15px rgba(255, 217, 123, 0.1);
-    }
+        /* KARTY (Glassmorphism) */
+        .story-item, .card, .log-container, .audio-wrap, .support-wrap {
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+        .story-item:hover { transform: translateY(-2px); border-color: rgba(255, 217, 123, 0.3); }
 
-    /* Wyróżniony przycisk (np. Czytaj dalej) */
-    .action-button[data-action="read-more"], 
-    .action-button[data-action="like"]:not([disabled]),
-    button[type="submit"] {
-        background: linear-gradient(135deg, #ffd97b 0%, #b8860b 100%);
-        border: none;
-        color: #1a1a1a;
-        font-weight: 700;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    
-    .action-button[data-action="read-more"]:hover,
-    .action-button[data-action="like"]:not([disabled]):hover,
-    button[type="submit"]:hover {
-        background: linear-gradient(135deg, #ffedb8 0%, #d4a017 100%);
-        box-shadow: 0 0 20px rgba(255, 217, 123, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    .action-button:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
+        /* META DANE */
+        .entry-meta { 
+            display: flex; flex-wrap: wrap; gap: 15px; 
+            color: #888; font-size: 0.85rem; margin-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px; 
+        }
+        .entry-meta span { display: flex; align-items: center; gap: 6px; }
+        .entry-meta i { color: var(--gold); }
 
-    /* AUDIO LIST */
-    .audio-btn { 
-        background: rgba(0,0,0,0.3); 
-        border-left: 4px solid #444; 
-        padding: 15px 20px; margin-bottom: 12px; border-radius: 8px; 
-        cursor: pointer; transition: all 0.2s ease; 
-        display: flex; align-items: center; gap: 15px; 
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    .audio-btn:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); border-color: rgba(255,255,255,0.1); }
-    .audio-btn.playing { 
-        border-left-color: #ffd97b; 
-        background: linear-gradient(90deg, rgba(255,217,123,0.1) 0%, rgba(0,0,0,0) 100%);
-    }
-    .audio-icon { font-size: 1.5rem; color: #555; min-width: 30px; text-align: center; }
-    .audio-btn.playing .audio-icon { color: #ffd97b; animation: pulse 1.5s infinite; }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        /* PRZYCISKI AKCJI */
+        .log-actions, .card-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .action-button {
+            background: transparent;
+            border: 1px solid rgba(255, 217, 123, 0.4);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase;
+        }
+        
+        .action-button:hover {
+            background: rgba(255, 217, 123, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 217, 123, 0.1);
+        }
 
-    /* FORMULARZE */
-    input, textarea {
-        background: rgba(0, 0, 0, 0.3) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #fff !important;
-        border-radius: 8px !important;
-        padding: 12px !important;
-        font-family: inherit;
-        transition: border 0.3s;
-    }
-    input:focus, textarea:focus {
-        border-color: #ffd97b !important;
-        outline: none;
-        box-shadow: 0 0 10px rgba(255, 217, 123, 0.1);
-    }
+        /* Przycisk wyróżniony (Gradient) */
+        .action-button.primary, button[type="submit"] {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border: none;
+            color: #121212;
+            font-weight: 700;
+        }
+        .action-button.primary:hover, button[type="submit"]:hover {
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            box-shadow: 0 0 20px rgba(255, 217, 123, 0.4);
+        }
+        
+        .action-button:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
 
-  </style>
+        /* LISTA AUDIO */
+        .audio-btn { 
+            background: rgba(0,0,0,0.3); 
+            border-left: 4px solid #444; 
+            padding: 15px 20px; margin-bottom: 12px; border-radius: 8px; 
+            cursor: pointer; transition: all 0.2s ease; 
+            display: flex; align-items: center; gap: 15px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .audio-btn:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .audio-btn.playing { 
+            border-left-color: var(--gold); 
+            background: linear-gradient(90deg, rgba(255,217,123,0.1) 0%, transparent 100%);
+        }
+        .audio-icon { font-size: 1.5rem; color: #555; min-width: 40px; text-align: center; }
+        .audio-btn.playing .audio-icon { color: var(--gold); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* FORMULARZE */
+        input, textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: inherit;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(255, 217, 123, 0.1); }
+
+        /* LOADING */
+        .loading-spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.1); 
+            border-left-color: var(--gold); 
+            border-radius: 50%; 
+            width: 60px; height: 60px; 
+            animation: spin 1s linear infinite; 
+            margin: 150px auto; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* FAB HYMN */
+        #fab-hymn {
+            position: fixed; bottom: 25px; right: 25px;
+            width: 65px; height: 65px; border-radius: 50%;
+            background: linear-gradient(145deg, #ffd97b, #c5a059);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            border: none; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #121212; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #fab-hymn:active { transform: scale(0.9); }
+    </style>
 </head>
 <body>
   
@@ -214,7 +214,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // --- KONFIGURACJA FIREBASE ---
+    // --- 1. KONFIGURACJA ---
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
@@ -228,467 +228,333 @@
     const db = getFirestore(app);
     const HYMN_URL = "/audio/hymn.mp3"; 
 
-    // ========================================
-    // MODUŁ 1: MusicPlayer (HYMN)
-    // ========================================
-    const MusicPlayer = (() => {
-        let audio = null;
-        let isPlaying = false;
-        let btnElement = null;
+    // --- 2. NARZĘDZIA (Utils) ---
+    const Utils = {
+        escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
+        stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
+        // Szybkie sprawdzanie lajków w pamięci telefonu
+        isLiked: (id) => localStorage.getItem('liked_' + id) === 'true',
+        setLiked: (id) => localStorage.setItem('liked_' + id, 'true')
+    };
 
-        const init = () => {
-            // Styl przycisku Hymnu (Przywrócony piękny 3D)
-            const style = document.createElement('style');
-            style.innerHTML = `
-                .hymn-wrapper { position: fixed; bottom: 30px; right: 30px; z-index: 99999; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-                .hymn-btn-3d { 
-                    position: relative; width: 70px; height: 70px; border-radius: 50%; border: none; 
-                    background: linear-gradient(145deg, #ffd97b, #c5a059); 
-                    box-shadow: 0 6px 0 #8c7035, 0 10px 20px rgba(0,0,0,0.4); 
-                    cursor: pointer; display: flex; justify-content: center; align-items: center; 
-                    font-size: 28px; color: #1a1a1a; outline: none; transition: transform 0.1s; 
-                }
-                .hymn-btn-3d:active { transform: translateY(6px); box-shadow: 0 0 0 #8c7035, inset 0 4px 10px rgba(0,0,0,0.3); }
-                .hymn-label { 
-                    background: rgba(0,0,0,0.9); color: #ffd97b; padding: 5px 10px; border-radius: 6px; 
-                    font-size: 0.8rem; text-transform:uppercase; letter-spacing:1px; opacity: 0; 
-                    transition: opacity 0.3s; pointer-events: none; border: 1px solid #ffd97b;
-                }
-                .hymn-wrapper:hover .hymn-label { opacity: 1; }
-                .pulse-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; animation: pulse-gold 2s infinite; z-index: -1; display: none; }
-                @keyframes pulse-gold { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6); } 100% { transform: scale(1.6); box-shadow: 0 0 0 30px rgba(255, 217, 123, 0); } }
-            `;
-            document.head.appendChild(style);
+    // --- 3. SYSTEM AUDIO (The Manager) ---
+    const AudioSystem = {
+        mainPlayer: new Audio(),
+        hymnPlayer: new Audio(HYMN_URL),
+        synth: window.speechSynthesis,
+        state: { isHymnPlaying: false, currentTrackBtn: null },
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'hymn-wrapper';
-            wrapper.innerHTML = `<span class="hymn-label">Hymn</span><div class="pulse-ring" id="hymn-pulse"></div><button class="hymn-btn-3d" id="hymn-btn"><i class="fas fa-music"></i></button>`;
-            document.body.appendChild(wrapper);
-
-            btnElement = document.getElementById('hymn-btn');
-            btnElement.addEventListener('click', togglePlay);
-        };
-
-        const togglePlay = () => { isPlaying ? stop() : play(); };
-
-        const play = () => {
-            if (!audio) {
-                audio = new Audio(HYMN_URL);
-                audio.loop = true;
-            }
-            if (typeof lektor !== 'undefined') lektor.stop();
-            const hiddenPlayer = document.getElementById('hiddenPlayer');
-            if (hiddenPlayer) hiddenPlayer.pause();
-            
-            document.querySelectorAll('[data-action="lector-play-pause"]').forEach(btn => btn.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
-
-            audio.play().then(() => { isPlaying = true; updateUI(true); })
-                 .catch(e => { console.error(e); alert("Nie można odtworzyć hymnu (sprawdź plik /audio/hymn.mp3)"); });
-        };
-
-        const stop = () => { if (!audio) return; audio.pause(); isPlaying = false; updateUI(false); };
-
-        const updateUI = (playing) => {
-            const icon = btnElement.querySelector('i');
-            const pulse = document.getElementById('hymn-pulse');
-            if (playing) { icon.className = 'fas fa-pause'; pulse.style.display = 'block'; }
-            else { icon.className = 'fas fa-music'; pulse.style.display = 'none'; }
-        };
-
-        return { init, stop, play };
-    })();
-
-    // ========================================
-    // MODUŁ 2: Lektor (TTS)
-    // ========================================
-    const lektor = (() => {
-        let queue = [];
-        let isPaused = false;
-        let selectedVoice = null;
-        const synth = window.speechSynthesis;
-
-        const stripHtml = (html) => { 
-            const div = document.createElement("div"); 
-            div.innerHTML = html; 
-            return div.textContent || div.innerText || ""; 
-        };
-        
-        const initVoices = () => { 
-            const voices = synth.getVoices(); 
-            selectedVoice = voices.find(v => v.lang === "pl-PL") || voices[0]; 
-        }; 
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = initVoices;
-        }
-        initVoices();
-
-        const speakNext = () => { 
-            if (isPaused || queue.length === 0) return; 
-            if (!selectedVoice) initVoices();
-
-            const text = queue.shift(); 
-            const utterance = new SpeechSynthesisUtterance(text); 
-            utterance.lang = "pl-PL"; 
-            if (selectedVoice) utterance.voice = selectedVoice; 
-            utterance.rate = 0.9; 
-            utterance.onend = () => { if (!isPaused) speakNext(); }; 
-            synth.speak(utterance); 
-        };
-
-        const enqueue = (rawText) => { 
-            if (!rawText) return; 
-            MusicPlayer.stop(); 
-            stop(); 
-            const clean = stripHtml(rawText);
-            const parts = clean.match(/[^.!?]+[.!?]*/g) || [clean];
-            queue.push(...parts); 
-            speakNext(); 
-        };
-
-        const stop = () => { isPaused = false; queue = []; synth.cancel(); };
-        const pause = () => { if (synth.speaking) { synth.pause(); isPaused = true; } };
-        const resume = () => { if (isPaused) { isPaused = false; synth.resume(); } };
-        const getStatus = () => ({ speaking: synth.speaking, paused: isPaused });
-        
-        return { enqueue, stop, pause, resume, getStatus };
-    })();
-
-    // ========================================
-    // MODUŁ 3: SectionLoader (GŁÓWNY SILNIK)
-    // ========================================
-    const SectionLoader = {
-        state: { sectionName: '', cleanupFunctions: [] },
-        elements: { wrapper: document.getElementById('content-wrapper') },
-        utils: {
-            escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
-            stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
-            getLikedPosts: () => JSON.parse(localStorage.getItem('latarniaLikedPosts') || '[]'),
-            addLikedPost: (id) => { const l = JSON.parse(localStorage.getItem('latarniaLikedPosts') || '[]'); if(!l.includes(id)) { l.push(id); localStorage.setItem('latarniaLikedPosts', JSON.stringify(l)); }}
-        },
-        router: {
-            'Głos Latarni': { fetcher: 'fetchNoOp', renderer: 'renderAudioSection', theme: 'theme-audio' },
-            'Piciorys Chudego': { fetcher: 'fetchSingleEntry', renderer: 'renderPiciorys', theme: 'theme-piciorys' },
-            'Z punktu widzenia księżniczki': { fetcher: 'fetchSingleEntry', renderer: 'renderKsiezniczka', theme: 'theme-ksiezniczka' },
-            'Pomoc': { fetcher: 'fetchAllHelpEntries', renderer: 'renderPomoc', theme: 'theme-pomoc' },
-            'Wsparcie': { fetcher: 'fetchNoOp', renderer: 'renderSupportSection', theme: 'theme-support' },
-            'Galeria': { fetcher: 'fetchNoOp', renderer: 'renderGallery', theme: 'theme-gallery' },
-            '__default__': { fetcher: 'fetchAllEntries', renderer: 'renderStandard', queryOptions: [orderBy('createdAt', 'desc')], theme: 'theme-kronika' }
+        init() {
+            this.hymnPlayer.loop = true;
+            this.createHymnButton();
         },
 
-        async init() {
-            MusicPlayer.init();
-            
-            this.state.cleanupFunctions.forEach(c => c());
-            this.state.cleanupFunctions = [];
-            this.setupEventListeners();
-            
-            try {
-                const params = new URLSearchParams(window.location.search);
-                this.state.sectionName = decodeURIComponent(params.get('nazwa') || 'Kronika').trim();
-                
-                const route = this.router[this.state.sectionName] || this.router['__default__'];
-                document.title = `${this.utils.escapeHtml(this.state.sectionName)} — Latarnia Nadziei`;
-                
-                const data = await this.fetch[route.fetcher].call(this, route.queryOptions);
-                this.render[route.renderer].call(this, data);
-            } catch (e) {
-                console.error(e);
-                this.render.renderError('Błąd', 'Nie udało się wczytać sekcji. Sprawdź połączenie.');
+        createHymnButton() {
+            const btn = document.createElement('button');
+            btn.id = 'fab-hymn';
+            btn.innerHTML = '<i class="fas fa-music"></i>';
+            btn.onclick = () => this.toggleHymn();
+            document.body.appendChild(btn);
+        },
+
+        stopAll() {
+            this.mainPlayer.pause();
+            this.synth.cancel();
+            if (this.state.currentTrackBtn) {
+                this.state.currentTrackBtn.classList.remove('playing');
+                this.state.currentTrackBtn = null;
             }
         },
 
-        setupEventListeners() {
-            this.elements.wrapper.addEventListener('click', async (event) => {
-                const btn = event.target.closest('[data-action]');
-                if (!btn) return;
-                
-                const action = btn.dataset.action;
-                const docId = btn.closest('[data-doc-id]')?.dataset.docId;
-
-                // LAJKOWANIE
-                if (action === 'like' && docId) {
-                    if(btn.disabled || this.utils.getLikedPosts().includes(docId)) return;
-                    btn.disabled = true;
-                    try {
-                        const col = this.state.sectionName === 'Wsparcie' ? 'support_stories' : `sekcje/${this.state.sectionName}/entries`;
-                        await updateDoc(doc(db, col, docId), { likes: increment(1) });
-                        this.utils.addLikedPost(docId);
-                        
-                        btn.innerHTML = `<i class="fas fa-check"></i> Polubiono`;
-                        const counter = btn.closest('article, .log-container, .card').querySelector('[data-likes-counter]');
-                        if(counter) {
-                            const current = parseInt(counter.innerText.match(/\d+/)) || 0;
-                            counter.innerHTML = `<i class="fas fa-heart"></i> ${current + 1}`;
-                        }
-                    } catch(e) { console.error(e); btn.disabled = false; }
-                } 
-                // ROZWIJANIE
-                else if (action === 'read-more') {
-                    const content = btn.closest('.story-item').querySelector('.full-content');
-                    const isHidden = content.style.display === 'none';
-                    content.style.display = isHidden ? 'block' : 'none';
-                    btn.textContent = isHidden ? 'Ukryj' : 'Czytaj Dalej';
-                    
-                    if(isHidden && docId) { 
-                        try { await updateDoc(doc(db, `sekcje/${this.state.sectionName}/entries`, docId), { views: increment(1) }); } catch(e){} 
-                    }
-                }
-                // LEKTOR
-                else if (action === 'lector-play-pause') {
-                    const status = lektor.getStatus();
-                    if(status.speaking && !status.paused) { 
-                        lektor.pause(); 
-                        btn.innerHTML = `<i class="fas fa-play"></i> Wznów`; 
-                    }
-                    else if(status.paused) { 
-                        lektor.resume(); 
-                        btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`; 
-                    }
-                    else {
-                        document.querySelectorAll('[data-action="lector-play-pause"]').forEach(b => b.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
-                        const container = btn.closest('[data-text]');
-                        if(container) {
-                            lektor.enqueue(container.dataset.text);
-                            btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`;
-                        }
-                    }
-                }
-            });
-        },
-
-        fetch: {
-            async fetchNoOp() { return null; },
-            async fetchSingleEntry() { 
-                const q = query(collection(db, 'sekcje', SectionLoader.state.sectionName, 'entries'), limit(1)); 
-                const s = await getDocs(q); 
-                return s.empty ? null : s.docs[0]; 
-            },
-            async fetchAllEntries(opts) { 
-                const s = await getDocs(query(collection(db, `sekcje/${SectionLoader.state.sectionName}/entries`), ...opts)); 
-                return s.docs; 
-            },
-            async fetchAllHelpEntries() { return []; }
-        },
-
-        render: {
-            // RENDER: GŁOS LATARNI (Audio)
-            async renderAudioSection() {
-                SectionLoader.elements.wrapper.innerHTML = `
-                    <div class="audio-wrap">
-                        <header style="margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
-                            <h1>Głos Latarni</h1>
-                            <p style="color:rgba(255,255,255,0.7);">Posłuchaj, jeśli nie masz siły czytać.</p>
-                        </header>
-                        <div id="audioCategories"><i class="fas fa-spinner fa-spin"></i> Ładowanie biblioteki...</div>
-                        <audio id="hiddenPlayer" style="display:none;"></audio>
-                    </div>`;
-                
-                const container = document.getElementById('audioCategories');
-                const player = document.getElementById('hiddenPlayer');
-                let currentBtn = null;
-
-                const q = query(collection(db, 'audio_tracks'), where('active', '==', true), orderBy('category'), orderBy('order'));
-                SectionLoader.state.cleanupFunctions.push(onSnapshot(q, (snapshot) => {
-                    if (snapshot.empty) { container.innerHTML = 'Brak nagrań.'; return; }
-                    
-                    const grouped = {};
-                    snapshot.docs.forEach(d => {
-                        const t = d.data();
-                        const cat = t.category || 'inne';
-                        if(!grouped[cat]) grouped[cat] = [];
-                        grouped[cat].push(t);
-                    });
-
-                    container.innerHTML = '';
-                    const catNames = { 'ratunek': '🆘 Ratunek Teraz', 'medytacje': '🧘 Medytacje', 'wiedza': '🧠 Wiedza', 'historie': '🔥 Historie' };
-
-                    for (const [cat, items] of Object.entries(grouped)) {
-                        const sec = document.createElement('div');
-                        sec.innerHTML = `<h2 style="color:#fff; opacity:0.5; font-size:1rem; text-transform:uppercase; border-left:3px solid #ffd97b; padding-left:15px; margin-top:40px; margin-bottom:20px;">${catNames[cat] || cat}</h2>`;
-                        items.forEach(track => {
-                            const btn = document.createElement('div');
-                            btn.className = 'audio-btn';
-                            btn.innerHTML = `
-                                <div class="audio-icon"><i class="fas fa-play"></i></div>
-                                <div>
-                                    <div style="font-weight:bold; color:#e0e0e0; font-size:1.1rem;">${SectionLoader.utils.escapeHtml(track.title)}</div>
-                                    <div style="font-size:0.9rem; color:#888;">${SectionLoader.utils.escapeHtml(track.description||'')}</div>
-                                </div>`;
-                            
-                            btn.onclick = () => {
-                                if(currentBtn === btn && !player.paused) {
-                                    player.pause(); 
-                                    btn.classList.remove('playing'); 
-                                    btn.querySelector('i').className = 'fas fa-play';
-                                } else {
-                                    if(currentBtn) { 
-                                        currentBtn.classList.remove('playing'); 
-                                        currentBtn.querySelector('i').className = 'fas fa-play'; 
-                                    }
-                                    MusicPlayer.stop(); if(typeof lektor!=='undefined') lektor.stop();
-                                    player.src = track.url; player.play();
-                                    currentBtn = btn; 
-                                    btn.classList.add('playing'); 
-                                    btn.querySelector('i').className = 'fas fa-stop';
-                                }
-                            };
-                            sec.appendChild(btn);
-                        });
-                        container.appendChild(sec);
-                    }
-                }));
-                player.onended = () => { if(currentBtn) { currentBtn.classList.remove('playing'); currentBtn.querySelector('i').className = 'fas fa-play'; } };
-            },
-
-            // RENDER: WSPARCIE
-            async renderSupportSection() {
-                SectionLoader.elements.wrapper.innerHTML = `
-                    <div class="support-wrap">
-                        <header style="text-align:center; margin-bottom:40px;">
-                            <h1 style="font-size:2.5rem;">WSPARCIE</h1>
-                            <p>Zostaw dobre słowo. Ono wraca.</p>
-                        </header>
-                        
-                        <form id="supportForm" style="display:flex; flex-direction:column; gap:20px; margin-bottom:40px;">
-                            <input id="supportName" placeholder="Twoje imię / pseudonim" required>
-                            <textarea id="supportStory" placeholder="Twoja wiadomość..." style="min-height:120px;" required></textarea>
-                            <button type="submit" class="action-button" style="justify-content:center; padding:15px;">OPUBLIKUJ</button>
-                        </form>
-                        
-                        <div id="feed" style="display:flex; flex-direction:column; gap:25px;">
-                            <div style="text-align:center; color:#666;"><i class="fas fa-spinner fa-spin"></i> Pobieranie wpisów...</div>
-                        </div>
-                    </div>`;
-
-                const form = document.getElementById('supportForm');
-                const feed = document.getElementById('feed');
-
-                const q = query(collection(db, "support_stories"), where("isApproved", "==", true), orderBy("t", "desc"));
-                SectionLoader.state.cleanupFunctions.push(onSnapshot(q, (snapshot) => {
-                    feed.innerHTML = '';
-                    if(snapshot.empty) { feed.innerHTML = '<p style="text-align:center; color:#888;">Brak wpisów.</p>'; return; }
-                    
-                    snapshot.forEach(doc => {
-                        const item = doc.data();
-                        const card = document.createElement('article');
-                        card.className = 'card';
-                        card.dataset.docId = doc.id;
-                        card.dataset.text = `${item.name} napisał: ${item.text}`;
-                        const isLiked = SectionLoader.utils.getLikedPosts().includes(doc.id);
-                        
-                        card.innerHTML = `
-                            <h3 style="margin:0 0 10px 0; font-size:1.3rem;">${SectionLoader.utils.escapeHtml(item.name)}</h3>
-                            <p style="color:#ddd; font-size:1.05rem;">${SectionLoader.utils.escapeHtml(item.text)}</p>
-                            <div class="entry-meta" style="margin-top:20px;">
-                                <span data-likes-counter><i class="fas fa-heart"></i> ${item.likes||0}</span>
-                                <span style="font-size:0.8rem; margin-left:auto;">${item.t ? new Date(item.t.toDate()).toLocaleDateString() : 'Teraz'}</span>
-                            </div>
-                            <div class="card-actions">
-                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
-                                <button class="action-button" data-action="like" ${isLiked?'disabled':''}><i class="fas fa-heart"></i> ${isLiked?'Dzięki!':'Wspieram'}</button>
-                            </div>`;
-                        feed.appendChild(card);
-                    });
-                }));
-
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const btn = form.querySelector('button');
-                    btn.disabled = true; btn.innerText = "Wysyłanie...";
-                    try {
-                        await addDoc(collection(db, "support_stories"), { name: document.getElementById('supportName').value, text: document.getElementById('supportStory').value, t: serverTimestamp(), isApproved: false, likes: 0 });
-                        form.reset(); alert("Dziękujemy! Twój wpis trafił do moderacji.");
-                    } catch(err) { alert("Błąd wysyłania."); } 
-                    finally { btn.disabled = false; btn.innerText = "OPUBLIKUJ"; }
-                });
-            },
-
-            // RENDER: PICIORYS
-            renderPiciorys(doc) {
-                if(!doc) return SectionLoader.render.renderEmpty();
-                const e = doc.data();
-                const parts = (e.text || '').split('---PODZIAL---');
-                const intro = parts[0] || '';
-                const main = parts[1] || '';
-                const isLiked = SectionLoader.utils.getLikedPosts().includes(doc.id);
-
-                SectionLoader.elements.wrapper.innerHTML = `
-                    <div class="log-container" data-doc-id="${doc.id}">
-                        <div id="piciorys-intro" data-text="${SectionLoader.utils.escapeHtml(intro)}">
-                            <h1 style="font-size:2.2rem; margin-bottom:30px; text-align:center;">${SectionLoader.utils.escapeHtml(e.introTitle || 'Początek')}</h1>
-                            <div class="log-content" style="font-size:1.1rem; line-height:1.8;">${intro}</div>
-                            <div class="log-actions" style="margin-top:40px; justify-content:center;">
-                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Lektor</button>
-                                <button id="continue-btn" class="action-button" style="background: linear-gradient(135deg, #ffd97b 0%, #b8860b 100%); border:none; color:#000;">Czytaj dalej <i class="fas fa-arrow-down"></i></button>
-                            </div>
-                        </div>
-                        <div id="piciorys-main" style="display:none;" data-text="${SectionLoader.utils.escapeHtml(main)}">
-                             <hr style="border-color:rgba(255,255,255,0.1); margin:40px 0;">
-                             <h2 style="margin-bottom:20px;">${SectionLoader.utils.escapeHtml(e.mainTitle || 'Ciąg dalszy')}</h2>
-                             <div class="entry-meta"><span><i class="fas fa-eye"></i> ${e.views || 0}</span><span data-likes-counter><i class="fas fa-heart"></i> ${e.likes || 0}</span></div>
-                             <div class="log-content" style="font-size:1.1rem; line-height:1.8;">${main}</div>
-                             <div class="log-actions" style="margin-top:30px;">
-                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Lektor</button>
-                                <button class="action-button" data-action="like" ${isLiked?'disabled':''}><i class="fas fa-heart"></i> ${isLiked?'Polubiono':'Lubię to'}</button>
-                             </div>
-                        </div>
-                    </div>`;
-                
-                document.getElementById('continue-btn').addEventListener('click', () => {
-                    const mainEl = document.getElementById('piciorys-main');
-                    document.getElementById('piciorys-intro').style.opacity = '0.5';
-                    mainEl.style.display = 'block';
-                    mainEl.scrollIntoView({ behavior: 'smooth' });
-                    lektor.stop();
-                    updateDoc(doc.ref, { views: increment(1) }).catch(()=>{});
-                });
-            },
-
-            // RENDER: STANDARD
-            renderStandard(docs) {
-                if (!docs.length) return SectionLoader.render.renderEmpty();
-                const html = docs.map(d => {
-                    const e = d.data();
-                    const plain = SectionLoader.utils.stripHtml(e.text||'');
-                    const excerpt = plain.substring(0, 250)+'...';
-                    const isLiked = SectionLoader.utils.getLikedPosts().includes(d.id);
-
-                    return `
-                    <article class="story-item" data-doc-id="${d.id}" data-text="${SectionLoader.utils.escapeHtml(e.title)}. ${SectionLoader.utils.escapeHtml(plain)}">
-                        <h3 style="font-size:1.5rem;">${SectionLoader.utils.escapeHtml(e.title)}</h3>
-                        <div class="entry-meta">
-                            <span><i class="fas fa-calendar-alt"></i> ${e.createdAt ? e.createdAt.toDate().toLocaleDateString() : '---'}</span>
-                            <span data-likes-counter><i class="fas fa-heart"></i> ${e.likes||0}</span>
-                            <span><i class="fas fa-eye"></i> ${e.views||0}</span>
-                        </div>
-                        <div class="entry-content">
-                            <p>${excerpt}</p>
-                            <div class="full-content" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">${e.text||''}</div>
-                        </div>
-                        <div class="log-actions">
-                            <button class="action-button" data-action="read-more">Czytaj Dalej</button>
-                            <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
-                            <button class="action-button" data-action="like" ${isLiked?'disabled':''}>Lubię to</button>
-                        </div>
-                    </article>`;
-                }).join('');
-                
-                SectionLoader.elements.wrapper.innerHTML = `
-                    <div style="max-width:850px; margin:0 auto; padding:0 20px;">
-                        <h1 style="text-align:center; margin-bottom:50px; font-size:2.5rem;">${SectionLoader.state.sectionName}</h1>
-                        <div class="story-list">${html}</div>
-                    </div>`;
-            },
+        playTrack(url, btnElement) {
+            // Jeśli gra hymn - zatrzymaj
+            if (this.state.isHymnPlaying) this.toggleHymn();
             
-            renderEmpty() { SectionLoader.elements.wrapper.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Pusto</h2><p>Brak wpisów.</p></div>`; },
-            renderError(t, m) { SectionLoader.elements.wrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#ff6b6b;"><h2>${t}</h2><p>${m}</p></div>`; },
-            renderKsiezniczka() { SectionLoader.render.renderError('W budowie', 'Sekcja Księżniczki jest przygotowywana.'); },
-            renderPomoc() { SectionLoader.render.renderError('W budowie', 'Sekcja Pomocy jest przygotowywana.'); },
-            renderGallery() { SectionLoader.render.renderError('W budowie', 'Galeria jest przygotowywana.'); }
+            // Jeśli kliknięto to samo - pauza
+            if (this.state.currentTrackBtn === btnElement && !this.mainPlayer.paused) {
+                this.mainPlayer.pause();
+                btnElement.classList.remove('playing');
+                return;
+            }
+
+            // Stop innych
+            this.stopAll();
+
+            // Start nowego
+            this.mainPlayer.src = url;
+            this.mainPlayer.play().catch(e => alert("Błąd odtwarzania. Sprawdź plik."));
+            this.state.currentTrackBtn = btnElement;
+            btnElement.classList.add('playing');
+            
+            this.mainPlayer.onended = () => {
+                btnElement.classList.remove('playing');
+                this.state.currentTrackBtn = null;
+            };
+        },
+
+        toggleHymn() {
+            this.stopAll(); 
+            const btn = document.getElementById('fab-hymn');
+            
+            if (this.state.isHymnPlaying) {
+                this.hymnPlayer.pause();
+                this.state.isHymnPlaying = false;
+                btn.innerHTML = '<i class="fas fa-music"></i>';
+                btn.style.transform = 'scale(1)';
+            } else {
+                this.hymnPlayer.play().catch(e => console.error("Brak hymnu"));
+                this.state.isHymnPlaying = true;
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                btn.style.transform = 'scale(1.1)';
+            }
+        },
+
+        speak(text) {
+            this.stopAll();
+            if(this.state.isHymnPlaying) this.toggleHymn();
+
+            const cleanText = text.replace(/<[^>]*>?/gm, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = "pl-PL";
+            utterance.rate = 0.95;
+            this.synth.speak(utterance);
         }
     };
 
-    document.addEventListener("DOMContentLoaded", () => SectionLoader.init());
+    // --- 4. RENDERER (Silnik strony) ---
+    const Renderer = {
+        wrapper: document.getElementById('content-wrapper'),
+        
+        async init() {
+            AudioSystem.init();
+            const params = new URLSearchParams(window.location.search);
+            const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
+            document.title = `${section} | Latarnia`;
+
+            try {
+                if (section === 'Głos Latarni') await this.loadAudioSection();
+                else if (section === 'Piciorys Chudego') await this.loadPiciorys();
+                else if (section === 'Wsparcie') await this.loadSupport();
+                else await this.loadKronika(section);
+            } catch (e) {
+                this.renderError(e.message);
+            }
+        },
+
+        // --- SEKCJA: GŁOS LATARNI (AUDIO) ---
+        async loadAudioSection() {
+            this.wrapper.innerHTML = `
+                <div class="audio-wrap">
+                    <h1 style="text-align:center">Głos Latarni</h1>
+                    <p style="text-align:center; color:#888;">Posłuchaj, jeśli nie masz siły czytać.</p>
+                    <div id="audio-list" style="margin-top:30px;">
+                        <div class="loading-spinner" style="width:30px; height:30px; margin:0 auto;"></div>
+                    </div>
+                </div>`;
+            
+            // Pobieramy WSZYSTKO (bez where 'active')
+            const q = query(collection(db, 'audio_tracks'), orderBy('order', 'asc'));
+            
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('audio-list');
+                if (snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań w bazie.</p>'; return; }
+                
+                list.innerHTML = '';
+                // Sortowanie po kategorii (grupowanie wizualne)
+                const tracks = snap.docs.map(d => d.data());
+                tracks.sort((a,b) => (a.category || '').localeCompare(b.category || ''));
+
+                tracks.forEach(t => {
+                    const el = document.createElement('div');
+                    el.className = 'audio-btn';
+                    el.innerHTML = `
+                        <div class="audio-icon"><i class="fas fa-play"></i></div>
+                        <div>
+                            <div style="font-weight:bold; color:#fff; font-size:1.1rem;">${Utils.escapeHtml(t.title)}</div>
+                            <div style="font-size:0.85rem; color:#888;">${Utils.escapeHtml(t.description || '')}</div>
+                        </div>`;
+                    el.onclick = () => AudioSystem.playTrack(t.url, el);
+                    list.appendChild(el);
+                });
+            });
+        },
+
+        // --- SEKCJA: PICIORYS (INTELIGENTNY) ---
+        async loadPiciorys() {
+            const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
+            if (snap.empty) return this.renderError("Piciorys nie został jeszcze spisany.");
+            
+            const data = snap.docs[0].data();
+            const id = snap.docs[0].id;
+            
+            // Bezpieczny podział tekstu
+            let [intro, main] = data.text.includes('---PODZIAL---') 
+                ? data.text.split('---PODZIAL---') 
+                : [data.text.substring(0, 500) + '...', data.text];
+
+            this.wrapper.innerHTML = `
+                <div class="log-container">
+                    <h1 style="font-size:2.2rem; margin-bottom:20px; text-align:center;">${data.introTitle || 'Początek'}</h1>
+                    <div class="content-body" style="line-height:1.8;">${intro}</div>
+                    
+                    <div id="hidden-content" style="display:none; margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                        <h2>${data.mainTitle || 'Ciąg dalszy'}</h2>
+                        <div class="content-body" style="line-height:1.8;">${main}</div>
+                    </div>
+
+                    <div class="log-actions" style="margin-top:40px; justify-content:center;">
+                        <button class="action-button primary" id="read-more-btn" onclick="
+                            document.getElementById('hidden-content').style.display = 'block';
+                            this.style.display = 'none';
+                        ">Czytaj Dalej <i class="fas fa-arrow-down"></i></button>
+                        
+                        <button class="action-button" onclick="AudioSystem.speak('${Utils.escapeHtml(data.text)}')"><i class="fas fa-volume-up"></i> Lektor</button>
+                        ${this.getLikeButton(id, data.likes)}
+                    </div>
+                    
+                    <div class="entry-meta" style="margin-top:20px; justify-content:center;">
+                        <span><i class="fas fa-eye"></i> ${data.views || 0} wyświetleń</span>
+                    </div>
+                </div>`;
+
+            this.bindLike(id, 'sekcje/Piciorys Chudego/entries');
+            updateDoc(snap.docs[0].ref, { views: increment(1) }).catch(console.error);
+        },
+
+        // --- SEKCJA: WSPARCIE (FEED) ---
+        async loadSupport() {
+            this.wrapper.innerHTML = `
+                <div class="support-wrap">
+                    <h1 style="text-align:center">Wsparcie</h1>
+                    <p style="text-align:center; color:#aaa;">Zostaw dobre słowo. Ono wraca.</p>
+                    
+                    <form id="support-form">
+                        <input id="inp-name" placeholder="Twoje imię / ksywa" required>
+                        <textarea id="inp-msg" placeholder="Twoja wiadomość..." rows="4" required></textarea>
+                        <button type="submit" class="action-button primary" style="width:100%; justify-content:center">OPUBLIKUJ</button>
+                    </form>
+                </div>
+                <div id="feed-container" style="display:flex; flex-direction:column; gap:20px;"></div>`;
+
+            const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
+            
+            onSnapshot(q, (snap) => {
+                const cont = document.getElementById('feed-container');
+                cont.innerHTML = '';
+                if(snap.empty) { cont.innerHTML = '<p style="text-align:center; color:#666;">Bądź pierwszy.</p>'; return; }
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const el = document.createElement('article');
+                    el.className = 'card';
+                    el.innerHTML = `
+                        <h3 style="font-size:1.2rem; margin-bottom:10px">${Utils.escapeHtml(d.name)}</h3>
+                        <p>${Utils.escapeHtml(d.text)}</p>
+                        <div class="log-actions" style="justify-content:space-between; align-items:center;">
+                            ${this.getLikeButton(doc.id, d.likes)}
+                            <button class="action-button" style="font-size:0.8rem; border:none;" onclick="AudioSystem.speak('${Utils.escapeHtml(d.text)}')"><i class="fas fa-play"></i> Odsłuchaj</button>
+                        </div>`;
+                    cont.appendChild(el);
+                    this.bindLike(doc.id, 'support_stories');
+                });
+            });
+
+            document.getElementById('support-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.disabled = true; btn.innerText = "Wysyłanie...";
+                try {
+                    await addDoc(collection(db, 'support_stories'), {
+                        name: document.getElementById('inp-name').value,
+                        text: document.getElementById('inp-msg').value,
+                        t: serverTimestamp(), isApproved: false, likes: 0
+                    });
+                    alert("Wysłano do akceptacji!");
+                    e.target.reset();
+                } catch(err) { alert("Błąd wysyłania."); } 
+                finally { btn.disabled = false; btn.innerText = "OPUBLIKUJ"; }
+            };
+        },
+
+        // --- SEKCJA: KRONIKA (STANDARD) ---
+        async loadKronika(sectionName) {
+            const snap = await getDocs(query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc')));
+            
+            if (snap.empty) return this.renderError(`Sekcja "${sectionName}" jest pusta.`);
+
+            let html = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1>`;
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                const text = d.text || '';
+                const short = Utils.stripHtml(text).substring(0, 250) + '...';
+
+                html += `
+                <article class="story-item">
+                    <h3>${Utils.escapeHtml(d.title)}</h3>
+                    <div class="entry-meta">
+                        <span><i class="fas fa-calendar"></i> ${d.createdAt?.toDate().toLocaleDateString() || '-'}</span>
+                        <span><i class="fas fa-eye"></i> ${d.views || 0}</span>
+                    </div>
+                    <div class="content-body">
+                        <div class="short-view">${short}</div>
+                        <div class="full-view" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">${text}</div>
+                    </div>
+                    <div class="log-actions">
+                        <button class="action-button primary" onclick="
+                            const p = this.closest('article');
+                            const f = p.querySelector('.full-view');
+                            const s = p.querySelector('.short-view');
+                            if(f.style.display==='none'){f.style.display='block';s.style.display='none';this.innerHTML='Zwiń <i class=\'fas fa-arrow-up\'></i>'}
+                            else{f.style.display='none';s.style.display='block';this.innerHTML='Czytaj Dalej'}
+                        ">Czytaj Dalej</button>
+                        ${this.getLikeButton(doc.id, d.likes)}
+                        <button class="action-button" onclick="AudioSystem.speak('${Utils.escapeHtml(text.substring(0,100))}...')"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                </article>`;
+                updateDoc(doc.ref, { views: increment(1) }).catch(()=>{});
+            });
+            this.wrapper.innerHTML = html;
+            snap.forEach(doc => this.bindLike(doc.id, `sekcje/${sectionName}/entries`));
+        },
+
+        // --- POMOCNIKI UI ---
+        getLikeButton(id, count) {
+            const isLiked = Utils.isLiked(id);
+            const style = isLiked ? 'color:#ff6b6b; border-color:#ff6b6b' : '';
+            const icon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+            return `<button class="action-button" id="like-${id}" style="${style}"><i class="${icon}"></i> <span id="cnt-${id}">${count||0}</span></button>`;
+        },
+
+        bindLike(id, path) {
+            setTimeout(() => {
+                const btn = document.getElementById(`like-${id}`);
+                if (!btn) return;
+                btn.onclick = async () => {
+                    if (Utils.isLiked(id)) return; 
+                    
+                    // Optymistyczna zmiana
+                    Utils.setLiked(id);
+                    btn.style.color = '#ff6b6b';
+                    btn.style.borderColor = '#ff6b6b';
+                    btn.querySelector('i').classList.remove('far');
+                    btn.querySelector('i').classList.add('fas');
+                    const cnt = document.getElementById(`cnt-${id}`);
+                    cnt.innerText = parseInt(cnt.innerText) + 1;
+
+                    // Baza w tle
+                    try { await updateDoc(doc(db, path, id), { likes: increment(1) }); } catch(e){}
+                };
+            }, 100);
+        },
+
+        renderError(msg) {
+            this.wrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#ff6b6b;"><h2><i class="fas fa-exclamation-triangle"></i></h2><p>${msg}</p></div>`;
+        }
+    };
+
+    // START
+    document.addEventListener('DOMContentLoaded', () => Renderer.init());
   </script>
 </body>
 </html>
