@@ -10,7 +10,7 @@ import { ModalModule } from './modules.js';
 // --- Firebase config ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.app",
+  authDomain: "projekt-latarnia.firebaseapp.com",
   projectId: "projekt-latarnia",
   storageBucket: "projekt-latarnia.firebasestorage.app",
   messagingSenderId: "244008044225",
