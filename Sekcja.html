@@ -169,7 +169,7 @@
     const storage = getStorage(app);
 
     // ====================================================
-    // 2. MODUŁ SOUND MANAGER (Smart Link Fix)
+    // 2. MODUŁ SOUND MANAGER
     // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
@@ -178,7 +178,6 @@
         isHymnPlaying: false,
         currentBtn: null,
         
-        // Zmienne dla Lektora
         queue: [],
         isPlayingTTS: false,
 
@@ -188,12 +187,11 @@
                 const hymnUrl = await getDownloadURL(ref(storage, 'audio/hymn.mp3'));
                 this.hymnEl.src = hymnUrl;
             } catch (e) {
-                this.hymnEl.src = "/audio/hymn.mp3"; // Fallback
+                this.hymnEl.src = "/audio/hymn.mp3"; 
             }
 
             document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
             
-            // Odblokowanie AudioContext
             const unlockAudio = () => {
                 if(this.synth.paused) this.synth.resume();
                 const silent = new Audio();
@@ -245,7 +243,7 @@
             }
         },
 
-        // --- KLUCZOWA FUNKCJA ODTWARZANIA Z NAPRAWĄ ŚCIEŻEK ---
+        // --- PANCERNA FUNKCJA ODTWARZANIA ---
         async playTrack(trackData, btn) {
             if(this.currentBtn === btn && !this.trackEl.paused) {
                 this.stopAll();
@@ -255,45 +253,43 @@
             this.stopAll();
             this.currentBtn = btn;
             
-            // UI Loading
             btn.classList.add('active');
             const icon = btn.querySelector('.track-icon i');
             if(icon) icon.className = 'fas fa-spinner fa-spin';
 
             try {
-                let playableUrl = trackData.url ? trackData.url.trim() : '';
+                // Wyciągamy URL z bazy i usuwamy białe znaki
+                let finalUrl = trackData.url ? trackData.url.trim() : '';
 
-                // === LOGIKA DECYZYJNA (NAPRAWIONA) ===
-                // 1. Czy to pełny link HTTP/HTTPS? Jeśli tak, używamy go BEZ zmian.
-                if (playableUrl.toLowerCase().startsWith('http')) {
-                     // To jest ten przypadek ze zdjęcia błędu - link jest już gotowy
-                     console.log("Wykryto gotowy link URL");
+                // KROK 1: Jeśli to już jest link HTTP/HTTPS - UŻYWAJ GO BEZ ZMIAN!
+                if (finalUrl.toLowerCase().startsWith('http')) {
+                    console.log("Używam bezpośredniego linku:", finalUrl);
+                    // Nie robimy nic więcej, link jest gotowy
                 } 
-                // 2. Czy to link "gs://"?
-                else if (playableUrl.startsWith('gs://')) {
-                     playableUrl = await getDownloadURL(ref(storage, playableUrl));
-                }
-                // 3. To jest tylko nazwa pliku - budujemy ścieżkę
+                // KROK 2: Jeśli to nie link, tylko nazwa pliku - szukamy w Storage
                 else {
                     let storagePath = '';
                     if (trackData.category) {
-                        storagePath = `audio_tracks/${trackData.category}/${playableUrl}`;
+                        storagePath = `audio_tracks/${trackData.category}/${finalUrl}`;
                     } else {
-                        storagePath = `audio_tracks/${playableUrl}`;
+                        storagePath = `audio_tracks/${finalUrl}`;
                     }
-                    storagePath = storagePath.replace(/\/\//g, '/'); // Usuń podwójne ukośniki
-                    playableUrl = await getDownloadURL(ref(storage, storagePath));
+                    storagePath = storagePath.replace(/\/\//g, '/'); // Bez podwójnych slashy
+                    
+                    console.log("Szukam w Storage:", storagePath);
+                    finalUrl = await getDownloadURL(ref(storage, storagePath));
                 }
 
-                this.trackEl.src = playableUrl;
+                // ODTWARZANIE
+                this.trackEl.src = finalUrl;
                 await this.trackEl.play();
                 
                 if(icon) icon.className = 'fas fa-stop-circle';
                 this.trackEl.onended = () => this.stopAll();
 
             } catch (err) {
-                console.error("Błąd odtwarzania:", err);
-                alert(`Nie udało się odtworzyć pliku.\n\nSzczegóły błędu: ${err.message || err.code}`);
+                console.error("Błąd Audio:", err);
+                alert(`Błąd odtwarzania. Sprawdź czy plik istnieje.\n${err.message}`);
                 this.stopAll();
             }
         },
@@ -311,7 +307,6 @@
             btn.innerHTML = '<i class="fas fa-stop"></i> STOP';
 
             const cleanText = Utils.stripHtml(text).replace(/\s+/g, ' ').trim();
-            // Dzielimy na zdania (Chrome Mobile fix)
             const sentences = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
             
             this.queue = sentences;
@@ -370,7 +365,6 @@
 
             const actionsDiv = card.querySelector('.actions-row');
 
-            // Toggle
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'btn';
             toggleBtn.innerHTML = forceOpen ? 'ZWIŃ' : 'CZYTAJ DALEJ';
@@ -386,14 +380,12 @@
             };
             actionsDiv.appendChild(toggleBtn);
 
-            // Lektor
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
             lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
-            // Like
             const likeBtn = document.createElement('button');
             likeBtn.className = 'btn';
             likeBtn.innerHTML = isLiked ? '<i class="fas fa-heart"></i> DZIĘKI' : '<i class="far fa-heart"></i> LUBIĘ TO';
@@ -458,6 +450,7 @@
                         </div>
                     </div>
                 `;
+                // TU PRZEKAZUJEMY DANE, FUNKCJA playTrack SAMA ZDECYDUJE CZY TO LINK CZY PLIK
                 el.onclick = () => SoundManager.playTrack(t, el);
                 list.appendChild(el);
             });
