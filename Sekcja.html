@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  <meta property="og:title" content="Latarnia Nadziei">
+  <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
+  <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
+  <meta property="og:type" content="website">
+
   <title>Latarnia Nadziei</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
@@ -12,12 +18,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
   
   <style>
-    /* STYLE BAZOWE */
-    html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; background-color: #1a1a1a; color: #fff; font-family: 'Montserrat', sans-serif; }
-    .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #ffd97b; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 100px auto; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .full-content { margin-top: 1em; border-left: 3px solid rgba(255,217,123,0.5); padding-left: 1em; }
+    /* --- STYLE KRYTYCZNE DLA SEKCJI --- */
+    html, body { min-height: 100vh; margin: 0; padding: 0; background-color: #1a1a1a; color: #fff; font-family: 'Montserrat', sans-serif; }
     
+    .loading-spinner { 
+        border: 4px solid rgba(255, 255, 255, 0.1); 
+        border-left-color: #ffd97b; 
+        border-radius: 50%; 
+        width: 50px; height: 50px; 
+        animation: spin 1s linear infinite; 
+        margin: 100px auto; 
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* PRZYCISK POWROTU */
     .back-btn {
         position: fixed; top: 15px; left: 15px; z-index: 1001;
@@ -28,20 +41,73 @@
         text-decoration: none;
         font-weight: bold;
         border: 1px solid rgba(255, 217, 123, 0.3);
-        transition: all 0.3s;
         backdrop-filter: blur(5px);
+        transition: all 0.3s;
         font-size: 0.9rem;
+        display: flex; align-items: center; gap: 8px;
     }
     .back-btn:hover {
         background: rgba(255,217,123,0.2);
         color: #fff;
         transform: translateX(3px);
     }
+    
+    #content-wrapper { 
+        padding-top: 80px; 
+        padding-bottom: 100px; 
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
 
-    /* META DANE POSTÓW */
-    .entry-meta { display: flex; flex-wrap: wrap; gap: 15px; color: #888; font-size: 0.85rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    /* ELEMENTY LISTY */
+    .story-item, .card, .log-container {
+        max-width: 800px;
+        margin: 0 auto 25px auto;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 25px;
+        backdrop-filter: blur(10px);
+    }
+
+    .entry-meta { 
+        display: flex; flex-wrap: wrap; gap: 15px; 
+        color: #888; font-size: 0.85rem; margin-bottom: 15px; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
+    }
     .entry-meta span { display: flex; align-items: center; gap: 5px; }
     .entry-meta i { color: #ffd97b; }
+
+    /* PRZYCISKI AKCJI */
+    .log-actions, .card-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .action-button {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .action-button:hover { background: rgba(255,217,123,0.2); border-color: #ffd97b; }
+    .action-button:disabled { opacity: 0.5; cursor: default; }
+
+    /* AUDIO LIST */
+    .audio-btn { 
+        background: #151515; border-left: 4px solid #333; 
+        padding: 15px; margin-bottom: 10px; border-radius: 6px; 
+        cursor: pointer; transition: all 0.2s ease; 
+        display: flex; align-items: center; gap: 15px; 
+    }
+    .audio-btn:hover { background: #222; transform: translateX(5px); }
+    .audio-btn.playing { border-left-color: #ffd97b; background: #2a2510; }
+    .audio-icon { font-size: 1.5rem; color: #555; min-width: 30px; text-align: center; }
+    .audio-btn.playing .audio-icon { color: #ffd97b; }
+
+    /* TYTUŁY */
+    h1, h2, h3 { color: #ffd97b; font-family: 'Cinzel', serif; margin-top: 0; }
   </style>
 </head>
 <body>
@@ -58,7 +124,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // --- Konfiguracja Firebase ---
+    // --- KONFIGURACJA FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
@@ -70,11 +136,10 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     const HYMN_URL = "/audio/hymn.mp3"; 
 
     // ========================================
-    // MusicPlayer
+    // MODUŁ 1: MusicPlayer (HYMN)
     // ========================================
     const MusicPlayer = (() => {
         let audio = null;
@@ -82,133 +147,117 @@
         let btnElement = null;
 
         const init = () => {
-            console.log("Noema: Inicjalizacja interfejsu MusicPlayer...");
-            
+            // Styl przycisku Hymnu
             const style = document.createElement('style');
             style.innerHTML = `
-                .hymn-wrapper {
-                    position: fixed !important;
-                    bottom: 25px !important;
-                    right: 25px !important;
-                    z-index: 999999 !important;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 8px;
-                    pointer-events: auto;
-                }
-                .hymn-btn-3d {
-                    position: relative; width: 70px; height: 70px; border-radius: 50%;
-                    border: 2px solid rgba(255, 217, 123, 0.3);
-                    background: linear-gradient(145deg, #ffd97b, #c5a059);
-                    box-shadow: 0 6px 0 #8c7035, 0 12px 20px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.5);
-                    cursor: pointer; transition: all 0.1s; display: flex; justify-content: center; align-items: center;
-                    font-size: 26px; color: #222; outline: none; animation: entrance 1s ease-out forwards;
-                }
-                @keyframes entrance { from { transform: scale(0) rotate(-180deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
-                .hymn-btn-3d:active { box-shadow: 0 0 0 #8c7035, inset 0 4px 10px rgba(0,0,0,0.3); transform: translateY(6px); }
-                .hymn-btn-3d i { filter: drop-shadow(0 1px 1px rgba(255,255,255,0.4)); }
-                .hymn-label { background: rgba(0,0,0,0.9); color: #ffd97b; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; border: 1px solid rgba(255, 217, 123, 0.2); }
+                .hymn-wrapper { position: fixed; bottom: 25px; right: 25px; z-index: 99999; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+                .hymn-btn-3d { position: relative; width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(145deg, #ffd97b, #c5a059); box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #222; outline: none; transition: transform 0.1s; }
+                .hymn-btn-3d:active { transform: scale(0.95); }
+                .hymn-label { background: rgba(0,0,0,0.8); color: #ffd97b; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
                 .hymn-wrapper:hover .hymn-label { opacity: 1; }
-                .pulse-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6); animation: pulse-gold 2s infinite; z-index: -1; display: none; }
-                @keyframes pulse-gold { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6); } 70% { transform: scale(1.6); box-shadow: 0 0 0 25px rgba(255, 217, 123, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0); } }
+                .pulse-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; animation: pulse-gold 2s infinite; z-index: -1; display: none; }
+                @keyframes pulse-gold { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 217, 123, 0.6); } 100% { transform: scale(1.5); box-shadow: 0 0 0 20px rgba(255, 217, 123, 0); } }
             `;
             document.head.appendChild(style);
 
             const wrapper = document.createElement('div');
             wrapper.className = 'hymn-wrapper';
-            wrapper.innerHTML = `
-                <span class="hymn-label">Odtwórz Hymn</span>
-                <div class="pulse-ring" id="hymn-pulse"></div>
-                <button class="hymn-btn-3d" id="hymn-btn" aria-label="Odtwórz Hymn">
-                    <i class="fas fa-music"></i>
-                </button>
-            `;
+            wrapper.innerHTML = `<span class="hymn-label">Hymn</span><div class="pulse-ring" id="hymn-pulse"></div><button class="hymn-btn-3d" id="hymn-btn"><i class="fas fa-music"></i></button>`;
             document.body.appendChild(wrapper);
+
             btnElement = document.getElementById('hymn-btn');
             btnElement.addEventListener('click', togglePlay);
         };
-        
+
         const togglePlay = () => { isPlaying ? stop() : play(); };
-        
+
         const play = () => {
-            // Zmiana 3: Leniwa inicjalizacja Audio
             if (!audio) {
                 audio = new Audio(HYMN_URL);
                 audio.loop = true;
             }
-
-            if (typeof lektor !== 'undefined') {
-                lektor.stop();
-                document.querySelectorAll('[data-action="lector-play-pause"]').forEach(btn => btn.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
-            }
+            // Zatrzymaj inne audio
+            if (typeof lektor !== 'undefined') lektor.stop();
             const hiddenPlayer = document.getElementById('hiddenPlayer');
-            if (hiddenPlayer) { hiddenPlayer.pause(); }
+            if (hiddenPlayer) hiddenPlayer.pause();
+            
+            // Resetuj ikony lektora
+            document.querySelectorAll('[data-action="lector-play-pause"]').forEach(btn => btn.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
 
             audio.play().then(() => { isPlaying = true; updateUI(true); })
-            .catch(e => { console.error("Błąd audio:", e); alert("Błąd: Nie można odtworzyć hymnu."); });
+                 .catch(e => { console.error(e); alert("Nie można odtworzyć hymnu (sprawdź plik /audio/hymn.mp3)"); });
         };
 
         const stop = () => { if (!audio) return; audio.pause(); isPlaying = false; updateUI(false); };
-        
+
         const updateUI = (playing) => {
             const icon = btnElement.querySelector('i');
             const pulse = document.getElementById('hymn-pulse');
             if (playing) { icon.className = 'fas fa-pause'; pulse.style.display = 'block'; }
             else { icon.className = 'fas fa-music'; pulse.style.display = 'none'; }
         };
+
         return { init, stop, play };
     })();
 
     // ========================================
-    // Lektor
+    // MODUŁ 2: Lektor (TTS)
     // ========================================
     const lektor = (() => {
         let queue = [];
-        let currentUtterance = null;
         let isPaused = false;
         let selectedVoice = null;
-        const stripHtml = (html) => { const div = document.createElement("div"); div.innerHTML = html; return div.textContent || div.innerText || ""; };
-        const numToWords = (num) => { if (num > 999999) return num.toString(); const ones = ["zero","jeden","dwa","trzy","cztery","pięć","sześć","siedem","osiem","dziewięć"]; const teens = ["dziesięć","jedenaście","dwanaście","trzynaście","czternaście","piętnaście","szesnaście","siedemnaście","osiemnaście","dziewiętnasta"]; const tens = ["","dziesięć","dwadzieścia","trzydzieści","czterdzieści","pięćdziesiąt","sześćdziesiąt","siedemdziesiąt","osiemdziesiąt","dziewięćdziesiąt"]; const hundreds = ["","sto","dwieście","trzysta","czterysta","pięćset","sześćset","siedemset","osiemset","dziewięćset"]; if (num < 10) return ones[num]; if (num < 20) return teens[num-10]; if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : ""); if (num < 1000) return hundreds[Math.floor(num/100)] + (num%100 ? " " + numToWords(num%100) : ""); if (num < 2000) return "tysiąc " + (num%1000 ? numToWords(num%1000) : ""); const thousands = Math.floor(num/1000); let thousandsStr = ""; if ([2,3,4].includes(thousands % 10) && ![12,13,14].includes(thousands % 100)) thousandsStr = numToWords(thousands) + " tysiące"; else thousandsStr = numToWords(thousands) + " tysięcy"; return thousandsStr + (num%1000 ? " " + numToWords(num%1000) : ""); };
-        const parseDate = (str) => { const match = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (!match) return null; const [_, d, m, y] = match.map(Number); const months = ["","stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"]; return `${numToWords(d)} ${months[m]} ${numToWords(y)} roku`; };
-        const parseTime = (str) => { const match = str.match(/^(\d{1,2}):(\d{2})$/); if (!match) return null; const [_, h, m] = match.map(Number); if (m === 0) return `${numToWords(h)} zero zero`; return `${numToWords(h)} ${numToWords(m)}`; };
-        const normalizeText = (input = "") => { let text = stripHtml(input); const replacements = { "np.": "na przykład", "itd.": "i tak dalej", "itp.": "i tym podobne", "m.in.": "między innymi", "tj.": "to jest", "dr ": "doktor ", "prof.": "profesor", "ul.": "ulica", "mr ": "mister ", "mrs ": "missis " }; for (const [abbr, full] of Object.entries(replacements)) { text = text.replace(new RegExp("\\b" + abbr.replace(".", "\\.") + "\\b", "gi"), full); } text = text.replace(/\b\d{1,2}\.\d{1,2}\.\d{4}\b/g, (d) => parseDate(d) || d); text = text.replace(/\b\d{1,2}:\d{2}\b/g, (t) => parseTime(t) || t); text = text.replace(/\b\d+\b/g, (n) => { const num = parseInt(n, 10); return isNaN(num) ? n : numToWords(num); }); return text.replace(/\s+/g, " ").trim(); };
-        const splitText = (text, maxLen = 250) => { const parts = []; if (!text) return parts; const sentences = text.match(/[^.!?]+[.!?]*/g) || []; let chunk = ""; for (const s of sentences) { if ((chunk + " " + s).length > maxLen) { if (chunk) parts.push(chunk.trim()); chunk = s; } else { chunk += " " + s; } } if (chunk.trim()) parts.push(chunk.trim()); return parts.filter(p => p); };
+        const synth = window.speechSynthesis;
+
+        const stripHtml = (html) => { 
+            const div = document.createElement("div"); 
+            div.innerHTML = html; 
+            return div.textContent || div.innerText || ""; 
+        };
         
-        // Zmiana 3: Sprawdzanie głosów dla mobilnego Safari
         const initVoices = () => { 
-            const voices = window.speechSynthesis.getVoices(); 
-            if (voices.length > 0) {
-                selectedVoice = voices.find(v => v.lang === "pl-PL") || voices[0]; 
-            }
+            const voices = synth.getVoices(); 
+            selectedVoice = voices.find(v => v.lang === "pl-PL") || voices[0]; 
         }; 
-        window.speechSynthesis.onvoiceschanged = initVoices; 
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = initVoices;
+        }
         initVoices();
 
         const speakNext = () => { 
-            if (isPaused || queue.length === 0) { currentUtterance = null; return; } 
-            
-            // Re-inicjalizacja głosów jeśli zniknęły
+            if (isPaused || queue.length === 0) return; 
             if (!selectedVoice) initVoices();
 
             const text = queue.shift(); 
-            currentUtterance = new SpeechSynthesisUtterance(text); 
-            currentUtterance.lang = "pl-PL"; 
-            if (selectedVoice) currentUtterance.voice = selectedVoice; 
-            currentUtterance.rate = 0.9; 
-            currentUtterance.onend = () => { currentUtterance = null; if (!isPaused) speakNext(); }; 
-            window.speechSynthesis.speak(currentUtterance); 
+            const utterance = new SpeechSynthesisUtterance(text); 
+            utterance.lang = "pl-PL"; 
+            if (selectedVoice) utterance.voice = selectedVoice; 
+            utterance.rate = 0.9; 
+            utterance.onend = () => { if (!isPaused) speakNext(); }; 
+            synth.speak(utterance); 
         };
-        const enqueue = (rawText) => { if (!rawText) return; MusicPlayer.stop(); stop(); const parts = splitText(normalizeText(rawText)); queue.push(...parts); speakNext(); };
-        const stop = () => { isPaused = false; queue = []; window.speechSynthesis.cancel(); };
-        const pause = () => { if (window.speechSynthesis.speaking && !isPaused) { window.speechSynthesis.pause(); isPaused = true; } };
-        const resume = () => { if (!isPaused) return; MusicPlayer.stop(); isPaused = false; if (window.speechSynthesis.paused) window.speechSynthesis.resume(); else if (queue.length > 0) speakNext(); };
-        const getStatus = () => ({ speaking: window.speechSynthesis.speaking, paused: isPaused });
+
+        const enqueue = (rawText) => { 
+            if (!rawText) return; 
+            MusicPlayer.stop(); 
+            stop(); 
+            const clean = stripHtml(rawText);
+            // Dzielimy tekst na zdania, żeby lektor się nie zacinał na długich blokach
+            const parts = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+            queue.push(...parts); 
+            speakNext(); 
+        };
+
+        const stop = () => { isPaused = false; queue = []; synth.cancel(); };
+        const pause = () => { if (synth.speaking) { synth.pause(); isPaused = true; } };
+        const resume = () => { if (isPaused) { isPaused = false; synth.resume(); } };
+        const getStatus = () => ({ speaking: synth.speaking, paused: isPaused });
+        
         return { enqueue, stop, pause, resume, getStatus };
     })();
 
     // ========================================
-    // SectionLoader
+    // MODUŁ 3: SectionLoader (GŁÓWNY SILNIK)
     // ========================================
     const SectionLoader = {
         state: { sectionName: '', cleanupFunctions: [] },
@@ -216,338 +265,413 @@
         utils: {
             escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
             stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
-            likedPostsKey: 'latarniaLikedPosts',
-            getLikedPosts: () => { try { return JSON.parse(localStorage.getItem('latarniaLikedPosts') || '[]'); } catch(e){ return []; } },
-            addLikedPost: (id) => { const l = SectionLoader.utils.getLikedPosts(); if(!l.includes(id)){ l.push(id); localStorage.setItem('latarniaLikedPosts', JSON.stringify(l)); } }
+            getLikedPosts: () => JSON.parse(localStorage.getItem('latarniaLikedPosts') || '[]'),
+            addLikedPost: (id) => { const l = JSON.parse(localStorage.getItem('latarniaLikedPosts') || '[]'); if(!l.includes(id)) { l.push(id); localStorage.setItem('latarniaLikedPosts', JSON.stringify(l)); }}
         },
         router: {
             'Głos Latarni': { fetcher: 'fetchNoOp', renderer: 'renderAudioSection', theme: 'theme-audio' },
             'Piciorys Chudego': { fetcher: 'fetchSingleEntry', renderer: 'renderPiciorys', theme: 'theme-piciorys' },
             'Z punktu widzenia księżniczki': { fetcher: 'fetchSingleEntry', renderer: 'renderKsiezniczka', theme: 'theme-ksiezniczka' },
             'Pomoc': { fetcher: 'fetchAllHelpEntries', renderer: 'renderPomoc', theme: 'theme-pomoc' },
-            'List w Butelce': { fetcher: 'fetchNoOp', renderer: 'renderBottleSection', theme: 'theme-bottle' },
-            'Galeria': { fetcher: 'fetchNoOp', renderer: 'renderGallery', theme: 'theme-gallery' },
             'Wsparcie': { fetcher: 'fetchNoOp', renderer: 'renderSupportSection', theme: 'theme-support' },
+            'Galeria': { fetcher: 'fetchNoOp', renderer: 'renderGallery', theme: 'theme-gallery' },
             '__default__': { fetcher: 'fetchAllEntries', renderer: 'renderStandard', queryOptions: [orderBy('createdAt', 'desc')], theme: 'theme-kronika' }
         },
 
         async init() {
-            // Zmiana 5: Bezpiecznik Odsłaniania - od razu pokazujemy interfejs (usuwamy spinner jeśli to konieczne)
-            // W tym przypadku usuwamy zawartość loading na starcie jeśli chcemy natychmiastowy UI
-            // Tutaj logika renderowania i tak nadpisze wrapper.
+            MusicPlayer.init();
             
-            this.state.cleanupFunctions.forEach(c => c()); 
+            // Czyszczenie poprzednich nasłuchiwaczy (np. przy przeładowaniu SPA)
+            this.state.cleanupFunctions.forEach(c => c());
             this.state.cleanupFunctions = [];
             this.setupEventListeners();
             
             try {
                 const params = new URLSearchParams(window.location.search);
-                // Zmiana 2: Bezpieczne dekodowanie nazwy sekcji
+                // Domyślnie "Kronika" jeśli brak parametru
                 this.state.sectionName = decodeURIComponent(params.get('nazwa') || 'Kronika').trim();
                 
                 const route = this.router[this.state.sectionName] || this.router['__default__'];
-                document.documentElement.className = route.theme;
                 document.title = `${this.utils.escapeHtml(this.state.sectionName)} — Latarnia Nadziei`;
                 
                 const data = await this.fetch[route.fetcher].call(this, route.queryOptions);
                 this.render[route.renderer].call(this, data);
             } catch (e) {
                 console.error(e);
-                SectionLoader.render.renderError.call(SectionLoader, 'Błąd', 'Wystąpił problem z wczytywaniem sekcji.');
+                this.render.renderError('Błąd', 'Nie udało się wczytać sekcji. Sprawdź połączenie.');
             }
         },
 
         setupEventListeners() {
-            // Zmiana 2: Ujednolicenie odwołań this -> SectionLoader.elements.wrapper
-            SectionLoader.elements.wrapper.addEventListener('click', async (event) => {
+            // Jeden główny nasłuchiwacz na wrapper (Delegacja zdarzeń)
+            this.elements.wrapper.addEventListener('click', async (event) => {
                 const btn = event.target.closest('[data-action]');
                 if (!btn) return;
+                
                 const action = btn.dataset.action;
                 const docId = btn.closest('[data-doc-id]')?.dataset.docId;
 
-                if (action === 'like' && docId && !btn.disabled) {
-                    if(SectionLoader.utils.getLikedPosts().includes(docId)) return;
+                // 1. LAJKOWANIE
+                if (action === 'like' && docId) {
+                    if(btn.disabled || this.utils.getLikedPosts().includes(docId)) return;
                     btn.disabled = true;
                     try {
-                        const col = (['Wsparcie'].includes(SectionLoader.state.sectionName)) ? 'support_stories' : `sekcje/${SectionLoader.state.sectionName}/entries`;
+                        const col = this.state.sectionName === 'Wsparcie' ? 'support_stories' : `sekcje/${this.state.sectionName}/entries`;
                         await updateDoc(doc(db, col, docId), { likes: increment(1) });
-                        SectionLoader.utils.addLikedPost(docId);
-                        const ctr = btn.closest('article, .log-container').querySelector('[data-likes-counter]');
-                        if(ctr) {
-                            const current = parseInt(ctr.innerText.match(/\d+/)?.[0] || 0);
-                            ctr.innerHTML = `<i class="fas fa-heart"></i> Polubienia: ${current + 1}`;
-                        }
+                        this.utils.addLikedPost(docId);
+                        
                         btn.innerHTML = `<i class="fas fa-check"></i> Polubiono`;
-                    } catch(e) { btn.disabled = false; console.error(e); }
-                } else if (action === 'read-more') {
+                        const counter = btn.closest('article, .log-container, .card').querySelector('[data-likes-counter]');
+                        if(counter) {
+                            const current = parseInt(counter.innerText.match(/\d+/)) || 0;
+                            counter.innerHTML = `<i class="fas fa-heart"></i> ${current + 1}`;
+                        }
+                    } catch(e) { console.error(e); btn.disabled = false; }
+                } 
+                // 2. CZYTAJ DALEJ (Rozwijanie tekstu)
+                else if (action === 'read-more') {
                     const content = btn.closest('.story-item').querySelector('.full-content');
-                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
-                    btn.textContent = content.style.display === 'block' ? 'Ukryj' : 'Czytaj Dalej';
-                    if(docId && content.style.display === 'block') {
-                         try { await updateDoc(doc(db, `sekcje/${SectionLoader.state.sectionName}/entries`, docId), { views: increment(1) }); } catch(e){}
+                    const isHidden = content.style.display === 'none';
+                    content.style.display = isHidden ? 'block' : 'none';
+                    btn.textContent = isHidden ? 'Ukryj' : 'Czytaj Dalej';
+                    
+                    if(isHidden && docId) { 
+                        // Zlicz wyświetlenie tylko raz na sesję (uproszczone)
+                        try { await updateDoc(doc(db, `sekcje/${this.state.sectionName}/entries`, docId), { views: increment(1) }); } catch(e){} 
                     }
-                } else if (action === 'lector-play-pause') {
+                }
+                // 3. LEKTOR (Play/Pause)
+                else if (action === 'lector-play-pause') {
                     const status = lektor.getStatus();
-                    if(status.speaking && !status.paused) { lektor.pause(); btn.innerHTML = `<i class="fas fa-play"></i> Wznów`; }
-                    else if(status.paused) { lektor.resume(); btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`; }
+                    if(status.speaking && !status.paused) { 
+                        lektor.pause(); 
+                        btn.innerHTML = `<i class="fas fa-play"></i> Wznów`; 
+                    }
+                    else if(status.paused) { 
+                        lektor.resume(); 
+                        btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`; 
+                    }
                     else {
+                        // Reset innych przycisków lektora
                         document.querySelectorAll('[data-action="lector-play-pause"]').forEach(b => b.innerHTML = `<i class="fas fa-play"></i> Odsłuchaj`);
-                        lektor.enqueue(btn.closest('[data-text]').dataset.text);
-                        btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`;
+                        
+                        // Pobierz tekst z atrybutu data-text
+                        const container = btn.closest('[data-text]');
+                        if(container) {
+                            lektor.enqueue(container.dataset.text);
+                            btn.innerHTML = `<i class="fas fa-pause"></i> Pauza`;
+                        }
                     }
                 }
             });
         },
 
+        // --- FETCHERS (Pobieranie danych) ---
         fetch: {
             async fetchNoOp() { return null; },
-            async fetchSingleEntry() { const q = query(collection(db, 'sekcje', SectionLoader.state.sectionName, 'entries'), limit(1)); const s = await getDocs(q); return s.empty ? null : s.docs[0]; },
-            async fetchAllEntries(opts) { const s = await getDocs(query(collection(db, `sekcje/${SectionLoader.state.sectionName}/entries`), ...opts)); return s.docs; },
-            async fetchAllHelpEntries() { return (await getDocs(query(collection(db, 'help'), orderBy('name', 'asc')))).docs; }
+            async fetchSingleEntry() { 
+                const q = query(collection(db, 'sekcje', SectionLoader.state.sectionName, 'entries'), limit(1)); 
+                const s = await getDocs(q); 
+                return s.empty ? null : s.docs[0]; 
+            },
+            async fetchAllEntries(opts) { 
+                const s = await getDocs(query(collection(db, `sekcje/${SectionLoader.state.sectionName}/entries`), ...opts)); 
+                return s.docs; 
+            },
+            async fetchAllHelpEntries() { 
+                // Placeholder dla sekcji Pomoc
+                return []; 
+            }
         },
 
+        // --- RENDERERS (Wyświetlanie) ---
         render: {
+            
+            // --- GŁOS LATARNI (Audio Player) ---
             async renderAudioSection() {
                 SectionLoader.elements.wrapper.innerHTML = `
-                    <style>
-                      .audio-wrap { max-width: 800px; margin: 0 auto; padding: 40px 20px 100px; text-align: left; }
-                      .audio-header { margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
-                      .audio-header h1 { font-family: 'Cinzel', serif; color: #ffd97b; font-size: 2.2rem; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
-                      .audio-header p { color: rgba(255,255,255,0.7); font-size: 1.1rem; margin: 0; line-height: 1.5; }
-                      .audio-category { margin-bottom: 40px; }
-                      .audio-category h2 { color: #fff; opacity: 0.5; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-left: 3px solid #ffd97b; padding-left: 10px; }
-                      .audio-btn { background: #151515; border-left: 4px solid #333; padding: 18px 20px; margin-bottom: 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 15px; position: relative; overflow: hidden; }
-                      .audio-btn:hover { background: #1f1f1f; transform: translateX(5px); }
-                      .audio-btn.playing { border-left-color: #ff3b3b; background: #220a0a; box-shadow: 0 0 15px rgba(255, 59, 59, 0.1); }
-                      .audio-btn.playing .audio-icon { color: #ff3b3b; animation: pulse-icon 1.5s infinite; }
-                      .audio-icon { font-size: 1.5rem; color: #555; transition: color 0.3s; min-width: 30px; text-align: center; }
-                      .audio-content { flex-grow: 1; }
-                      .audio-title { font-size: 1.1rem; font-weight: 700; color: #e0e0e0; margin-bottom: 4px; }
-                      .audio-desc { font-size: 0.85rem; color: #888; }
-                      @keyframes pulse-icon { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-                      .list-empty { padding: 40px; text-align: center; color: #555; font-style: italic; }
-                    </style>
-                    <div class="audio-wrap">
-                        <header class="audio-header">
-                            <h1>Głos Latarni</h1>
-                            <p>Jeśli nie masz siły czytać — kliknij i słuchaj. Tu nikt Cię nie ocenia.</p>
+                    <div class="audio-wrap" style="max-width:800px; margin:0 auto; padding:20px;">
+                        <header style="margin-bottom:40px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:20px;">
+                            <h1 style="color:#ffd97b; text-transform:uppercase;">Głos Latarni</h1>
+                            <p style="color:rgba(255,255,255,0.7);">Posłuchaj, jeśli nie masz siły czytać.</p>
                         </header>
-                        <div id="audioCategories" class="audio-list">
-                            <div class="list-empty"><i class="fas fa-spinner fa-spin"></i> Ładowanie głosu...</div>
-                        </div>
+                        <div id="audioCategories"><i class="fas fa-spinner fa-spin"></i> Ładowanie biblioteki...</div>
                         <audio id="hiddenPlayer" style="display:none;"></audio>
-                    </div>
-                `;
-
+                    </div>`;
+                
                 const container = document.getElementById('audioCategories');
                 const player = document.getElementById('hiddenPlayer');
-                let currentTrackPath = null;
                 let currentBtn = null;
 
-                const handlePlay = (track, btn) => {
-                    if (currentTrackPath === track.filePath) { stopAudio(); return; }
-                    stopAudio();
-                    MusicPlayer.stop(); 
-                    if(typeof lektor !== 'undefined') lektor.stop();
-
-                    if (track.url) {
-                        player.src = track.url;
-                        player.play().catch(e => alert("Błąd: Przeglądarka zablokowała autostart lub plik jest niedostępny."));
-                        currentTrackPath = track.filePath;
-                        currentBtn = btn;
-                        btn.classList.add('playing');
-                        const icon = btn.querySelector('.audio-icon i');
-                        if(icon) { icon.className = 'fas fa-stop'; }
-                    }
-                };
-
-                const stopAudio = () => {
-                    player.pause();
-                    player.currentTime = 0;
-                    currentTrackPath = null;
-                    if (currentBtn) {
-                        currentBtn.classList.remove('playing');
-                        const icon = currentBtn.querySelector('.audio-icon i');
-                        if(icon) { icon.className = 'fas fa-play'; }
-                        currentBtn = null;
-                    }
-                };
-
-                player.onended = stopAudio;
-
                 const q = query(collection(db, 'audio_tracks'), where('active', '==', true), orderBy('category'), orderBy('order'));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
-                    if (snapshot.empty) { container.innerHTML = '<div class="list-empty">Jeszcze nic tu nie ma.</div>'; return; }
-                    const tracks = snapshot.docs.map(d => d.data());
-                    const grouped = tracks.reduce((acc, track) => {
-                        const cat = track.category || 'inne';
-                        if (!acc[cat]) acc[cat] = [];
-                        acc[cat].push(track);
-                        return acc;
-                    }, {});
+                
+                // Real-time listener dla audio
+                SectionLoader.state.cleanupFunctions.push(onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) { container.innerHTML = 'Brak nagrań.'; return; }
+                    
+                    // Grupowanie utworów
+                    const grouped = {};
+                    snapshot.docs.forEach(d => {
+                        const t = d.data();
+                        const cat = t.category || 'inne';
+                        if(!grouped[cat]) grouped[cat] = [];
+                        grouped[cat].push(t);
+                    });
 
                     container.innerHTML = '';
-                    const catNames = { 'ratunek': '🆘 Ratunek Teraz', 'medytacje': '🧘 Medytacje i Oddech', 'wiedza': '🧠 Wiedza', 'historie': '🔥 Historie' };
+                    const catNames = { 'ratunek': '🆘 Ratunek Teraz', 'medytacje': '🧘 Medytacje', 'wiedza': '🧠 Wiedza', 'historie': '🔥 Historie' };
 
                     for (const [cat, items] of Object.entries(grouped)) {
-                        const section = document.createElement('div');
-                        section.className = 'audio-category';
-                        section.innerHTML = `<h2>${catNames[cat] || cat}</h2>`;
+                        const sec = document.createElement('div');
+                        sec.innerHTML = `<h2 style="color:#fff; opacity:0.5; font-size:0.9rem; text-transform:uppercase; border-left:3px solid #ffd97b; padding-left:10px; margin-top:30px;">${catNames[cat] || cat}</h2>`;
+                        
                         items.forEach(track => {
                             const btn = document.createElement('div');
                             btn.className = 'audio-btn';
                             btn.innerHTML = `
                                 <div class="audio-icon"><i class="fas fa-play"></i></div>
-                                <div class="audio-content">
-                                    <div class="audio-title">${SectionLoader.utils.escapeHtml(track.title)}</div>
-                                    ${track.description ? `<div class="audio-desc">${SectionLoader.utils.escapeHtml(track.description)}</div>` : ''}
-                                </div>
-                            `;
-                            btn.onclick = () => handlePlay(track, btn);
-                            section.appendChild(btn);
+                                <div>
+                                    <div style="font-weight:bold; color:#e0e0e0;">${SectionLoader.utils.escapeHtml(track.title)}</div>
+                                    <div style="font-size:0.85rem; color:#888;">${SectionLoader.utils.escapeHtml(track.description||'')}</div>
+                                </div>`;
+                            
+                            btn.onclick = () => {
+                                // Pauza jeśli ten sam utwór gra
+                                if(currentBtn === btn && !player.paused) {
+                                    player.pause(); 
+                                    btn.classList.remove('playing'); 
+                                    btn.querySelector('i').className = 'fas fa-play';
+                                } else {
+                                    // Stop poprzedniego
+                                    if(currentBtn) { 
+                                        currentBtn.classList.remove('playing'); 
+                                        currentBtn.querySelector('i').className = 'fas fa-play'; 
+                                    }
+                                    MusicPlayer.stop(); 
+                                    if(typeof lektor!=='undefined') lektor.stop();
+                                    
+                                    // Start nowego
+                                    player.src = track.url; 
+                                    player.play();
+                                    currentBtn = btn; 
+                                    btn.classList.add('playing'); 
+                                    btn.querySelector('i').className = 'fas fa-stop';
+                                }
+                            };
+                            sec.appendChild(btn);
                         });
-                        container.appendChild(section);
+                        container.appendChild(sec);
                     }
-                });
+                }));
                 
-                SectionLoader.state.cleanupFunctions.push(unsubscribe);
-                SectionLoader.state.cleanupFunctions.push(() => stopAudio());
+                player.onended = () => { 
+                    if(currentBtn) { 
+                        currentBtn.classList.remove('playing'); 
+                        currentBtn.querySelector('i').className = 'fas fa-play'; 
+                    } 
+                };
             },
 
+            // --- WSPARCIE (Formularz + Lista) ---
             async renderSupportSection() {
                 SectionLoader.elements.wrapper.innerHTML = `
-                <style>
-                  .support-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 48px 18px 140px; position: relative; }
-                  .support-header { text-align: center; margin-bottom: 30px; }
-                  .support-header h1 { font-size: 2.4rem; color: #ffd97b; font-family: 'Cinzel', serif; }
-                  .support-form { width: 100%; max-width: 820px; background: rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 25px; backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
-                  .support-form input, .support-form textarea { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0, 0, 0, 0.3); color: #fff; box-sizing: border-box; }
-                  .feed { width: 100%; max-width: 820px; display: flex; flex-direction: column; gap: 25px; }
-                  .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; transition: all 0.5s ease; opacity: 0; transform: translateY(20px); }
-                  .card.show { opacity: 1; transform: translateY(0); }
-                  .card h3 { color: #ffd97b; margin: 0 0 10px; }
-                  .comments-wrapper { margin-top: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; display: none; }
-                </style>
-                <div class="support-wrap">
-                    <header class="support-header">
-                        <h1>Podziel się swoją historią</h1>
-                        <p>Twoje doświadczenie ma znaczenie.</p>
-                    </header>
-                    <form id="supportForm" class="support-form">
-                        <input id="supportName" placeholder="Twoje imię lub pseudonim" required />
-                        <textarea id="supportStory" placeholder="Twoja historia..." required></textarea>
-                        <button class="back-btn" style="position:static; width: 200px;" type="submit">Opublikuj</button>
-                    </form>
-                    <div id="feed" class="feed"></div>
-                </div>`;
+                    <div class="support-wrap" style="max-width:800px; margin:0 auto; padding:20px;">
+                        <header style="text-align:center; margin-bottom:40px;">
+                            <h1 style="color:#ffd97b; font-size:2.5rem;">WSPARCIE</h1>
+                            <p>Zostaw dobre słowo. Ono wraca.</p>
+                        </header>
+                        
+                        <form id="supportForm" style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; display:flex; flex-direction:column; gap:15px; border:1px solid rgba(255,255,255,0.1);">
+                            <input id="supportName" placeholder="Twoje imię / pseudonim" style="padding:15px; background:rgba(0,0,0,0.3); border:1px solid #444; color:#fff; border-radius:8px;" required>
+                            <textarea id="supportStory" placeholder="Twoja wiadomość..." style="padding:15px; background:rgba(0,0,0,0.3); border:1px solid #444; color:#fff; min-height:100px; border-radius:8px;" required></textarea>
+                            <button type="submit" style="padding:15px; background:#ffd97b; border:none; cursor:pointer; font-weight:bold; border-radius:8px; text-transform:uppercase;">Opublikuj</button>
+                        </form>
+                        
+                        <div id="feed" style="margin-top:40px; display:flex; flex-direction:column; gap:20px;">
+                            <div style="text-align:center; color:#666;"><i class="fas fa-spinner fa-spin"></i> Pobieranie wpisów...</div>
+                        </div>
+                    </div>`;
 
-                const feed = document.getElementById('feed');
                 const form = document.getElementById('supportForm');
-                
-                const renderCard = (item, docId) => {
-                    const card = document.createElement('article');
-                    card.className = 'card';
-                    card.dataset.text = `${item.name}. ${item.text}`;
-                    card.dataset.docId = docId;
-                    
-                    card.innerHTML = `
-                        <h3>${SectionLoader.utils.escapeHtml(item.name)}</h3>
-                        <p>${SectionLoader.utils.escapeHtml(item.text)}</p>
-                        <div class="entry-meta">
-                            <span data-likes-counter><i class="fas fa-heart"></i> ${item.likes || 0}</span>
-                        </div>
-                        <div class="log-actions">
-                            <button class="action-button" data-action="lector-play-pause">Odsłuchaj</button>
-                            <button class="action-button" data-action="like">Lubię to</button>
-                        </div>
-                    `;
-                    feed.prepend(card);
-                    setTimeout(() => card.classList.add('show'), 50);
-                };
+                const feed = document.getElementById('feed');
 
+                // Pobieranie postów (Real-time)
                 const q = query(collection(db, "support_stories"), where("isApproved", "==", true), orderBy("t", "desc"));
+                
                 SectionLoader.state.cleanupFunctions.push(onSnapshot(q, (snapshot) => {
                     feed.innerHTML = '';
-                    snapshot.forEach(doc => renderCard(doc.data(), doc.id));
+                    if(snapshot.empty) {
+                        feed.innerHTML = '<p style="text-align:center; color:#888;">Brak wpisów. Bądź pierwszy!</p>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(doc => {
+                        const item = doc.data();
+                        const card = document.createElement('article');
+                        card.className = 'card';
+                        card.dataset.docId = doc.id;
+                        card.dataset.text = `${item.name} napisał: ${item.text}`;
+                        
+                        // Sprawdź czy polubione lokalnie
+                        const isLiked = SectionLoader.utils.getLikedPosts().includes(doc.id);
+                        
+                        card.innerHTML = `
+                            <h3 style="color:#ffd97b; margin:0 0 10px 0; font-size:1.2rem;">${SectionLoader.utils.escapeHtml(item.name)}</h3>
+                            <p style="line-height:1.6;">${SectionLoader.utils.escapeHtml(item.text)}</p>
+                            <div class="entry-meta" style="margin-top:15px;">
+                                <span data-likes-counter><i class="fas fa-heart"></i> ${item.likes||0}</span>
+                                <span style="font-size:0.8rem; margin-left:auto;">${item.t ? new Date(item.t.toDate()).toLocaleDateString() : 'Teraz'}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
+                                <button class="action-button" data-action="like" ${isLiked?'disabled':''}><i class="fas fa-heart"></i> ${isLiked?'Dzięki!':'Wspieram'}</button>
+                            </div>`;
+                        feed.appendChild(card);
+                    });
                 }));
 
-                form.addEventListener('submit', async (ev) => {
-                    ev.preventDefault();
-                    const name = document.getElementById('supportName').value.trim();
-                    const text = document.getElementById('supportStory').value.trim();
+                // Wysyłanie formularza
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    btn.disabled = true; btn.innerText = "Wysyłanie...";
+                    
+                    const name = document.getElementById('supportName').value;
+                    const text = document.getElementById('supportStory').value;
+                    
                     try {
-                        await addDoc(collection(db, "support_stories"), { name, text, t: serverTimestamp(), isApproved: false, likes: 0 });
-                        form.reset();
-                        alert("Wysłano do moderacji.");
-                    } catch (e) { alert('Błąd.'); }
+                        await addDoc(collection(db, "support_stories"), { 
+                            name, text, t: serverTimestamp(), isApproved: false, likes: 0 
+                        });
+                        form.reset(); 
+                        alert("Dziękujemy! Twój wpis trafił do moderacji i wkrótce się pojawi.");
+                    } catch(err) { 
+                        console.error(err);
+                        alert("Błąd wysyłania. Spróbuj ponownie."); 
+                    } finally {
+                        btn.disabled = false; btn.innerText = "OPUBLIKUJ";
+                    }
                 });
             },
-            
-            renderPiciorys(doc) { 
+
+            // --- PICIORYS (Intro + Main) ---
+            renderPiciorys(doc) {
                 if(!doc) return SectionLoader.render.renderEmpty();
                 const e = doc.data();
+                
+                // Dzielenie tekstu na Intro i Main
+                const parts = (e.text || '').split('---PODZIAL---');
+                const intro = parts[0] || '';
+                const main = parts[1] || '';
                 const isLiked = SectionLoader.utils.getLikedPosts().includes(doc.id);
+
                 SectionLoader.elements.wrapper.innerHTML = `
-                <div class="log-container" data-doc-id="${doc.id}" data-text="${SectionLoader.utils.escapeHtml(SectionLoader.utils.stripHtml(e.text || ''))}">
-                    <h2 class="log-title">${SectionLoader.utils.escapeHtml(e.introTitle||'Piciorys')}</h2>
-                    <div class="entry-meta">
-                        <span><i class="fas fa-eye"></i> ${e.views || 0}</span>
-                        <span data-likes-counter><i class="fas fa-heart"></i> Polubienia: ${e.likes || 0}</span>
-                    </div>
-                    <div class="log-content">${e.text || ''}</div>
-                    <div class="log-actions">
-                        <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
-                        <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>${isLiked ? 'Polubiono' : 'Lubię to'}</button>
-                    </div>
-                </div>`;
+                    <div class="log-container" data-doc-id="${doc.id}" style="max-width:800px; margin:0 auto;">
+                        
+                        <div id="piciorys-intro" data-text="${SectionLoader.utils.escapeHtml(intro)}">
+                            <h1 style="color:#ffd97b; font-size:2rem; margin-bottom:20px;">${SectionLoader.utils.escapeHtml(e.introTitle || 'Początek')}</h1>
+                            <div class="log-content" style="line-height:1.8; font-size:1.1rem;">${intro}</div>
+                            
+                            <div class="log-actions" style="margin-top:40px; justify-content:center;">
+                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Lektor</button>
+                                <button id="continue-btn" class="action-button" style="background:#ffd97b; color:#000; font-weight:bold;">
+                                    Czytaj dalej <i class="fas fa-arrow-down"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="piciorys-main" style="display:none;" data-text="${SectionLoader.utils.escapeHtml(main)}">
+                             <hr style="border-color:rgba(255,255,255,0.1); margin:40px 0;">
+                             <h2 style="color:#ffd97b; margin-bottom:20px;">${SectionLoader.utils.escapeHtml(e.mainTitle || 'Ciąg dalszy')}</h2>
+                             
+                             <div class="entry-meta">
+                                <span><i class="fas fa-eye"></i> ${e.views || 0}</span>
+                                <span data-likes-counter><i class="fas fa-heart"></i> ${e.likes || 0}</span>
+                             </div>
+
+                             <div class="log-content" style="line-height:1.8; font-size:1.1rem;">${main}</div>
+                             
+                             <div class="log-actions" style="margin-top:30px;">
+                                <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Lektor</button>
+                                <button class="action-button" data-action="like" ${isLiked?'disabled':''}><i class="fas fa-heart"></i> ${isLiked?'Polubiono':'Lubię to'}</button>
+                             </div>
+                        </div>
+                    </div>`;
+                
+                // Obsługa przejścia Intro -> Main
+                document.getElementById('continue-btn').addEventListener('click', () => {
+                    const introEl = document.getElementById('piciorys-intro');
+                    const mainEl = document.getElementById('piciorys-main');
+                    
+                    introEl.style.opacity = '0.5'; // Przyciemnij wstęp
+                    mainEl.style.display = 'block'; // Pokaż resztę
+                    mainEl.scrollIntoView({ behavior: 'smooth' });
+                    
+                    lektor.stop(); // Zatrzymaj lektora jeśli czytał wstęp
+                    
+                    // Zlicz wyświetlenie
+                    updateDoc(doc.ref, { views: increment(1) }).catch(console.error);
+                });
             },
 
+            // --- STANDARD (Lista wpisów - Kronika) ---
             renderStandard(docs) {
-                if(!docs.length) return SectionLoader.render.renderEmpty();
+                if (!docs.length) return SectionLoader.render.renderEmpty();
+                
                 const html = docs.map(d => {
                     const e = d.data();
+                    const plain = SectionLoader.utils.stripHtml(e.text||'');
+                    const excerpt = plain.substring(0, 250)+'...';
                     const isLiked = SectionLoader.utils.getLikedPosts().includes(d.id);
-                    // Zmiana 4: Zabezpieczenie przed pustym tekstem (excerpt)
-                    const plainText = SectionLoader.utils.stripHtml(e.text || "");
-                    const excerpt = plainText ? plainText.substring(0, 300) : "";
-                    
+
                     return `
-                    <article class="story-item" data-doc-id="${d.id}" data-text="${SectionLoader.utils.escapeHtml(e.title)}. ${SectionLoader.utils.escapeHtml(plainText)}">
-                        <h3 class="entry-title">${SectionLoader.utils.escapeHtml(e.title)}</h3>
+                    <article class="story-item" data-doc-id="${d.id}" data-text="${SectionLoader.utils.escapeHtml(e.title)}. ${SectionLoader.utils.escapeHtml(plain)}">
+                        <h3 style="color:#ffd97b; font-size:1.4rem;">${SectionLoader.utils.escapeHtml(e.title)}</h3>
+                        
                         <div class="entry-meta">
-                            <span><i class="fas fa-calendar-alt"></i> ${e.createdAt ? e.createdAt.toDate().toLocaleDateString('pl-PL') : '---'}</span>
-                            <span data-likes-counter><i class="fas fa-heart"></i> ${e.likes || 0}</span>
+                            <span><i class="fas fa-calendar-alt"></i> ${e.createdAt ? e.createdAt.toDate().toLocaleDateString() : '---'}</span>
+                            <span data-likes-counter><i class="fas fa-heart"></i> ${e.likes||0}</span>
+                            <span><i class="fas fa-eye"></i> ${e.views||0}</span>
                         </div>
+                        
                         <div class="entry-content">
-                            <p>${excerpt}...</p>
-                            <div class="full-content" style="display:none">${e.text || ''}</div>
+                            <p style="line-height:1.6;">${excerpt}</p>
+                            <div class="full-content" style="display:none; margin-top:15px; border-top:1px solid #333; padding-top:15px;">${e.text||''}</div>
                         </div>
+                        
                         <div class="log-actions">
                             <button class="action-button" data-action="read-more">Czytaj Dalej</button>
-                            <button class="action-button" data-action="lector-play-pause">Odsłuchaj</button>
-                            <button class="action-button" data-action="like" ${isLiked ? 'disabled' : ''}>Lubię to</button>
+                            <button class="action-button" data-action="lector-play-pause"><i class="fas fa-play"></i> Odsłuchaj</button>
+                            <button class="action-button" data-action="like" ${isLiked?'disabled':''}><i class="fas fa-heart"></i> Lubię to</button>
                         </div>
                     </article>`;
                 }).join('');
-                SectionLoader.elements.wrapper.innerHTML = `<div class="content-container"><h2 class="fancy-title">${SectionLoader.state.sectionName}</h2><div class="story-list">${html}</div></div>`;
+                
+                SectionLoader.elements.wrapper.innerHTML = `
+                    <div class="content-container" style="max-width:800px; margin:0 auto; padding:20px;">
+                        <h1 style="color:#ffd97b; text-align:center; text-transform:uppercase; margin-bottom:40px;">
+                            ${SectionLoader.state.sectionName}
+                        </h1>
+                        <div class="story-list">${html}</div>
+                    </div>`;
             },
-            
+
+            // --- POZOSTAŁE ---
+            renderEmpty() { 
+                SectionLoader.elements.wrapper.innerHTML = `<div style="text-align:center; padding:50px;"><h2>Pusto</h2><p>Brak wpisów w tej sekcji.</p></div>`; 
+            },
             renderError(t, m) { 
-                SectionLoader.elements.wrapper.innerHTML = `<div class="content-container"><h2>${t}</h2><p>${m}</p></div>`; 
+                SectionLoader.elements.wrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#ff6b6b;"><h2>${t}</h2><p>${m}</p></div>`; 
             },
-            renderEmpty() { SectionLoader.render.renderError('Pusto', 'Brak wpisów w tej sekcji.'); },
-            renderKsiezniczka() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
-            renderPomoc() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
-            renderGallery() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); },
-            renderBottleSection() { SectionLoader.render.renderError('Info', 'Sekcja w budowie.'); }
+            // Placeholdery dla brakujących sekcji
+            renderKsiezniczka() { SectionLoader.render.renderError('W budowie', 'Sekcja Księżniczki jest przygotowywana.'); },
+            renderPomoc() { SectionLoader.render.renderError('W budowie', 'Sekcja Pomocy jest przygotowywana.'); },
+            renderGallery() { SectionLoader.render.renderError('W budowie', 'Galeria jest przygotowywana.'); }
         }
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
-        // Zmiana 5: Inicjalizacja bez blokowania interfejsu
-        MusicPlayer.init();
-        SectionLoader.init();
-    });
+    // START
+    document.addEventListener("DOMContentLoaded", () => SectionLoader.init());
   </script>
 </body>
 </html>
