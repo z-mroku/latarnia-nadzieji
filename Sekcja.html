@@ -153,6 +153,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    // IMPORT NIEZBĘDNY DO TŁUMACZENIA ŚCIEŻEK
     import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // 1. KONFIGURACJA FIREBASE
@@ -169,7 +170,7 @@
     const storage = getStorage(app);
 
     // ====================================================
-    // 2. MODUŁ SOUND MANAGER (Pancerny)
+    // 2. MODUŁ SOUND MANAGER (Pancerny + Path Resolver)
     // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
@@ -183,12 +184,13 @@
         isPlayingTTS: false,
 
         async init() {
-            // Obsługa Hymnu - Próba pobrania linku z Storage, fallback do lokalnego
+            // Obsługa Hymnu
             try {
+                // Próba pobrania hymnu z głównego folderu
                 const hymnUrl = await getDownloadURL(ref(storage, 'audio/hymn.mp3'));
                 this.hymnEl.src = hymnUrl;
             } catch (e) {
-                console.warn("Hymn z storage niedostępny, używam lokalnego.", e);
+                console.warn("Hymn w storage niedostępny, używam ścieżki lokalnej.");
                 this.hymnEl.src = "/audio/hymn.mp3";
             }
 
@@ -246,7 +248,9 @@
             }
         },
 
-        async playTrack(rawUrl, btn) {
+        // --- KLUCZOWA FUNKCJA ODTWARZANIA Z NAPRAWĄ ŚCIEŻEK ---
+        async playTrack(trackData, btn) {
+            // Jeśli kliknięto ten sam przycisk, to pauza
             if(this.currentBtn === btn && !this.trackEl.paused) {
                 this.stopAll();
                 return;
@@ -261,16 +265,31 @@
             if(icon) icon.className = 'fas fa-spinner fa-spin';
 
             try {
-                let playableUrl = rawUrl;
-                const decodedUrl = decodeURIComponent(rawUrl);
+                let playableUrl = trackData.url;
 
-                // LOGIKA NAPRAWIANIA LINKÓW
-                // Jeśli link NIE zaczyna się od http, traktujemy go jako ścieżkę Storage (gs:// lub ścieżka)
-                if (!decodedUrl.startsWith('http')) {
-                    const storageRef = ref(storage, decodedUrl);
-                    playableUrl = await getDownloadURL(storageRef);
+                // JEŚLI TO NIE JEST GOTOWY LINK HTTPS, MUSIMY GO ZNALEŹĆ
+                if (!playableUrl.startsWith('http')) {
+                    let storagePath = '';
+
+                    // 1. Sprawdzamy czy mamy kategorię (na podstawie Twojego zdjęcia struktury folderów)
+                    if (trackData.category) {
+                        // Np. audio_tracks/historie/plik.mp3
+                        storagePath = `audio_tracks/${trackData.category}/${trackData.url}`;
+                    } else {
+                        // Fallback: szukamy bezpośrednio w audio_tracks
+                        storagePath = `audio_tracks/${trackData.url}`;
+                    }
+                    
+                    // Usuwamy ewentualne podwójne ukośniki
+                    storagePath = storagePath.replace('//', '/');
+
+                    console.log(`Próba pobrania pliku ze ścieżki: ${storagePath}`);
+                    
+                    // Pobieramy "Download URL" z Firebase Storage
+                    playableUrl = await getDownloadURL(ref(storage, storagePath));
                 }
 
+                // Odtwarzanie
                 this.trackEl.src = playableUrl;
                 await this.trackEl.play();
                 
@@ -279,8 +298,9 @@
 
             } catch (err) {
                 console.error("Błąd odtwarzania:", err);
-                // Wyświetl użytkownikowi DOKŁADNY kod błędu, żebyśmy wiedzieli co naprawić
-                alert(`Nie udało się pobrać pliku audio.\nKod błędu: ${err.code || err.message}\nSprawdź czy plik istnieje w Storage.`);
+                // Wyświetl ścieżkę, której szukaliśmy, żeby łatwiej było zdiagnozować
+                let pathInfo = trackData.category ? `audio_tracks/${trackData.category}/${trackData.url}` : `audio_tracks/${trackData.url}`;
+                alert(`Nie udało się znaleźć pliku audio.\nSzukana ścieżka: ${pathInfo}\n\nSprawdź czy nazwa pliku w bazie zgadza się z plikiem w Storage.`);
                 this.stopAll();
             }
         },
@@ -393,6 +413,7 @@
                 await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
             };
             actionsDiv.appendChild(likeBtn);
+
             return card;
         }
     };
@@ -435,13 +456,16 @@
                 el.className = 'audio-track';
                 el.innerHTML = `
                     <div class="track-icon"><i class="fas fa-play-circle"></i></div>
-                    <div class="track-info">
+                    <div style="flex:1">
                         <h3 style="margin:0; font-size:1.1rem; color:#fff">${Utils.escapeHtml(t.title)}</h3>
-                        <span style="font-size:0.9rem; color:#888">${Utils.escapeHtml(t.description || '')}</span>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#888; margin-top:4px;">
+                            <span>${Utils.escapeHtml(t.description || '')}</span>
+                            <span style="color:var(--gold)">${t.category || ''}</span>
+                        </div>
                     </div>
                 `;
-                // Przekazujemy surowy URL do SoundManagera - on go naprawi
-                el.onclick = () => SoundManager.playTrack(t.url, el);
+                // Przekazujemy CAŁY obiekt t, żeby funkcja miała dostęp do 'category'
+                el.onclick = () => SoundManager.playTrack(t, el);
                 list.appendChild(el);
             });
         });
