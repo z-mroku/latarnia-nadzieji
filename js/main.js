@@ -1,11 +1,12 @@
-// Plik: /js/main.js (WERSJA DO REPO - PEŁNA OPTYMALIZACJA MOBILNA)
+// Plik: /js/main.js
+// WERSJA PEŁNA - NAPRAWIONA ODPORNOŚĆ NA BŁĘDY MODUŁÓW
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
   getFirestore, collection, getDocs, query, orderBy, limit, doc, updateDoc, increment 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { ModalModule } from '/js/modules.js';
 
+// --- KONFIGURACJA FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
   authDomain: "projekt-latarnia.firebaseapp.app",
@@ -15,53 +16,85 @@ const firebaseConfig = {
   appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
   measurementId: "G-LNYWJD2YV7"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let sparksFromDB = [], player, playlist = [], currentIndex = 0;
+// --- ZMIENNE GLOBALNE ---
+let sparksFromDB = [];
+let player = null;
+let playlist = [];
+let currentIndex = 0;
 
+// --- FUNKCJE POMOCNICZE ---
 function escapeHtml(s = '') { 
   return String(s).replace(/[&<>"']/g, c => ({ 
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' 
   }[c])); 
 }
-function stripHtml(s = '') { return String(s).replace(/<[^>]*>?/gm, ''); }
+
+function stripHtml(s = '') { 
+  return String(s).replace(/<[^>]*>?/gm, ''); 
+}
+
 function getVideoId(url) { 
   if (!url) return null; 
   const m = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/); 
   return m ? m[1] : null; 
 }
 
-// ==================== MENU ====================
+// ==================== 1. MENU ====================
 async function fetchAndRenderMenu(container) {
   try {
     const snap = await getDocs(query(collection(db, "menu"), orderBy("order", "asc")));
+    
+    if (snap.empty) {
+        container.innerHTML = '<li><a class="index-nav-button">Brak elementów menu</a></li>';
+        return;
+    }
+
     container.innerHTML = snap.docs.map(doc => {
       const data = doc.data();
       let finalUrl = escapeHtml(data.url);
-      if (finalUrl.toLowerCase() === 'sekcja.html') {
+      
+      // Obsługa przekierowań do Sekcja.html z parametrem
+      if (finalUrl.toLowerCase().includes('sekcja.html')) {
         finalUrl = `/Sekcja.html?nazwa=${encodeURIComponent(data.text)}`;
       }
+      
       return `<li><a href="${finalUrl}" class="index-nav-button">${escapeHtml(data.text)}</a></li>`;
-    }).join('') || '<li><a class="index-nav-button">Brak menu</a></li>';
+    }).join('');
   } catch (e) {
-    console.error("Błąd wczytywania menu:", e);
-    container.innerHTML = '<li><a class="index-nav-button">Błąd</a></li>';
+    console.error("Błąd wczytywania menu (próba awaryjna):", e);
+    // Fallback: pobierz bez sortowania, jeśli index nie istnieje
+    try {
+        const snap = await getDocs(collection(db, "menu"));
+        container.innerHTML = snap.docs.map(doc => {
+            const data = doc.data();
+            return `<li><a href="${escapeHtml(data.url)}" class="index-nav-button">${escapeHtml(data.text)}</a></li>`;
+        }).join('');
+    } catch(errCritical) {
+        container.innerHTML = '<li><a class="index-nav-button" style="color:red">Błąd połączenia</a></li>';
+    }
   }
 }
 
-// ==================== LATARNIA NADZIEI ====================
+// ==================== 2. LATARNIA NADZIEI (OSTATNIE WPISY) ====================
 async function fetchLatarniaNadziei(container) {
   try {
-    const sectionsToExclude = ['Piciorys Chudego', 'Z punktu widzenia księżniczki', 'Pomoc', 'Galeria'];
-    const menuSnap = await getDocs(query(collection(db, "menu")));
+    const sectionsToExclude = ['Piciorys Chudego', 'Z punktu widzenia księżniczki', 'Pomoc', 'Galeria', 'Wsparcie'];
+    
+    // 1. Pobierz listę sekcji z Menu
+    const menuSnap = await getDocs(collection(db, "menu"));
     const sectionsToQuery = menuSnap.docs
       .map(doc => doc.data().text)
       .filter(name => !sectionsToExclude.includes(name));
 
-    const queries = sectionsToQuery.map(sectionName =>
+    // 2. Pobierz najnowsze wpisy z każdej sekcji (równolegle)
+    const queries = sectionsToQuery.map(sectionName => 
       getDocs(query(collection(db, 'sekcje', sectionName, 'entries'), orderBy("createdAt", "desc"), limit(2)))
     );
+    
     const results = await Promise.allSettled(queries);
 
     let allEntries = [];
@@ -72,6 +105,8 @@ async function fetchLatarniaNadziei(container) {
         });
       }
     });
+
+    // 3. Posortuj wszystko razem po dacie
     allEntries.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
     if (!allEntries.length) {
@@ -79,6 +114,7 @@ async function fetchLatarniaNadziei(container) {
       return;
     }
 
+    // 4. Wyświetl (limit 4 na głównej)
     container.innerHTML = allEntries.slice(0, 4).map(e => {
       const title = escapeHtml(e.title || 'Bez tytułu');
       const author = escapeHtml(e.author || 'Chudy');
@@ -88,15 +124,15 @@ async function fetchLatarniaNadziei(container) {
 
       return `
         <article class="story-item" data-section="${e.section}" data-id="${e.id}"
-          style="background: rgba(15,20,30,0.7); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          style="background: rgba(15,20,30,0.7); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
           <h3 class="fancy-title entry-title" style="font-size: 1.5rem; margin-bottom: 10px;">
-            <a href="#" class="entry-link" style="text-decoration:none; color:inherit;">${title}</a>
+            <a href="/Sekcja.html?nazwa=${encodeURIComponent(e.section)}" class="entry-link" style="text-decoration:none; color:inherit;">${title}</a>
           </h3>
           <div class="entry-meta">
-            <span><i class="fas fa-user-edit"></i> Autor: ${author}</span>
+            <span><i class="fas fa-folder"></i> ${e.section}</span>
             <span><i class="fas fa-calendar-alt"></i> ${date}</span>
-            <span><i class="fas fa-heart"></i> Polubienia: <span class="like-count">${e.likes || 0}</span></span>
-            <span><i class="fas fa-eye"></i> Wyświetlenia: <span class="view-count">${e.views || 0}</span></span>
+            <span><i class="fas fa-heart"></i> <span class="like-count">${e.likes || 0}</span></span>
+            <span><i class="fas fa-eye"></i> <span class="view-count">${e.views || 0}</span></span>
           </div>
           <div class="entry-content">
             <p>${excerpt}</p>
@@ -107,16 +143,39 @@ async function fetchLatarniaNadziei(container) {
         </article>`;
     }).join('');
 
+    // Obsługa przycisków
+    container.querySelectorAll('.read-more-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+             const content = e.target.closest('.story-item').querySelector('.full-content');
+             const excerpt = e.target.closest('.story-item').querySelector('p');
+             if(content.style.display === 'none') {
+                 content.style.display = 'block';
+                 excerpt.style.display = 'none';
+                 e.target.textContent = 'Zwiń';
+                 // Zlicz wyświetlenie
+                 const article = e.target.closest('.story-item');
+                 incrementField(article, 'views', '.view-count');
+             } else {
+                 content.style.display = 'none';
+                 excerpt.style.display = 'block';
+                 e.target.textContent = 'Czytaj dalej';
+             }
+        });
+    });
+
     container.querySelectorAll('.like-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const article = e.target.closest('.story-item');
+        if(btn.disabled) return;
+        btn.disabled = true;
         await incrementField(article, 'likes', '.like-count');
+        btn.innerHTML = '❤️ Polubiono';
       });
     });
 
   } catch (e) {
     console.error("Błąd wczytywania Latarnia Nadziei:", e);
-    container.innerHTML = "<p style='text-align:center; color: red;'>Błąd ładowania wpisów.</p>";
+    container.innerHTML = "<p style='text-align:center; color: red;'>Nie udało się załadować wpisów.</p>";
   }
 }
 
@@ -134,7 +193,7 @@ async function incrementField(article, field, selector) {
   }
 }
 
-// ==================== ISKIERKI NADZIEI ====================
+// ==================== 3. ISKIERKI NADZIEI ====================
 async function fetchSparks(textEl) {
   try {
     const snap = await getDocs(query(collection(db, "sparks"), orderBy("createdAt", "desc")));
@@ -143,9 +202,17 @@ async function fetchSparks(textEl) {
     else textEl.innerText = "Brak iskierek w bazie.";
   } catch (e) {
     console.error("Błąd wczytywania iskierek:", e);
-    textEl.innerText = "Błąd ładowania";
+    // Fallback bez sortowania
+    try {
+        const snap = await getDocs(collection(db, "sparks"));
+        sparksFromDB = snap.docs.map(d => d.data().quote);
+        if (sparksFromDB.length > 0) changeSpark(textEl);
+    } catch (err) {
+        textEl.innerText = "Niech światło nadziei nigdy nie gaśnie.";
+    }
   }
 }
+
 function changeSpark(textEl) {
   if (!sparksFromDB.length || !textEl) return;
   const newSpark = sparksFromDB[Math.floor(Math.random() * sparksFromDB.length)];
@@ -156,12 +223,14 @@ function changeSpark(textEl) {
   }, 300);
 }
 
-// ==================== ODTWARZACZ YT ====================
+// ==================== 4. ODTWARZACZ YT ====================
 function initYTPlayer() {
   if (!document.getElementById('youtube-player') || window.YT) return;
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
+  const firstScript = document.getElementsByTagName('script')[0];
+  firstScript.parentNode.insertBefore(tag, firstScript);
+
   window.onYouTubeIframeAPIReady = () => {
     player = new YT.Player('youtube-player', {
       height: '0', width: '0',
@@ -170,6 +239,7 @@ function initYTPlayer() {
     });
   };
 }
+
 async function onPlayerReady() {
   const songTitle = document.getElementById("current-song-title");
   try {
@@ -179,17 +249,24 @@ async function onPlayerReady() {
     else if (songTitle) songTitle.innerText = "Brak utworów w playliście.";
   } catch (e) {
     console.error("Błąd playlisty:", e);
+    if(songTitle) songTitle.innerText = "Playlista niedostępna.";
   }
 }
+
 function onPlayerStateChange(e) {
   const icon = document.querySelector('#play-pause-btn i');
   if (icon) icon.className = (e.data === YT.PlayerState.PLAYING) ? 'fas fa-pause' : 'fas fa-play';
   if (e.data === YT.PlayerState.ENDED) nextSong();
 }
+
 function togglePlayPause() {
   if (!player || !playlist.length) return;
+  // Sprawdzenie czy player jest gotowy
+  if (typeof player.getPlayerState !== 'function') return;
+  
   (player.getPlayerState() === YT.PlayerState.PLAYING) ? player.pauseVideo() : player.playVideo();
 }
+
 function loadCurrentSong(autoplay = true) {
   if (!playlist.length || !player) return;
   const songTitleEl = document.getElementById("current-song-title");
@@ -199,10 +276,11 @@ function loadCurrentSong(autoplay = true) {
   if (autoplay) player.loadVideoById(playlist[currentIndex].videoId);
   else player.cueVideoById(playlist[currentIndex].videoId);
 }
+
 function nextSong() { if (!playlist.length) return; currentIndex = (currentIndex + 1) % playlist.length; loadCurrentSong(true); }
 function prevSong() { if (!playlist.length) return; currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadCurrentSong(true); }
 
-// ==================== DISQUS ====================
+// ==================== 5. DISQUS (Opcjonalny) ====================
 function initializeDisqus() {
   const disqusThread = document.getElementById('disqus_thread');
   if (!disqusThread) return;
@@ -216,37 +294,43 @@ function initializeDisqus() {
   (d.head || d.body).appendChild(s);
 }
 
-// ==================== START APP ====================
+// ==================== 6. START APLIKACJI ====================
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   let rawSection = urlParams.get('nazwa');
-  const sectionName = rawSection ? decodeURIComponent(rawSection) : null;
+  
+  // Elementy DOM
+  const menuContainer = document.getElementById('main-menu');
+  const entriesContainer = document.getElementById('entries-container');
+  const sparkText = document.getElementById('sparkText');
+  const sparkButton = document.getElementById('sparkButton');
 
-  setTimeout(() => {
-    const menuContainer = document.getElementById('main-menu');
-    const entriesContainer = document.getElementById('entries-container');
-    const sparkText = document.getElementById('sparkText');
-    const sparkButton = document.getElementById('sparkButton');
+  // Uruchomienie głównych funkcji
+  if (menuContainer) fetchAndRenderMenu(menuContainer);
+  if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
+  if (sparkText) fetchSparks(sparkText);
+  
+  if (sparkButton && sparkText) {
+    sparkButton.addEventListener('click', () => changeSpark(sparkText));
+  }
+  
+  // Inicjalizacja Playera
+  initYTPlayer();
+  const playPauseBtn = document.getElementById('play-pause-btn');
+  if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
+  if (document.getElementById('next-btn')) document.getElementById('next-btn').addEventListener('click', nextSong);
+  if (document.getElementById('prev-btn')) document.getElementById('prev-btn').addEventListener('click', prevSong);
+  
+  if (document.getElementById('disqus_thread')) initializeDisqus();
 
-    if (menuContainer) fetchAndRenderMenu(menuContainer);
-    if (entriesContainer) fetchLatarniaNadziei(entriesContainer);
-    if (sparkText) fetchSparks(sparkText);
-    
-    if (sparkButton && sparkText) {
-      sparkButton.addEventListener('click', () => changeSpark(sparkText));
-    }
-    
-    initYTPlayer();
-    
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlayPause);
-    if (document.getElementById('next-btn')) document.getElementById('next-btn').addEventListener('click', nextSong);
-    if (document.getElementById('prev-btn')) document.getElementById('prev-btn').addEventListener('click', prevSong);
-    
-    if (document.getElementById('disqus_thread')) initializeDisqus();
-
-    if (typeof ModalModule !== 'undefined' && ModalModule.init) {
-      ModalModule.init();
-    }
-  }, 100);
+  // NAPRAWIONE: Dynamiczne ładowanie ModalModule (aby błąd nie blokował reszty)
+  import('/js/modules.js')
+    .then((module) => {
+        if (module.ModalModule && module.ModalModule.init) {
+            module.ModalModule.init();
+        }
+    })
+    .catch((err) => {
+        console.warn("ModalModule nie załadowany (opcjonalny):", err);
+    });
 });
