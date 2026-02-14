@@ -9,7 +9,6 @@
     <title>Latarnia Nadziei</title>
     <meta property="og:title" content="Latarnia Nadziei">
     <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
-    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
     <meta property="og:type" content="website">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕯️</text></svg>">
@@ -25,7 +24,6 @@
             --gold: #ffd97b;
             --gold-dark: #c5a059;
             --bg-deep: #0f1014;
-            /* Ciemne szkło dla lepszej czytelności */
             --glass-bg: rgba(25, 27, 35, 0.92);
             --glass-border: 1px solid rgba(255, 217, 123, 0.25);
             --text-main: #e0e0e0;
@@ -43,7 +41,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* TYPOGRAFIA LATARNI */
+        /* TYPOGRAFIA */
         h1, h2, h3 { 
             color: var(--gold); 
             font-family: 'Cinzel', serif; 
@@ -86,7 +84,7 @@
         }
         .back-btn:hover { background: rgba(255, 217, 123, 0.15); transform: translateY(-2px); }
 
-        /* KARTY (WPISY) - VIGOR GLASS */
+        /* KARTY (WPISY) */
         .card {
             background: var(--glass-bg);
             border: var(--glass-border);
@@ -98,15 +96,13 @@
             overflow: hidden;
             transition: transform 0.3s ease;
         }
-        
-        /* Złota linia na górze karty */
         .card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
             opacity: 0.8;
         }
 
-        /* META DANE (STATYSTYKI) */
+        /* META DANE */
         .meta-row {
             display: flex; gap: 20px; flex-wrap: wrap;
             margin-bottom: 25px; padding-bottom: 15px;
@@ -144,7 +140,6 @@
         .btn:hover { background: rgba(255, 217, 123, 0.1); border-color: var(--gold); }
         .btn:active { transform: scale(0.96); }
 
-        /* Przycisk Główny (Złoty Gradient) */
         .btn-primary {
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             color: #000;
@@ -192,6 +187,7 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 28px; color: #000; cursor: pointer;
             transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         #hymn-fab:active { transform: scale(0.9); }
 
@@ -231,22 +227,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // Ścieżka do hymnu (musi być poprawna)
+    // Adres hymnu
     const HYMN_URL = "/audio/hymn.mp3";
 
     // ============================================
-    // 2. CENTRALNY MANAGER DŹWIĘKU (SoundManager)
+    // 2. SOUND MANAGER (NAPRAWIONY DLA MOBILE)
     // ============================================
     const SoundManager = {
         hymn: new Audio(HYMN_URL),
         track: new Audio(),
         synth: window.speechSynthesis,
         isHymnPlaying: false,
-        currentTrackBtn: null, 
+        currentTrackBtn: null,
+        voices: [],
 
         init() {
             this.hymn.loop = true;
+            this.hymn.preload = 'auto';
             document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
+            
+            // Ładowanie głosów (fix dla Android/Chrome)
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
+            }
+            this.loadVoices();
+        },
+
+        loadVoices() {
+            this.voices = this.synth.getVoices();
         },
 
         stopAll() {
@@ -255,18 +263,15 @@
             this.isHymnPlaying = false;
             document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
 
-            // Stop Track
+            // Stop Track (Audio Sekcja)
             this.track.pause();
             if(this.currentTrackBtn) {
                 this.currentTrackBtn.classList.remove('playing');
-                // Przywróć ikonę play w zależności od typu przycisku
                 const icon = this.currentTrackBtn.querySelector('.track-icon i') || this.currentTrackBtn.querySelector('i');
                 if(icon) {
                     if (icon.classList.contains('fa-stop')) icon.className = 'fas fa-play';
                     if (icon.classList.contains('fa-volume-mute')) icon.className = 'fas fa-volume-up';
                 }
-                
-                // Reset napisu przycisku Lektora
                 if (this.currentTrackBtn.innerHTML.includes('STOP')) {
                      this.currentTrackBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
                 }
@@ -279,34 +284,28 @@
 
         playHymn() {
             this.stopAll();
-            this.hymn.play().catch(e => console.error("Hymn error", e));
-            this.isHymnPlaying = true;
-            document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
+            this.hymn.play().then(() => {
+                this.isHymnPlaying = true;
+                document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
+            }).catch(e => console.log("Autoplay block:", e));
         },
 
         toggleHymn() {
-            if(this.isHymnPlaying) {
-                this.stopAll();
-            } else {
-                this.playHymn();
-            }
+            if(this.isHymnPlaying) this.stopAll();
+            else this.playHymn();
         },
 
         playTrack(url, btnElement) {
-            // Jeśli gra hymn - zatrzymaj
-            if (this.state && this.state.isHymnPlaying) this.toggleHymn();
+            if (this.isHymnPlaying) this.toggleHymn();
             
-            // Jeśli kliknięto to samo - pauza
             if (this.currentTrackBtn === btnElement && !this.track.paused) {
                 this.stopAll();
                 return;
             }
 
-            // Nowy utwór -> Stop wszystkiego
             this.stopAll();
-            
             this.track.src = url;
-            this.track.play().catch(e => alert("Błąd odtwarzania. Sprawdź łącze."));
+            this.track.play().catch(e => alert("Błąd odtwarzania audio."));
             
             this.currentTrackBtn = btnElement;
             btnElement.classList.add('playing');
@@ -314,13 +313,11 @@
             const icon = btnElement.querySelector('.track-icon i') || btnElement.querySelector('i');
             if(icon) icon.className = 'fas fa-stop';
 
-            this.track.onended = () => {
-                this.stopAll();
-            };
+            this.track.onended = () => this.stopAll();
         },
 
         speak(text, btnElement) {
-            // Jeśli ten sam przycisk - STOP
+            // Pauza jeśli to ten sam przycisk
             if(this.currentTrackBtn === btnElement && this.synth.speaking) {
                 this.stopAll();
                 return;
@@ -328,28 +325,31 @@
 
             this.stopAll();
             
-            // Czyść tekst z HTML
             const clean = text.replace(/<[^>]*>?/gm, '');
             const u = new SpeechSynthesisUtterance(clean);
+            
+            // WYBÓR GŁOSU (FIX)
+            if (this.voices.length === 0) this.loadVoices();
+            const plVoice = this.voices.find(v => v.lang === 'pl-PL' || v.lang === 'pl_PL' || v.lang.startsWith('pl'));
+            if(plVoice) u.voice = plVoice;
+            
             u.lang = "pl-PL";
             u.rate = 0.95;
             
             if(btnElement) {
                 this.currentTrackBtn = btnElement;
-                btnElement.classList.add('playing'); // Dodajemy klasę dla efektu
+                btnElement.classList.add('playing');
                 btnElement.innerHTML = '<i class="fas fa-stop"></i> STOP';
             }
 
             this.synth.speak(u);
-            
-            u.onend = () => {
-                this.stopAll();
-            };
+            u.onend = () => this.stopAll();
+            u.onerror = (e) => console.warn("Lektor error:", e);
         }
     };
 
     // ============================================
-    // 3. UTILS (Narzędzia formatowania)
+    // 3. UTILS
     // ============================================
     const Utils = {
         escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
@@ -358,11 +358,9 @@
     };
 
     // ============================================
-    // 4. BUDOWNICZY DOM (Tworzenie kart)
+    // 4. BUDOWNICZY KART (DOMBuilder)
     // ============================================
     const DOMBuilder = {
-        
-        // Tworzy Kartę Wpisu (Uniwersalną dla Kroniki, Piciorysu, Dnia po Dniu)
         createCard(data, id, collectionPath, forceOpen = false) {
             const card = document.createElement('article');
             card.className = 'card';
@@ -371,10 +369,8 @@
             const previewText = cleanText.substring(0, 300) + '...';
             const views = data.views || 0;
             const likes = data.likes || 0;
-            // Sprawdź czy użytkownik polubił lokalnie
             const isLiked = localStorage.getItem('liked_' + id);
 
-            // 1. Struktura HTML
             card.innerHTML = `
                 <h3>${Utils.escapeHtml(data.title || data.name || 'Bez tytułu')}</h3>
                 <div class="meta-row">
@@ -389,64 +385,49 @@
                 <div class="actions-row"></div>
             `;
 
-            // 2. Budujemy przyciski (Dla pewności działania na Mobile)
             const actionsDiv = card.querySelector('.actions-row');
 
-            // === PRZYCISK: CZYTAJ DALEJ ===
+            // Button: Czytaj Dalej
             const readBtn = document.createElement('button');
             readBtn.className = 'btn btn-primary';
             readBtn.innerHTML = forceOpen ? 'ZWIŃ <i class="fas fa-arrow-up"></i>' : 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
-            
             readBtn.onclick = () => {
                 const full = card.querySelector('.full-content');
                 const prev = card.querySelector('.preview');
-                
                 if(full.style.display === 'block') {
-                    full.style.display = 'none';
-                    prev.style.display = 'block';
+                    full.style.display = 'none'; prev.style.display = 'block';
                     readBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
                 } else {
-                    full.style.display = 'block';
-                    prev.style.display = 'none';
+                    full.style.display = 'block'; prev.style.display = 'none';
                     readBtn.innerHTML = 'ZWIŃ <i class="fas fa-arrow-up"></i>';
-                    
-                    // Aktualizacja statystyki Views (tylko w bazie, bez odświeżania UI dla płynności)
                     updateDoc(doc(db, collectionPath, id), { views: increment(1) });
-                    const v = card.querySelector('.view-cnt');
-                    v.innerText = parseInt(v.innerText) + 1;
+                    const v = card.querySelector('.view-cnt'); v.innerText = parseInt(v.innerText) + 1;
                 }
             };
             actionsDiv.appendChild(readBtn);
 
-            // === PRZYCISK: LEKTOR ===
+            // Button: Lektor
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
             lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
-            // === PRZYCISK: LIKE ===
+            // Button: Like
             const likeBtn = document.createElement('button');
             likeBtn.className = 'btn';
-            
             if(isLiked) {
                 likeBtn.innerHTML = '<i class="fas fa-heart"></i> LUBISZ';
                 likeBtn.style.color = '#ff6b6b'; likeBtn.style.borderColor = '#ff6b6b';
             } else {
                 likeBtn.innerHTML = '<i class="far fa-heart"></i> LUBIĘ TO';
             }
-
             likeBtn.onclick = async () => {
-                if(localStorage.getItem('liked_' + id)) return; // Blokada ponownego lajka
-                
-                // Optymistyczna zmiana (od razu na ekranie)
+                if(localStorage.getItem('liked_' + id)) return;
                 localStorage.setItem('liked_' + id, 'true');
                 likeBtn.style.color = '#ff6b6b'; likeBtn.style.borderColor = '#ff6b6b';
                 likeBtn.innerHTML = '<i class="fas fa-heart"></i> LUBISZ';
-                const l = card.querySelector('.like-cnt');
-                l.innerText = parseInt(l.innerText) + 1;
-
-                // Wysłanie do bazy w tle
+                const l = card.querySelector('.like-cnt'); l.innerText = parseInt(l.innerText) + 1;
                 await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
             };
             actionsDiv.appendChild(likeBtn);
@@ -456,133 +437,95 @@
     };
 
     // ============================================
-    // 5. GŁÓWNY ROUTER (Sterowanie widokiem)
+    // 5. ROUTER I RENDEROWANIE
     // ============================================
     const wrapper = document.getElementById('content-wrapper');
 
     async function initPage() {
         SoundManager.init();
         const params = new URLSearchParams(window.location.search);
-        // Pobieramy nazwę sekcji lub domyślnie Kronika
         const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
         document.title = `${section} | Latarnia`;
 
         try {
-            wrapper.innerHTML = ''; // Czyść spinner przed renderem
-            
-            // Rozdzielnia ruchu (Router)
+            wrapper.innerHTML = ''; 
             if (section === 'Głos Latarni') await renderAudioSection();
             else if (section === 'Piciorys Chudego') await renderPiciorys();
             else if (section === 'Wsparcie') await renderSupport();
             else if (section === 'Galeria') await renderGallery();
-            else await renderStandard(section); // Obsługuje: Kronika, Dzień po dniu, Refleksje...
-
+            else await renderStandard(section); 
         } catch (e) {
             console.error(e);
             wrapper.innerHTML = `<h2 style="color:red; text-align:center">Wystąpił błąd: ${e.message}</h2>`;
         }
     }
 
-    // --- A. SEKCJA: GŁOS LATARNI (AUDIO) ---
+    // --- SEKCJA: GŁOS LATARNI (AUDIO) ---
     async function renderAudioSection() {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
         const list = document.getElementById('audio-list');
-
-        // Pobieramy wszystkie mp3
         onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
             if(snap.empty) { list.innerHTML = '<p class="text-center">Brak nagrań.</p>'; return; }
             list.innerHTML = '';
-            
             snap.forEach(doc => {
                 const t = doc.data();
                 const el = document.createElement('div');
                 el.className = 'audio-track';
                 el.innerHTML = `
                     <div class="track-icon"><i class="fas fa-play"></i></div>
-                    <div class="track-info">
-                        <h4>${Utils.escapeHtml(t.title)}</h4>
-                        <span>${Utils.escapeHtml(t.description || '')}</span>
-                    </div>
+                    <div class="track-info"><h4>${Utils.escapeHtml(t.title)}</h4><span>${Utils.escapeHtml(t.description || '')}</span></div>
                 `;
-                // Bezpośrednie przypisanie zdarzenia (Pancerne)
                 el.onclick = () => SoundManager.playTrack(t.url, el);
                 list.appendChild(el);
             });
         });
     }
 
-    // --- B. SEKCJA: PICIORYS ---
+    // --- SEKCJA: PICIORYS ---
     async function renderPiciorys() {
-        // Pobieramy wpis
         const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
-        
         if(snap.empty) { wrapper.innerHTML = '<h2>Piciorys nie został jeszcze spisany.</h2>'; return; }
-        
         const data = snap.docs[0].data();
         const id = snap.docs[0].id;
-        
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
-        
-        // Tworzymy kartę (otwartą)
         const card = DOMBuilder.createCard(data, id, 'sekcje/Piciorys Chudego/entries', false);
         wrapper.appendChild(card);
-        
-        // Zlicz wyświetlenie strony (od razu)
         updateDoc(snap.docs[0].ref, { views: increment(1) }).catch(()=>{});
     }
 
-    // --- C. SEKCJA: STANDARD (Kronika, Dzień po dniu) ---
+    // --- SEKCJA: STANDARD (Kronika, itp.) ---
     async function renderStandard(sectionName) {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
         const container = document.getElementById('entries-list');
-
-        // Pobieramy wpisy
         const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
-
-        container.innerHTML = ''; // Usuń spinner
+        container.innerHTML = ''; 
         if(snap.empty) { container.innerHTML = '<p style="text-align:center">Brak wpisów w tej sekcji.</p>'; return; }
-
         snap.forEach(doc => {
             const card = DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`);
             container.appendChild(card);
         });
     }
 
-    // --- D. SEKCJA: WSPARCIE ---
+    // --- SEKCJA: WSPARCIE ---
     async function renderSupport() {
         wrapper.innerHTML = `
             <h1 style="text-align:center">Wsparcie</h1>
             <div class="card" style="border:1px solid var(--gold);">
                 <h3 style="margin-bottom:15px">Dodaj Otuchy</h3>
-                <form id="supp-form">
-                    <input id="in-name" placeholder="Imię" required>
-                    <textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea>
-                    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">OPUBLIKUJ</button>
-                </form>
+                <form id="supp-form"><input id="in-name" placeholder="Imię" required><textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea><button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">OPUBLIKUJ</button></form>
             </div>
             <div id="supp-feed"></div>
         `;
-
         const feed = document.getElementById('supp-feed');
-        // Tylko zatwierdzone wpisy
         const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
-        
         onSnapshot(q, (snap) => {
             feed.innerHTML = '';
             snap.forEach(doc => {
                 const data = doc.data();
-                // Używamy createCard ale z inną ścieżką
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `
-                    <h3>${Utils.escapeHtml(data.name)}</h3>
-                    <p>${Utils.escapeHtml(data.text)}</p>
-                    <div class="actions-row">
-                        <button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button>
-                    </div>`;
-                
-                // Prosty lajk dla wsparcia
+                card.innerHTML = `<h3>${Utils.escapeHtml(data.name)}</h3><p>${Utils.escapeHtml(data.text)}</p><div class="actions-row"><button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button></div>`;
                 const lBtn = card.querySelector('.like-btn');
                 lBtn.onclick = async () => {
                     if(lBtn.style.color) return;
@@ -593,46 +536,34 @@
                 feed.appendChild(card);
             });
         });
-
         document.getElementById('supp-form').onsubmit = async (e) => {
             e.preventDefault();
             try {
-                await addDoc(collection(db, 'support_stories'), {
-                    name: document.getElementById('in-name').value,
-                    text: document.getElementById('in-text').value,
-                    t: serverTimestamp(), isApproved: false, likes: 0
-                });
+                await addDoc(collection(db, 'support_stories'), { name: document.getElementById('in-name').value, text: document.getElementById('in-text').value, t: serverTimestamp(), isApproved: false, likes: 0 });
                 alert("Wysłano do moderacji!"); e.target.reset();
             } catch(err) { alert("Błąd wysyłania."); }
         };
     }
 
-    // --- E. SEKCJA: GALERIA ---
+    // --- SEKCJA: GALERIA ---
     async function renderGallery() {
         wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div id="gal" class="gallery-grid"></div>`;
         const gal = document.getElementById('gal');
-        
         onSnapshot(collection(db, 'gallery'), (snap) => {
             gal.innerHTML = '';
             if(snap.empty) { gal.innerHTML = '<p>Brak zdjęć.</p>'; return; }
-            
             snap.forEach(doc => {
                 const d = doc.data();
                 if(d.url) {
-                    const img = document.createElement('img');
-                    img.src = d.url;
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item';
-                    div.appendChild(img);
-                    gal.appendChild(div);
+                    const img = document.createElement('img'); img.src = d.url;
+                    const div = document.createElement('div'); div.className = 'gallery-item';
+                    div.appendChild(img); gal.appendChild(div);
                 }
             });
         });
     }
 
-    // START WSZYSTKIEGO
     initPage();
-
 </script>
 </body>
 </html>
