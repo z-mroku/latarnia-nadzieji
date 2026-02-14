@@ -7,12 +7,9 @@
     <meta name="theme-color" content="#0f1014">
 
     <title>Latarnia Nadziei</title>
-    <meta property="og:title" content="Latarnia Nadziei">
-    <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
-    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
-    <meta property="og:type" content="website">
-
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕯️</text></svg>">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -25,8 +22,8 @@
             --gold: #ffd97b;
             --gold-dark: #c5a059;
             --bg-dark: #0f1014;
-            --glass-bg: rgba(30, 34, 45, 0.75);
-            --glass-border: 1px solid rgba(255, 217, 123, 0.15);
+            --glass-bg: rgba(30, 34, 45, 0.85); /* Ciemniejsze tło dla czytelności */
+            --glass-border: 1px solid rgba(255, 217, 123, 0.2);
             --text-main: #e0e0e0;
         }
 
@@ -59,15 +56,13 @@
             min-height: 100vh;
             padding-left: 15px; padding-right: 15px;
             box-sizing: border-box;
-            animation: fadeIn 0.8s ease-out;
             max-width: 900px; margin: 0 auto;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* PRZYCISK POWROTU */
         .back-btn {
             position: fixed; top: 20px; left: 20px; z-index: 1001;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: var(--gold);
             padding: 10px 18px;
             border-radius: 50px;
@@ -75,27 +70,22 @@
             font-weight: 600;
             border: 1px solid rgba(255, 217, 123, 0.3);
             backdrop-filter: blur(8px);
-            transition: all 0.3s;
             display: flex; align-items: center; gap: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .back-btn:hover { background: rgba(255, 217, 123, 0.15); border-color: var(--gold); transform: translateY(-2px); }
 
-        /* KARTY (Glassmorphism) */
+        /* KARTY (Wpisy) */
         .story-item, .card, .log-container, .audio-wrap, .support-wrap {
             background: var(--glass-bg);
             border: var(--glass-border);
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 25px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease;
+            position: relative;
         }
-        .story-item:hover { transform: translateY(-2px); border-color: rgba(255, 217, 123, 0.3); }
 
-        /* META DANE */
+        /* META DANE (Statystyki) */
         .entry-meta { 
             display: flex; flex-wrap: wrap; gap: 15px; 
             color: #888; font-size: 0.85rem; margin-bottom: 20px; 
@@ -105,16 +95,15 @@
         .entry-meta i { color: var(--gold); }
 
         /* PRZYCISKI AKCJI */
-        .log-actions, .card-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .log-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
         
         .action-button {
             background: transparent;
             border: 1px solid rgba(255, 217, 123, 0.4);
             color: var(--gold);
-            padding: 10px 18px;
+            padding: 12px 20px; /* Większe pod palec */
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
@@ -122,69 +111,51 @@
             text-transform: uppercase;
         }
         
-        .action-button:hover {
-            background: rgba(255, 217, 123, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(255, 217, 123, 0.1);
-        }
-
-        /* Przycisk wyróżniony (Gradient) */
-        .action-button.primary, button[type="submit"] {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-            border: none;
-            color: #121212;
-            font-weight: 700;
-        }
-        .action-button.primary:hover, button[type="submit"]:hover {
-            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
-            box-shadow: 0 0 20px rgba(255, 217, 123, 0.4);
-        }
-        
-        .action-button:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
+        .action-button:active { transform: scale(0.95); background: rgba(255, 217, 123, 0.1); }
 
         /* LISTA AUDIO */
         .audio-btn { 
             background: rgba(0,0,0,0.3); 
             border-left: 4px solid #444; 
-            padding: 15px 20px; margin-bottom: 12px; border-radius: 8px; 
-            cursor: pointer; transition: all 0.2s ease; 
-            display: flex; align-items: center; gap: 15px; 
+            padding: 20px; /* Większe pod palec */
+            margin-bottom: 15px; border-radius: 8px; 
+            cursor: pointer; display: flex; align-items: center; gap: 15px; 
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .audio-btn:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
         .audio-btn.playing { 
             border-left-color: var(--gold); 
-            background: linear-gradient(90deg, rgba(255,217,123,0.1) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(255,217,123,0.15) 0%, transparent 100%);
         }
-        .audio-icon { font-size: 1.5rem; color: #555; min-width: 40px; text-align: center; }
+        .audio-icon { font-size: 1.8rem; color: #555; min-width: 40px; text-align: center; }
         .audio-btn.playing .audio-icon { color: var(--gold); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        /* GALERIA */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .gallery-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 1; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .gallery-item:active img { transform: scale(1.05); }
+
         /* FORMULARZE */
         input, textarea {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            font-family: inherit;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            transition: 0.3s;
+            width: 100%; background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1); color: #fff;
+            border-radius: 8px; padding: 15px; font-family: inherit;
+            margin-bottom: 15px; box-sizing: border-box;
         }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(255, 217, 123, 0.1); }
 
         /* LOADING */
         .loading-spinner { 
-            border: 4px solid rgba(255, 255, 255, 0.1); 
-            border-left-color: var(--gold); 
-            border-radius: 50%; 
-            width: 60px; height: 60px; 
-            animation: spin 1s linear infinite; 
-            margin: 150px auto; 
+            border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--gold); 
+            border-radius: 50%; width: 50px; height: 50px; 
+            animation: spin 1s linear infinite; margin: 150px auto; 
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* UKRYWANIE TREŚCI */
+        .hidden { display: none !important; }
+        .visible { display: block !important; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* FAB HYMN */
         #fab-hymn {
@@ -195,16 +166,12 @@
             border: none; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
             font-size: 24px; color: #121212; cursor: pointer;
-            transition: transform 0.2s;
         }
-        #fab-hymn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
   
-  <a href="/index.html" class="back-btn">
-      <i class="fas fa-arrow-left"></i> Powrót
-  </a>
+  <a href="/index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Powrót</a>
   
   <div id="content-wrapper">
     <div class="loading-spinner"></div>
@@ -228,16 +195,16 @@
     const db = getFirestore(app);
     const HYMN_URL = "/audio/hymn.mp3"; 
 
-    // --- 2. NARZĘDZIA (Utils) ---
+    // --- 2. NARZĘDZIA ---
     const Utils = {
         escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
         stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
-        // Szybkie sprawdzanie lajków w pamięci telefonu
+        // Liked in localStorage
         isLiked: (id) => localStorage.getItem('liked_' + id) === 'true',
         setLiked: (id) => localStorage.setItem('liked_' + id, 'true')
     };
 
-    // --- 3. SYSTEM AUDIO (The Manager) ---
+    // --- 3. SYSTEM AUDIO (Główny) ---
     const AudioSystem = {
         mainPlayer: new Audio(),
         hymnPlayer: new Audio(HYMN_URL),
@@ -266,26 +233,31 @@
             }
         },
 
+        // Odtwarzanie ścieżek z listy
         playTrack(url, btnElement) {
-            // Jeśli gra hymn - zatrzymaj
             if (this.state.isHymnPlaying) this.toggleHymn();
             
-            // Jeśli kliknięto to samo - pauza
             if (this.state.currentTrackBtn === btnElement && !this.mainPlayer.paused) {
                 this.mainPlayer.pause();
                 btnElement.classList.remove('playing');
                 return;
             }
 
-            // Stop innych
             this.stopAll();
-
-            // Start nowego
             this.mainPlayer.src = url;
-            this.mainPlayer.play().catch(e => alert("Błąd odtwarzania. Sprawdź plik."));
-            this.state.currentTrackBtn = btnElement;
-            btnElement.classList.add('playing');
             
+            // Promise handling dla mobile
+            const playPromise = this.mainPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    this.state.currentTrackBtn = btnElement;
+                    btnElement.classList.add('playing');
+                }).catch(e => {
+                    alert("Błąd odtwarzania. Sprawdź łącze.");
+                    console.error(e);
+                });
+            }
+
             this.mainPlayer.onended = () => {
                 btnElement.classList.remove('playing');
                 this.state.currentTrackBtn = null;
@@ -300,71 +272,129 @@
                 this.hymnPlayer.pause();
                 this.state.isHymnPlaying = false;
                 btn.innerHTML = '<i class="fas fa-music"></i>';
-                btn.style.transform = 'scale(1)';
             } else {
-                this.hymnPlayer.play().catch(e => console.error("Brak hymnu"));
+                this.hymnPlayer.play().catch(e => alert("Nie można odtworzyć hymnu."));
                 this.state.isHymnPlaying = true;
                 btn.innerHTML = '<i class="fas fa-pause"></i>';
-                btn.style.transform = 'scale(1.1)';
             }
         },
 
         speak(text) {
             this.stopAll();
             if(this.state.isHymnPlaying) this.toggleHymn();
-
-            const cleanText = text.replace(/<[^>]*>?/gm, '');
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = "pl-PL";
-            utterance.rate = 0.95;
-            this.synth.speak(utterance);
+            const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
+            u.lang = "pl-PL"; u.rate = 0.9;
+            this.synth.speak(u);
         }
     };
 
-    // --- 4. RENDERER (Silnik strony) ---
-    const Renderer = {
+    // --- 4. GŁÓWNY SILNIK (Renderer) ---
+    const Page = {
         wrapper: document.getElementById('content-wrapper'),
-        
+        currentSection: '',
+
         async init() {
             AudioSystem.init();
-            const params = new URLSearchParams(window.location.search);
-            const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
-            document.title = `${section} | Latarnia`;
+            
+            // Globalny Event Listener (Delegacja) - NAPRAWA "CZYTAJ DALEJ" i "LIKE"
+            this.wrapper.addEventListener('click', (e) => this.handleClicks(e));
 
             try {
-                if (section === 'Głos Latarni') await this.loadAudioSection();
-                else if (section === 'Piciorys Chudego') await this.loadPiciorys();
-                else if (section === 'Wsparcie') await this.loadSupport();
-                else await this.loadKronika(section);
+                const params = new URLSearchParams(window.location.search);
+                this.currentSection = decodeURIComponent(params.get('nazwa') || 'Kronika');
+                document.title = `${this.currentSection} | Latarnia`;
+
+                // ROUTER
+                if (this.currentSection === 'Głos Latarni') await this.renderAudio();
+                else if (this.currentSection === 'Piciorys Chudego') await this.renderPiciorys();
+                else if (this.currentSection === 'Wsparcie') await this.renderSupport();
+                else if (this.currentSection === 'Galeria') await this.renderGallery();
+                else await this.renderStandard(this.currentSection); // Kronika, Dzień po dniu itd.
+
             } catch (e) {
-                this.renderError(e.message);
+                this.wrapper.innerHTML = `<div style="text-align:center; padding:20px; color:red"><h2>Błąd Krytyczny</h2><p>${e.message}</p></div>`;
             }
         },
 
-        // --- SEKCJA: GŁOS LATARNI (AUDIO) ---
-        async loadAudioSection() {
+        // --- OBSŁUGA KLIKNIĘĆ (The Master Handler) ---
+        handleClicks(e) {
+            const target = e.target;
+            
+            // 1. CZYTAJ DALEJ / ZWIŃ
+            const readMoreBtn = target.closest('[data-role="read-more"]');
+            if (readMoreBtn) {
+                const article = readMoreBtn.closest('.story-item');
+                const fullText = article.querySelector('.full-content');
+                const prevText = article.querySelector('.preview-content');
+                
+                if (fullText.classList.contains('hidden')) {
+                    fullText.classList.remove('hidden');
+                    fullText.classList.add('visible');
+                    prevText.classList.add('hidden');
+                    readMoreBtn.innerHTML = 'ZWIŃ <i class="fas fa-arrow-up"></i>';
+                    
+                    // Zlicz wyświetlenie przy rozwinięciu
+                    const docId = article.dataset.id;
+                    const collectionPath = article.dataset.path;
+                    if(docId && collectionPath) {
+                        updateDoc(doc(db, collectionPath, docId), { views: increment(1) }).catch(console.error);
+                    }
+                } else {
+                    fullText.classList.add('hidden');
+                    fullText.classList.remove('visible');
+                    prevText.classList.remove('hidden');
+                    readMoreBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
+                }
+                return;
+            }
+
+            // 2. LIKE
+            const likeBtn = target.closest('[data-role="like"]');
+            if (likeBtn) {
+                const docId = likeBtn.dataset.id;
+                const path = likeBtn.dataset.path;
+                
+                if (Utils.isLiked(docId)) return; // Już polubione
+
+                // Optymistyczna aktualizacja UI
+                Utils.setLiked(docId);
+                likeBtn.style.color = '#ff6b6b';
+                likeBtn.style.borderColor = '#ff6b6b';
+                const counter = likeBtn.querySelector('.count');
+                counter.innerText = parseInt(counter.innerText) + 1;
+
+                // Wysyłka do bazy
+                updateDoc(doc(db, path, docId), { likes: increment(1) }).catch(console.error);
+                return;
+            }
+
+            // 3. LEKTOR
+            const speakerBtn = target.closest('[data-role="speak"]');
+            if (speakerBtn) {
+                const text = speakerBtn.dataset.text;
+                AudioSystem.speak(text);
+            }
+        },
+
+        // --- RENDERERY ---
+
+        // A. AUDIO (Głosy Latarni)
+        async renderAudio() {
             this.wrapper.innerHTML = `
                 <div class="audio-wrap">
                     <h1 style="text-align:center">Głos Latarni</h1>
                     <p style="text-align:center; color:#888;">Posłuchaj, jeśli nie masz siły czytać.</p>
-                    <div id="audio-list" style="margin-top:30px;">
-                        <div class="loading-spinner" style="width:30px; height:30px; margin:0 auto;"></div>
-                    </div>
+                    <div id="audio-list" style="margin-top:30px;"><div class="loading-spinner"></div></div>
                 </div>`;
             
-            // Pobieramy WSZYSTKO (bez where 'active')
-            const q = query(collection(db, 'audio_tracks'), orderBy('order', 'asc'));
-            
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('audio-list');
-                if (snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań w bazie.</p>'; return; }
-                
+            const list = document.getElementById('audio-list');
+            // Pobieramy wszystko bez filtrów
+            onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
+                if (snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań.</p>'; return; }
                 list.innerHTML = '';
-                // Sortowanie po kategorii (grupowanie wizualne)
-                const tracks = snap.docs.map(d => d.data());
-                tracks.sort((a,b) => (a.category || '').localeCompare(b.category || ''));
-
-                tracks.forEach(t => {
+                
+                snap.forEach(doc => {
+                    const t = doc.data();
                     const el = document.createElement('div');
                     el.className = 'audio-btn';
                     el.innerHTML = `
@@ -379,182 +409,174 @@
             });
         },
 
-        // --- SEKCJA: PICIORYS (INTELIGENTNY) ---
-        async loadPiciorys() {
-            const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
-            if (snap.empty) return this.renderError("Piciorys nie został jeszcze spisany.");
-            
-            const data = snap.docs[0].data();
-            const id = snap.docs[0].id;
-            
-            // Bezpieczny podział tekstu
-            let [intro, main] = data.text.includes('---PODZIAL---') 
-                ? data.text.split('---PODZIAL---') 
-                : [data.text.substring(0, 500) + '...', data.text];
+        // B. STANDARD (Kronika, Dzień po dniu, inne)
+        async renderStandard(sectionName) {
+            const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
 
-            this.wrapper.innerHTML = `
-                <div class="log-container">
-                    <h1 style="font-size:2.2rem; margin-bottom:20px; text-align:center;">${data.introTitle || 'Początek'}</h1>
-                    <div class="content-body" style="line-height:1.8;">${intro}</div>
-                    
-                    <div id="hidden-content" style="display:none; margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
-                        <h2>${data.mainTitle || 'Ciąg dalszy'}</h2>
-                        <div class="content-body" style="line-height:1.8;">${main}</div>
-                    </div>
-
-                    <div class="log-actions" style="margin-top:40px; justify-content:center;">
-                        <button class="action-button primary" id="read-more-btn" onclick="
-                            document.getElementById('hidden-content').style.display = 'block';
-                            this.style.display = 'none';
-                        ">Czytaj Dalej <i class="fas fa-arrow-down"></i></button>
-                        
-                        <button class="action-button" onclick="AudioSystem.speak('${Utils.escapeHtml(data.text)}')"><i class="fas fa-volume-up"></i> Lektor</button>
-                        ${this.getLikeButton(id, data.likes)}
-                    </div>
-                    
-                    <div class="entry-meta" style="margin-top:20px; justify-content:center;">
-                        <span><i class="fas fa-eye"></i> ${data.views || 0} wyświetleń</span>
-                    </div>
-                </div>`;
-
-            this.bindLike(id, 'sekcje/Piciorys Chudego/entries');
-            updateDoc(snap.docs[0].ref, { views: increment(1) }).catch(console.error);
-        },
-
-        // --- SEKCJA: WSPARCIE (FEED) ---
-        async loadSupport() {
-            this.wrapper.innerHTML = `
-                <div class="support-wrap">
-                    <h1 style="text-align:center">Wsparcie</h1>
-                    <p style="text-align:center; color:#aaa;">Zostaw dobre słowo. Ono wraca.</p>
-                    
-                    <form id="support-form">
-                        <input id="inp-name" placeholder="Twoje imię / ksywa" required>
-                        <textarea id="inp-msg" placeholder="Twoja wiadomość..." rows="4" required></textarea>
-                        <button type="submit" class="action-button primary" style="width:100%; justify-content:center">OPUBLIKUJ</button>
-                    </form>
-                </div>
-                <div id="feed-container" style="display:flex; flex-direction:column; gap:20px;"></div>`;
-
-            const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
-            
-            onSnapshot(q, (snap) => {
-                const cont = document.getElementById('feed-container');
-                cont.innerHTML = '';
-                if(snap.empty) { cont.innerHTML = '<p style="text-align:center; color:#666;">Bądź pierwszy.</p>'; return; }
-
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const el = document.createElement('article');
-                    el.className = 'card';
-                    el.innerHTML = `
-                        <h3 style="font-size:1.2rem; margin-bottom:10px">${Utils.escapeHtml(d.name)}</h3>
-                        <p>${Utils.escapeHtml(d.text)}</p>
-                        <div class="log-actions" style="justify-content:space-between; align-items:center;">
-                            ${this.getLikeButton(doc.id, d.likes)}
-                            <button class="action-button" style="font-size:0.8rem; border:none;" onclick="AudioSystem.speak('${Utils.escapeHtml(d.text)}')"><i class="fas fa-play"></i> Odsłuchaj</button>
-                        </div>`;
-                    cont.appendChild(el);
-                    this.bindLike(doc.id, 'support_stories');
-                });
-            });
-
-            document.getElementById('support-form').onsubmit = async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button');
-                btn.disabled = true; btn.innerText = "Wysyłanie...";
-                try {
-                    await addDoc(collection(db, 'support_stories'), {
-                        name: document.getElementById('inp-name').value,
-                        text: document.getElementById('inp-msg').value,
-                        t: serverTimestamp(), isApproved: false, likes: 0
-                    });
-                    alert("Wysłano do akceptacji!");
-                    e.target.reset();
-                } catch(err) { alert("Błąd wysyłania."); } 
-                finally { btn.disabled = false; btn.innerText = "OPUBLIKUJ"; }
-            };
-        },
-
-        // --- SEKCJA: KRONIKA (STANDARD) ---
-        async loadKronika(sectionName) {
-            const snap = await getDocs(query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc')));
-            
-            if (snap.empty) return this.renderError(`Sekcja "${sectionName}" jest pusta.`);
+            if (snap.empty) { 
+                this.wrapper.innerHTML = `<h2 style="text-align:center; margin-top:50px;">Sekcja "${sectionName}" jest pusta.</h2>`; 
+                return; 
+            }
 
             let html = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1>`;
             
             snap.forEach(doc => {
-                const d = doc.data();
-                const text = d.text || '';
-                const short = Utils.stripHtml(text).substring(0, 250) + '...';
+                const data = doc.data();
+                const id = doc.id;
+                const path = `sekcje/${sectionName}/entries`;
+                const text = Utils.stripHtml(data.text || '');
+                const preview = text.substring(0, 200) + '...';
+                
+                // Statystyki
+                const views = data.views || 0;
+                const likes = data.likes || 0;
+                const likedStyle = Utils.isLiked(id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
 
                 html += `
-                <article class="story-item">
-                    <h3>${Utils.escapeHtml(d.title)}</h3>
+                <article class="story-item" data-id="${id}" data-path="${path}">
+                    <h3>${Utils.escapeHtml(data.title)}</h3>
+                    
                     <div class="entry-meta">
-                        <span><i class="fas fa-calendar"></i> ${d.createdAt?.toDate().toLocaleDateString() || '-'}</span>
-                        <span><i class="fas fa-eye"></i> ${d.views || 0}</span>
+                        <span><i class="fas fa-calendar-alt"></i> ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-'}</span>
+                        <span><i class="fas fa-eye"></i> ${views}</span>
+                        <span><i class="fas fa-heart"></i> ${likes}</span>
                     </div>
-                    <div class="content-body">
-                        <div class="short-view">${short}</div>
-                        <div class="full-view" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">${text}</div>
+
+                    <div class="content-container">
+                        <div class="preview-content">${preview}</div>
+                        <div class="full-content hidden" style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
+                            ${data.text}
+                        </div>
                     </div>
+
                     <div class="log-actions">
-                        <button class="action-button primary" onclick="
-                            const p = this.closest('article');
-                            const f = p.querySelector('.full-view');
-                            const s = p.querySelector('.short-view');
-                            if(f.style.display==='none'){f.style.display='block';s.style.display='none';this.innerHTML='Zwiń <i class=\'fas fa-arrow-up\'></i>'}
-                            else{f.style.display='none';s.style.display='block';this.innerHTML='Czytaj Dalej'}
-                        ">Czytaj Dalej</button>
-                        ${this.getLikeButton(doc.id, d.likes)}
-                        <button class="action-button" onclick="AudioSystem.speak('${Utils.escapeHtml(text.substring(0,100))}...')"><i class="fas fa-volume-up"></i></button>
+                        <button class="action-button" data-role="read-more">CZYTAJ DALEJ <i class="fas fa-arrow-down"></i></button>
+                        <button class="action-button" data-role="speak" data-text="${Utils.escapeHtml(preview)}"><i class="fas fa-volume-up"></i></button>
+                        <button class="action-button" data-role="like" data-id="${id}" data-path="${path}" style="${likedStyle}">
+                            <i class="fas fa-heart"></i> <span class="count">${likes}</span>
+                        </button>
                     </div>
                 </article>`;
-                updateDoc(doc.ref, { views: increment(1) }).catch(()=>{});
             });
             this.wrapper.innerHTML = html;
-            snap.forEach(doc => this.bindLike(doc.id, `sekcje/${sectionName}/entries`));
         },
 
-        // --- POMOCNIKI UI ---
-        getLikeButton(id, count) {
-            const isLiked = Utils.isLiked(id);
-            const style = isLiked ? 'color:#ff6b6b; border-color:#ff6b6b' : '';
-            const icon = isLiked ? 'fas fa-heart' : 'far fa-heart';
-            return `<button class="action-button" id="like-${id}" style="${style}"><i class="${icon}"></i> <span id="cnt-${id}">${count||0}</span></button>`;
-        },
+        // C. PICIORYS
+        async renderPiciorys() {
+            const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
+            if(snap.empty) { this.wrapper.innerHTML = '<h2>Brak Piciorysu.</h2>'; return; }
+            
+            const data = snap.docs[0].data();
+            const id = snap.docs[0].id;
+            const path = 'sekcje/Piciorys Chudego/entries';
+            
+            let [intro, main] = (data.text || '').split('---PODZIAL---');
+            if(!main) { intro = data.text; main = ''; }
 
-        bindLike(id, path) {
-            setTimeout(() => {
-                const btn = document.getElementById(`like-${id}`);
-                if (!btn) return;
-                btn.onclick = async () => {
-                    if (Utils.isLiked(id)) return; 
+            const likes = data.likes || 0;
+            const likedStyle = Utils.isLiked(id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
+
+            this.wrapper.innerHTML = `
+                <div class="log-container story-item" data-id="${id}" data-path="${path}">
+                    <h1 style="text-align:center">${data.introTitle || 'Piciorys'}</h1>
                     
-                    // Optymistyczna zmiana
-                    Utils.setLiked(id);
-                    btn.style.color = '#ff6b6b';
-                    btn.style.borderColor = '#ff6b6b';
-                    btn.querySelector('i').classList.remove('far');
-                    btn.querySelector('i').classList.add('fas');
-                    const cnt = document.getElementById(`cnt-${id}`);
-                    cnt.innerText = parseInt(cnt.innerText) + 1;
+                    <div class="content-body" style="line-height:1.8;">${intro}</div>
+                    
+                    <div id="piciorys-main" class="hidden" style="margin-top:30px; border-top:1px solid #444; padding-top:20px;">
+                        <h2>${data.mainTitle || 'Ciąg dalszy'}</h2>
+                        <div style="line-height:1.8;">${main}</div>
+                    </div>
 
-                    // Baza w tle
-                    try { await updateDoc(doc(db, path, id), { likes: increment(1) }); } catch(e){}
-                };
-            }, 100);
+                    <div class="log-actions" style="justify-content:center; margin-top:40px;">
+                        ${main ? `<button class="action-button" onclick="document.getElementById('piciorys-main').classList.remove('hidden'); this.style.display='none'">CZYTAJ DALEJ</button>` : ''}
+                        
+                        <button class="action-button" data-role="speak" data-text="${Utils.escapeHtml(intro)}">Lektor</button>
+                        <button class="action-button" data-role="like" data-id="${id}" data-path="${path}" style="${likedStyle}">
+                            <i class="fas fa-heart"></i> <span class="count">${likes}</span>
+                        </button>
+                    </div>
+                    <div class="entry-meta" style="justify-content:center; margin-top:20px;">
+                        <span><i class="fas fa-eye"></i> ${data.views||0} Wyświetleń</span>
+                    </div>
+                </div>`;
+            
+            // Zlicz widok
+            updateDoc(doc(db, path, id), { views: increment(1) }).catch(console.error);
         },
 
-        renderError(msg) {
-            this.wrapper.innerHTML = `<div style="text-align:center; padding:50px; color:#ff6b6b;"><h2><i class="fas fa-exclamation-triangle"></i></h2><p>${msg}</p></div>`;
+        // D. WSPARCIE
+        async renderSupport() {
+            this.wrapper.innerHTML = `
+                <div class="support-wrap">
+                    <h1 style="text-align:center">Wsparcie</h1>
+                    <form id="supp-form">
+                        <input id="s-name" placeholder="Twoje imię" required>
+                        <textarea id="s-text" placeholder="Treść..." rows="4" required></textarea>
+                        <button type="submit" class="action-button" style="width:100%; justify-content:center; background:#ffd97b; color:#000;">OPUBLIKUJ</button>
+                    </form>
+                    <div id="feed"></div>
+                </div>`;
+
+            const feed = document.getElementById('feed');
+            onSnapshot(query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc')), (snap) => {
+                feed.innerHTML = '';
+                snap.forEach(d => {
+                    const data = d.data();
+                    const el = document.createElement('div');
+                    el.className = 'card';
+                    const likedStyle = Utils.isLiked(d.id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
+                    
+                    el.innerHTML = `
+                        <h3 style="font-size:1.1rem; margin-bottom:5px">${Utils.escapeHtml(data.name)}</h3>
+                        <p>${Utils.escapeHtml(data.text)}</p>
+                        <div class="log-actions" style="margin-top:15px;">
+                            <button class="action-button" data-role="like" data-id="${d.id}" data-path="support_stories" style="${likedStyle}">
+                                <i class="fas fa-heart"></i> <span class="count">${data.likes||0}</span>
+                            </button>
+                        </div>`;
+                    feed.appendChild(el);
+                });
+            });
+
+            document.getElementById('supp-form').onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    await addDoc(collection(db, 'support_stories'), {
+                        name: document.getElementById('s-name').value,
+                        text: document.getElementById('s-text').value,
+                        t: serverTimestamp(), isApproved: false, likes: 0
+                    });
+                    alert("Wysłano do akceptacji!"); e.target.reset();
+                } catch(err) { alert("Błąd wysyłania."); }
+            };
+        },
+
+        // E. GALERIA
+        async renderGallery() {
+            this.wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Galeria</h1><div id="gallery-grid" class="gallery-grid"><div class="loading-spinner"></div></div>`;
+            
+            const grid = document.getElementById('gallery-grid');
+            // Zakładam kolekcję 'gallery' z polem 'url'
+            onSnapshot(collection(db, 'gallery'), (snap) => {
+                if(snap.empty) { grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Brak zdjęć.</p>'; return; }
+                grid.innerHTML = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if(data.url) {
+                        const div = document.createElement('div');
+                        div.className = 'gallery-item';
+                        div.innerHTML = `<img src="${data.url}" alt="Foto" loading="lazy">`;
+                        grid.appendChild(div);
+                    }
+                });
+            });
         }
     };
 
-    // START
-    document.addEventListener('DOMContentLoaded', () => Renderer.init());
+    // START APLIKACJI
+    document.addEventListener("DOMContentLoaded", () => Page.init());
+
   </script>
 </body>
 </html>
