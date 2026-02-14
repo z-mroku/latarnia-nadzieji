@@ -1,5 +1,5 @@
 // Plik: /js/main.js
-// WERSJA PEŁNA - NAPRAWIONA ODPORNOŚĆ NA BŁĘDY MODUŁÓW
+// WERSJA PEŁNA - NAPRAWIONA ODPORNOŚĆ NA BŁĘDY MODUŁÓW I YOUTUBE API
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { 
@@ -223,9 +223,11 @@ function changeSpark(textEl) {
   }, 300);
 }
 
-// ==================== 4. ODTWARZACZ YT ====================
+// ==================== 4. ODTWARZACZ YT (NAPRAWIONY) ====================
 function initYTPlayer() {
   if (!document.getElementById('youtube-player') || window.YT) return;
+  
+  // Dynamiczne ładowanie API
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   const firstScript = document.getElementsByTagName('script')[0];
@@ -233,20 +235,39 @@ function initYTPlayer() {
 
   window.onYouTubeIframeAPIReady = () => {
     player = new YT.Player('youtube-player', {
-      height: '0', width: '0',
-      playerVars: { 'playsinline': 1, 'origin': window.location.origin },
-      events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
+      height: '0', 
+      width: '0',
+      host: 'https://www.youtube.com', // Wymuszenie bezpiecznego hosta
+      playerVars: { 
+        'playsinline': 1, 
+        'enablejsapi': 1, // Kluczowe dla unikania błędów postMessage
+        'origin': window.location.origin, // Zgodność domeny
+        'rel': 0 
+      },
+      events: { 
+        'onReady': onPlayerReady, 
+        'onStateChange': onPlayerStateChange,
+        'onError': (e) => console.log("YT Player Error:", e.data)
+      }
     });
   };
 }
 
-async function onPlayerReady() {
+async function onPlayerReady(event) {
   const songTitle = document.getElementById("current-song-title");
   try {
     const snap = await getDocs(query(collection(db, "playlist"), orderBy("createdAt", "asc")));
     playlist = snap.docs.map(d => ({ title: d.data().title, videoId: getVideoId(d.data().link) })).filter(s => s.videoId);
-    if (playlist.length > 0) loadCurrentSong(false);
-    else if (songTitle) songTitle.innerText = "Brak utworów w playliście.";
+    
+    if (playlist.length > 0) {
+        // Nie uruchamiamy autoplay od razu przy ładowaniu strony (polityka przeglądarek),
+        // tylko ładujemy pierwszy utwór do kolejki.
+        const firstVideo = playlist[currentIndex];
+        if(songTitle) songTitle.innerText = firstVideo.title;
+        event.target.cueVideoById(firstVideo.videoId);
+    } else if (songTitle) {
+        songTitle.innerText = "Brak utworów w playliście.";
+    }
   } catch (e) {
     console.error("Błąd playlisty:", e);
     if(songTitle) songTitle.innerText = "Playlista niedostępna.";
@@ -261,10 +282,14 @@ function onPlayerStateChange(e) {
 
 function togglePlayPause() {
   if (!player || !playlist.length) return;
-  // Sprawdzenie czy player jest gotowy
   if (typeof player.getPlayerState !== 'function') return;
   
-  (player.getPlayerState() === YT.PlayerState.PLAYING) ? player.pauseVideo() : player.playVideo();
+  const state = player.getPlayerState();
+  if (state === YT.PlayerState.PLAYING) {
+      player.pauseVideo();
+  } else {
+      player.playVideo();
+  }
 }
 
 function loadCurrentSong(autoplay = true) {
