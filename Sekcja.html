@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -148,13 +147,12 @@
     <div class="spinner"></div>
 </div>
 
-<audio id="hymn-player" src="/audio/hymn.mp3" loop preload="auto"></audio>
-<audio id="track-player" preload="auto"></audio>
+<audio id="hymn-player" loop preload="none"></audio>
+<audio id="track-player" preload="none"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    // UWAGA: Import Storage jest kluczowy do obsługi linków gs://
     import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     // 1. KONFIGURACJA FIREBASE
@@ -168,10 +166,10 @@
     };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app); // Inicjalizacja modułu Storage
+    const storage = getStorage(app);
 
     // ====================================================
-    // 2. MODUŁ SOUND MANAGER (Advanced + Storage Fix)
+    // 2. MODUŁ SOUND MANAGER (Pancerny)
     // ====================================================
     const SoundManager = {
         hymnEl: document.getElementById('hymn-player'),
@@ -180,18 +178,25 @@
         isHymnPlaying: false,
         currentBtn: null,
         
-        // Zmienne dla Lektora (Queueing System)
+        // Zmienne dla Lektora
         queue: [],
         isPlayingTTS: false,
 
-        init() {
-            // Obsługa Hymnu
+        async init() {
+            // Obsługa Hymnu - Próba pobrania linku z Storage, fallback do lokalnego
+            try {
+                const hymnUrl = await getDownloadURL(ref(storage, 'audio/hymn.mp3'));
+                this.hymnEl.src = hymnUrl;
+            } catch (e) {
+                console.warn("Hymn z storage niedostępny, używam lokalnego.", e);
+                this.hymnEl.src = "/audio/hymn.mp3";
+            }
+
             document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
             
-            // Fix dla iOS/Android: Pierwsze dotknięcie ekranu "odblokowuje" AudioContext
+            // Odblokowanie AudioContext (iOS Fix)
             const unlockAudio = () => {
                 if(this.synth.paused) this.synth.resume();
-                // Odtwórz pusty dźwięk, by obudzić silnik audio
                 const silent = new Audio();
                 silent.play().catch(()=>{});
                 document.removeEventListener('click', unlockAudio);
@@ -202,25 +207,18 @@
         },
 
         stopAll() {
-            // Zatrzymanie Hymnu
             this.hymnEl.pause();
             this.isHymnPlaying = false;
             document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
-
-            // Zatrzymanie Tracka
             this.trackEl.pause();
-            
-            // Zatrzymanie Lektora
             this.synth.cancel();
             this.queue = [];
             this.isPlayingTTS = false;
 
-            // Reset UI przycisku
             if(this.currentBtn) {
                 this.currentBtn.classList.remove('playing');
                 this.currentBtn.classList.remove('active');
                 
-                // Przywracanie ikon
                 const icon = this.currentBtn.querySelector('i');
                 if(icon) {
                     if(icon.classList.contains('fa-stop')) icon.className = 'fas fa-play';
@@ -229,7 +227,6 @@
                     if(icon.classList.contains('fa-spinner')) icon.className = 'fas fa-play-circle';
                 }
                 
-                // Przywracanie tekstu
                 if(this.currentBtn.innerText.includes('STOP')) {
                     this.currentBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
                 }
@@ -245,55 +242,49 @@
                 this.hymnEl.play().then(() => {
                     this.isHymnPlaying = true;
                     document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
-                }).catch(e => console.error("Hymn play failed:", e));
+                }).catch(e => alert("Kliknij stronę, aby odblokować dźwięk."));
             }
         },
 
         async playTrack(rawUrl, btn) {
-            // Logika Toggle (pauza jeśli to samo)
             if(this.currentBtn === btn && !this.trackEl.paused) {
                 this.stopAll();
                 return;
             }
 
-            // Reset innych
             this.stopAll();
             this.currentBtn = btn;
             
-            // UI - Loading state
+            // UI Loading
             btn.classList.add('active');
             const icon = btn.querySelector('.track-icon i');
-            if(icon) icon.className = 'fas fa-spinner fa-spin'; // Pokaż że ładuje
+            if(icon) icon.className = 'fas fa-spinner fa-spin';
 
             try {
                 let playableUrl = rawUrl;
+                const decodedUrl = decodeURIComponent(rawUrl);
 
-                // --- KLUCZOWA NAPRAWA LINKÓW BAZY DANYCH ---
-                // Jeśli link nie jest "http" (czyli jest np. "gs://..." lub ścieżką względną),
-                // konwertujemy go używając Firebase Storage SDK.
-                if (!rawUrl.startsWith('http')) {
-                    console.log("Konwertowanie linku Storage:", rawUrl);
-                    const storageRef = ref(storage, rawUrl);
+                // LOGIKA NAPRAWIANIA LINKÓW
+                // Jeśli link NIE zaczyna się od http, traktujemy go jako ścieżkę Storage (gs:// lub ścieżka)
+                if (!decodedUrl.startsWith('http')) {
+                    const storageRef = ref(storage, decodedUrl);
                     playableUrl = await getDownloadURL(storageRef);
                 }
-                // -------------------------------------------
 
                 this.trackEl.src = playableUrl;
                 await this.trackEl.play();
                 
-                // UI - Playing state
                 if(icon) icon.className = 'fas fa-stop-circle';
-
                 this.trackEl.onended = () => this.stopAll();
 
             } catch (err) {
                 console.error("Błąd odtwarzania:", err);
-                alert("Nie udało się pobrać pliku audio. Sprawdź połączenie.");
-                this.stopAll(); // Reset UI
+                // Wyświetl użytkownikowi DOKŁADNY kod błędu, żebyśmy wiedzieli co naprawić
+                alert(`Nie udało się pobrać pliku audio.\nKod błędu: ${err.code || err.message}\nSprawdź czy plik istnieje w Storage.`);
+                this.stopAll();
             }
         },
 
-        // Zaawansowany Lektor z Chunkingiem (niezbędne dla Androida)
         speak(text, btn) {
             if(this.currentBtn === btn && this.synth.speaking) {
                 this.stopAll();
@@ -303,14 +294,10 @@
             this.stopAll();
             this.currentBtn = btn;
             
-            // UI
             btn.classList.add('playing');
             btn.innerHTML = '<i class="fas fa-stop"></i> STOP';
 
-            // Czyszczenie tekstu
             const cleanText = Utils.stripHtml(text).replace(/\s+/g, ' ').trim();
-            
-            // Inteligentne dzielenie na zdania (aby nie ucięło w połowie słowa)
             const sentences = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
             
             this.queue = sentences;
@@ -329,15 +316,8 @@
             u.lang = 'pl-PL';
             u.rate = 1.0;
 
-            u.onend = () => {
-                if(this.isPlayingTTS) this.processQueue();
-            };
-            
-            u.onerror = (e) => {
-                console.warn("TTS Error:", e);
-                // Próbuj dalej mimo błędu (częsty bug na Samsungach)
-                if(this.isPlayingTTS) this.processQueue(); 
-            };
+            u.onend = () => { if(this.isPlayingTTS) this.processQueue(); };
+            u.onerror = (e) => { console.warn("TTS Error:", e); if(this.isPlayingTTS) this.processQueue(); };
 
             this.synth.speak(u);
         }
@@ -353,11 +333,9 @@
     };
 
     const DOMBuilder = {
-        // Główna funkcja tworząca kartę wpisu
         createCard(data, id, collectionPath, forceOpen = false) {
             const card = document.createElement('article');
             card.className = 'card';
-
             const cleanText = Utils.stripHtml(data.text || '');
             const previewText = cleanText.substring(0, 300) + '...';
             const isLiked = localStorage.getItem('liked_' + id);
@@ -378,7 +356,7 @@
 
             const actionsDiv = card.querySelector('.actions-row');
 
-            // Button 1: Toggle
+            // Toggle
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'btn';
             toggleBtn.innerHTML = forceOpen ? 'ZWIŃ' : 'CZYTAJ DALEJ';
@@ -394,14 +372,14 @@
             };
             actionsDiv.appendChild(toggleBtn);
 
-            // Button 2: Lektor
+            // Lektor
             const lektorBtn = document.createElement('button');
             lektorBtn.className = 'btn';
             lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
             lektorBtn.onclick = () => SoundManager.speak(cleanText, lektorBtn);
             actionsDiv.appendChild(lektorBtn);
 
-            // Button 3: Like
+            // Like
             const likeBtn = document.createElement('button');
             likeBtn.className = 'btn';
             likeBtn.innerHTML = isLiked ? '<i class="fas fa-heart"></i> DZIĘKI' : '<i class="far fa-heart"></i> LUBIĘ TO';
@@ -415,13 +393,12 @@
                 await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
             };
             actionsDiv.appendChild(likeBtn);
-
             return card;
         }
     };
 
     // ====================================================
-    // 4. SECTION LOADER (ROUTER)
+    // 4. SECTION LOADER
     // ====================================================
     const wrapper = document.getElementById('content-wrapper');
 
@@ -430,24 +407,19 @@
         const params = new URLSearchParams(window.location.search);
         const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
         document.title = `${section} | Latarnia Nadziei`;
-
-        wrapper.innerHTML = ''; // Clear spinner
+        wrapper.innerHTML = ''; 
 
         try {
-            // ROUTING LOGIC
             if (section === 'Głos Latarni') await renderAudioSection();
             else if (section === 'Piciorys Chudego') await renderPiciorys();
             else if (section === 'Wsparcie') await renderSupport();
             else if (section === 'Galeria') await renderGallery();
             else await renderStandard(section);
-
         } catch (e) {
             console.error(e);
             wrapper.innerHTML = `<h2 style="color:#d55; text-align:center;">Wystąpił błąd wczytywania danych.</h2>`;
         }
     }
-
-    // --- RENDERERS ---
 
     async function renderAudioSection() {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
@@ -468,7 +440,7 @@
                         <span style="font-size:0.9rem; color:#888">${Utils.escapeHtml(t.description || '')}</span>
                     </div>
                 `;
-                // Przekazujemy surowy URL (nawet gs://), a SoundManager go naprawi
+                // Przekazujemy surowy URL do SoundManagera - on go naprawi
                 el.onclick = () => SoundManager.playTrack(t.url, el);
                 list.appendChild(el);
             });
@@ -478,27 +450,18 @@
     async function renderStandard(sectionName) {
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
         const container = document.getElementById('entries-list');
-
         const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
         const snap = await getDocs(q);
-
         container.innerHTML = '';
         if(snap.empty) { container.innerHTML = '<p style="text-align:center">Brak wpisów.</p>'; return; }
-
-        snap.forEach(doc => {
-            const card = DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`);
-            container.appendChild(card);
-        });
+        snap.forEach(doc => { container.appendChild(DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`)); });
     }
 
     async function renderPiciorys() {
         const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
         if(snap.empty) { wrapper.innerHTML = '<h2 class="text-center">Piciorys nie został jeszcze spisany.</h2>'; return; }
-        
-        const data = snap.docs[0].data();
         wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
-        const card = DOMBuilder.createCard(data, snap.docs[0].id, 'sekcje/Piciorys Chudego/entries', true); // Force open
-        wrapper.appendChild(card);
+        wrapper.appendChild(DOMBuilder.createCard(snap.docs[0].data(), snap.docs[0].id, 'sekcje/Piciorys Chudego/entries', true));
     }
 
     async function renderSupport() {
@@ -506,52 +469,24 @@
             <h1 style="text-align:center">Wsparcie</h1>
             <div class="card" style="border:1px solid var(--gold);">
                 <h3 style="margin-bottom:15px">Dodaj Otuchy</h3>
-                <form id="supp-form">
-                    <input id="in-name" placeholder="Imię / Pseudonim" required>
-                    <textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea>
-                    <button type="submit" class="btn" style="background:var(--gold); color:#000; width:100%; justify-content:center;">OPUBLIKUJ</button>
-                </form>
+                <form id="supp-form"><input id="in-name" placeholder="Imię / Pseudonim" required><textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea><button type="submit" class="btn" style="background:var(--gold); color:#000; width:100%; justify-content:center;">OPUBLIKUJ</button></form>
             </div>
-            <div id="supp-feed"></div>
-        `;
-
+            <div id="supp-feed"></div>`;
         const feed = document.getElementById('supp-feed');
         const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
-        
         onSnapshot(q, (snap) => {
             feed.innerHTML = '';
             snap.forEach(doc => {
                 const data = doc.data();
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <h3>${Utils.escapeHtml(data.name)}</h3>
-                    <p>${Utils.escapeHtml(data.text)}</p>
-                    <div class="actions-row">
-                        <button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button>
-                    </div>`;
-                
+                const card = document.createElement('div'); card.className = 'card';
+                card.innerHTML = `<h3>${Utils.escapeHtml(data.name)}</h3><p>${Utils.escapeHtml(data.text)}</p><div class="actions-row"><button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button></div>`;
                 const lBtn = card.querySelector('.like-btn');
-                lBtn.onclick = async () => {
-                    if(lBtn.style.color) return;
-                    lBtn.style.color = '#ff6b6b'; 
-                    lBtn.innerHTML = `<i class="fas fa-heart"></i> ${(data.likes||0)+1}`;
-                    await updateDoc(doc.ref, { likes: increment(1) });
-                };
+                lBtn.onclick = async () => { if(lBtn.style.color) return; lBtn.style.color = '#ff6b6b'; lBtn.innerHTML = `<i class="fas fa-heart"></i> ${(data.likes||0)+1}`; await updateDoc(doc.ref, { likes: increment(1) }); };
                 feed.appendChild(card);
             });
         });
-
         document.getElementById('supp-form').onsubmit = async (e) => {
-            e.preventDefault();
-            try {
-                await addDoc(collection(db, 'support_stories'), {
-                    name: document.getElementById('in-name').value,
-                    text: document.getElementById('in-text').value,
-                    t: serverTimestamp(), isApproved: false, likes: 0
-                });
-                alert("Wysłano do moderacji!"); e.target.reset();
-            } catch(err) { alert("Błąd wysyłania."); }
+            e.preventDefault(); try { await addDoc(collection(db, 'support_stories'), { name: document.getElementById('in-name').value, text: document.getElementById('in-text').value, t: serverTimestamp(), isApproved: false, likes: 0 }); alert("Wysłano do moderacji!"); e.target.reset(); } catch(err) { alert("Błąd wysyłania."); }
         };
     }
 
@@ -560,16 +495,11 @@
         const gal = document.getElementById('gal');
         onSnapshot(collection(db, 'gallery'), (snap) => {
             gal.innerHTML = '';
-            snap.forEach(doc => {
-                const d = doc.data();
-                if(d.url) gal.innerHTML += `<div class="gallery-item"><img src="${d.url}"></div>`;
-            });
+            snap.forEach(doc => { const d = doc.data(); if(d.url) gal.innerHTML += `<div class="gallery-item"><img src="${d.url}"></div>`; });
         });
     }
 
-    // START
     initPage();
-
 </script>
 </body>
 </html>
