@@ -7,30 +7,34 @@
     <meta name="theme-color" content="#0f1014">
 
     <title>Latarnia Nadziei</title>
-    
+    <meta property="og:title" content="Latarnia Nadziei">
+    <meta property="og:description" content="Wsparcie w trzeźwieniu. Od dna do światła.">
+    <meta property="og:image" content="https://latarnia-nadzieji.vercel.app/logo.png">
+    <meta property="og:type" content="website">
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕯️</text></svg>">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================
-           STYLIZACJA PREMIUM (Latarnia Vigor Style)
+           STYLIZACJA PREMIUM: VIGOR (GOLD & GLASS)
            ========================================= */
         
         :root {
             --gold: #ffd97b;
-            --gold-dark: #c5a059;
-            --bg-dark: #0f1014;
-            --glass-bg: rgba(30, 34, 45, 0.85); /* Ciemniejsze tło dla czytelności */
+            --gold-dark: #b8860b;
+            --bg-deep: #0f1014;
+            --glass-bg: rgba(25, 27, 35, 0.85);
             --glass-border: 1px solid rgba(255, 217, 123, 0.2);
             --text-main: #e0e0e0;
+            --text-dim: #aaa;
         }
 
         html, body { 
             min-height: 100vh; margin: 0; padding: 0; 
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 0%, #1f222e 0%, #0f1014 85%);
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, #1f222e 0%, #000 85%);
             background-attachment: fixed;
             color: var(--text-main); 
             font-family: 'Montserrat', sans-serif; 
@@ -43,145 +47,169 @@
             color: var(--gold); 
             font-family: 'Cinzel', serif; 
             text-transform: uppercase; 
-            letter-spacing: 1px;
-            text-shadow: 0 2px 15px rgba(255, 217, 123, 0.2);
+            letter-spacing: 1.2px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
             margin-top: 0;
+            line-height: 1.3;
         }
-        p { line-height: 1.7; font-size: 1.05rem; color: #ccc; margin-bottom: 1.5rem; }
+        p { line-height: 1.8; font-size: 1.05rem; color: #ccc; margin-bottom: 1.5rem; }
 
         /* KONTENER GŁÓWNY */
         #content-wrapper { 
             padding-top: 90px; 
-            padding-bottom: 120px; 
+            padding-bottom: 140px; 
             min-height: 100vh;
             padding-left: 15px; padding-right: 15px;
             box-sizing: border-box;
             max-width: 900px; margin: 0 auto;
+            opacity: 0; animation: fadeIn 0.8s forwards;
         }
+        @keyframes fadeIn { to { opacity: 1; } }
 
         /* PRZYCISK POWROTU */
         .back-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 1001;
-            background: rgba(0, 0, 0, 0.8);
+            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(0,0,0,0.8);
             color: var(--gold);
-            padding: 10px 18px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            border: 1px solid rgba(255, 217, 123, 0.3);
-            backdrop-filter: blur(8px);
-            display: flex; align-items: center; gap: 8px;
+            padding: 12px 20px; border-radius: 50px;
+            text-decoration: none; font-weight: 600;
+            border: 1px solid var(--gold);
+            backdrop-filter: blur(5px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 10px;
+            transition: 0.3s;
         }
+        .back-btn:hover { background: rgba(255, 217, 123, 0.15); transform: translateY(-2px); }
 
-        /* KARTY (Wpisy) */
-        .story-item, .card, .log-container, .audio-wrap, .support-wrap {
+        /* KARTY (WPISY) - GLASSMORPHISM */
+        .card {
             background: var(--glass-bg);
             border: var(--glass-border);
             border-radius: 16px;
             padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
             position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Złota linia na górze karty */
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.6;
         }
 
-        /* META DANE (Statystyki) */
-        .entry-meta { 
-            display: flex; flex-wrap: wrap; gap: 15px; 
-            color: #888; font-size: 0.85rem; margin-bottom: 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 15px; 
+        /* META DANE (STATYSTYKI) */
+        .meta-row {
+            display: flex; gap: 15px; flex-wrap: wrap;
+            margin-bottom: 20px; padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-dim); font-size: 0.85rem;
         }
-        .entry-meta span { display: flex; align-items: center; gap: 6px; }
-        .entry-meta i { color: var(--gold); }
+        .meta-row span { display: flex; align-items: center; gap: 6px; }
+        .meta-row i { color: var(--gold); }
+
+        /* TREŚĆ */
+        .content-body { line-height: 1.8; font-size: 1.05rem; color: #d0d0d0; }
+        .preview { display: block; }
+        .full-content { display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; animation: slideDown 0.5s; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 
         /* PRZYCISKI AKCJI */
-        .log-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .actions-row { margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; }
         
-        .action-button {
+        .btn {
             background: transparent;
-            border: 1px solid rgba(255, 217, 123, 0.4);
+            border: 1px solid rgba(255, 217, 123, 0.3);
             color: var(--gold);
-            padding: 12px 20px; /* Większe pod palec */
+            padding: 12px 20px;
             border-radius: 8px;
-            cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 0.9rem;
-            display: flex; align-items: center; gap: 8px;
             text-transform: uppercase;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            user-select: none;
         }
-        
-        .action-button:active { transform: scale(0.95); background: rgba(255, 217, 123, 0.1); }
+        .btn:hover { background: rgba(255, 217, 123, 0.1); border-color: var(--gold); }
+        .btn:active { transform: scale(0.96); }
 
-        /* LISTA AUDIO */
-        .audio-btn { 
-            background: rgba(0,0,0,0.3); 
-            border-left: 4px solid #444; 
-            padding: 20px; /* Większe pod palec */
-            margin-bottom: 15px; border-radius: 8px; 
-            cursor: pointer; display: flex; align-items: center; gap: 15px; 
-            border: 1px solid rgba(255,255,255,0.05);
+        /* Przycisk Główny (Złoty Gradient) */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: #000;
+            border: none;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 217, 123, 0.2);
         }
-        .audio-btn.playing { 
-            border-left-color: var(--gold); 
-            background: linear-gradient(90deg, rgba(255,217,123,0.15) 0%, transparent 100%);
+        .btn-primary:hover { box-shadow: 0 0 25px rgba(255, 217, 123, 0.4); color: #000; transform: translateY(-2px); }
+
+        /* AUDIO PLAYER LISTA */
+        .audio-track {
+            display: flex; align-items: center; gap: 15px;
+            padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: 0.3s;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px; margin-bottom: 10px;
         }
-        .audio-icon { font-size: 1.8rem; color: #555; min-width: 40px; text-align: center; }
-        .audio-btn.playing .audio-icon { color: var(--gold); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .audio-track:hover { background: rgba(255,255,255,0.08); }
+        .audio-track.playing { border: 1px solid var(--gold); background: rgba(255, 217, 123, 0.1); }
+        .audio-track.playing .track-icon { color: var(--gold); box-shadow: 0 0 15px var(--gold); background: #000; }
+        
+        .track-icon {
+            width: 45px; height: 45px; border-radius: 50%; background: #222;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: #555; transition: 0.3s; flex-shrink: 0;
+        }
+        .track-info h4 { margin: 0; color: #fff; font-size: 1rem; font-family: 'Montserrat', sans-serif; text-transform: none; letter-spacing: 0; }
+        .track-info span { font-size: 0.8rem; color: #777; }
 
         /* GALERIA */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .gallery-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 1; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-        .gallery-item:active img { transform: scale(1.05); }
-
-        /* FORMULARZE */
-        input, textarea {
-            width: 100%; background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1); color: #fff;
-            border-radius: 8px; padding: 15px; font-family: inherit;
-            margin-bottom: 15px; box-sizing: border-box;
-        }
-
-        /* LOADING */
-        .loading-spinner { 
-            border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--gold); 
-            border-radius: 50%; width: 50px; height: 50px; 
-            animation: spin 1s linear infinite; margin: 150px auto; 
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* UKRYWANIE TREŚCI */
-        .hidden { display: none !important; }
-        .visible { display: block !important; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .gallery-item { border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); aspect-ratio: 1; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .gallery-item:hover img { transform: scale(1.1); }
 
         /* FAB HYMN */
-        #fab-hymn {
+        #hymn-fab {
             position: fixed; bottom: 25px; right: 25px;
             width: 65px; height: 65px; border-radius: 50%;
-            background: linear-gradient(145deg, #ffd97b, #c5a059);
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
             box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            border: none; z-index: 9999;
+            border: 2px solid #fff; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: #121212; cursor: pointer;
+            font-size: 26px; color: #000; cursor: pointer;
+            transition: transform 0.2s;
         }
+        #hymn-fab:active { transform: scale(0.9); }
+
+        /* LOADING */
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 100px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* FORMULARZE */
+        input, textarea { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.3); border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; font-family: inherit; margin-bottom: 15px; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
     </style>
 </head>
 <body>
-  
-  <a href="/index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Powrót</a>
-  
-  <div id="content-wrapper">
-    <div class="loading-spinner"></div>
-  </div>
 
-  <script type="module">
+<a href="/index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Powrót</a>
+<button id="hymn-fab"><i class="fas fa-music"></i></button>
+
+<div id="content-wrapper">
+    <div class="spinner"></div>
+</div>
+
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // --- 1. KONFIGURACJA ---
+    // 1. CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
       authDomain: "projekt-latarnia.firebaseapp.app",
@@ -190,392 +218,369 @@
       messagingSenderId: "244008044225",
       appId: "1:244008044225:web:67fbc7f5cfa89b627fb640",
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const HYMN_URL = "/audio/hymn.mp3"; 
+    const HYMN_URL = "/audio/hymn.mp3";
 
-    // --- 2. NARZĘDZIA ---
-    const Utils = {
-        escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
-        stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
-        // Liked in localStorage
-        isLiked: (id) => localStorage.getItem('liked_' + id) === 'true',
-        setLiked: (id) => localStorage.setItem('liked_' + id, 'true')
-    };
-
-    // --- 3. SYSTEM AUDIO (Główny) ---
-    const AudioSystem = {
-        mainPlayer: new Audio(),
-        hymnPlayer: new Audio(HYMN_URL),
+    // 2. CENTRALNY MANAGER DŹWIĘKU (SoundManager)
+    const SoundManager = {
+        hymn: new Audio(HYMN_URL),
+        track: new Audio(),
         synth: window.speechSynthesis,
-        state: { isHymnPlaying: false, currentTrackBtn: null },
+        isHymnPlaying: false,
+        currentTrackBtn: null, 
 
         init() {
-            this.hymnPlayer.loop = true;
-            this.createHymnButton();
-        },
-
-        createHymnButton() {
-            const btn = document.createElement('button');
-            btn.id = 'fab-hymn';
-            btn.innerHTML = '<i class="fas fa-music"></i>';
-            btn.onclick = () => this.toggleHymn();
-            document.body.appendChild(btn);
+            this.hymn.loop = true;
+            document.getElementById('hymn-fab').onclick = () => this.toggleHymn();
         },
 
         stopAll() {
-            this.mainPlayer.pause();
-            this.synth.cancel();
-            if (this.state.currentTrackBtn) {
-                this.state.currentTrackBtn.classList.remove('playing');
-                this.state.currentTrackBtn = null;
+            // Stop Hymn
+            this.hymn.pause();
+            this.isHymnPlaying = false;
+            document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-music"></i>';
+
+            // Stop Track
+            this.track.pause();
+            if(this.currentTrackBtn) {
+                this.currentTrackBtn.classList.remove('playing');
+                // Przywróć ikonę play w zależności od typu przycisku
+                const icon = this.currentTrackBtn.querySelector('.track-icon i') || this.currentTrackBtn.querySelector('i');
+                if(icon) icon.className = 'fas fa-play';
+                this.currentTrackBtn = null;
             }
+
+            // Stop Lektor
+            this.synth.cancel();
         },
 
-        // Odtwarzanie ścieżek z listy
-        playTrack(url, btnElement) {
-            if (this.state.isHymnPlaying) this.toggleHymn();
-            
-            if (this.state.currentTrackBtn === btnElement && !this.mainPlayer.paused) {
-                this.mainPlayer.pause();
-                btnElement.classList.remove('playing');
-                return;
-            }
-
+        playHymn() {
             this.stopAll();
-            this.mainPlayer.src = url;
-            
-            // Promise handling dla mobile
-            const playPromise = this.mainPlayer.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    this.state.currentTrackBtn = btnElement;
-                    btnElement.classList.add('playing');
-                }).catch(e => {
-                    alert("Błąd odtwarzania. Sprawdź łącze.");
-                    console.error(e);
-                });
-            }
-
-            this.mainPlayer.onended = () => {
-                btnElement.classList.remove('playing');
-                this.state.currentTrackBtn = null;
-            };
+            this.hymn.play().catch(e => console.error("Hymn error", e));
+            this.isHymnPlaying = true;
+            document.getElementById('hymn-fab').innerHTML = '<i class="fas fa-pause"></i>';
         },
 
         toggleHymn() {
-            this.stopAll(); 
-            const btn = document.getElementById('fab-hymn');
-            
-            if (this.state.isHymnPlaying) {
-                this.hymnPlayer.pause();
-                this.state.isHymnPlaying = false;
-                btn.innerHTML = '<i class="fas fa-music"></i>';
+            if(this.isHymnPlaying) {
+                this.stopAll();
             } else {
-                this.hymnPlayer.play().catch(e => alert("Nie można odtworzyć hymnu."));
-                this.state.isHymnPlaying = true;
-                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                this.playHymn();
             }
+        },
+
+        playTrack(url, btnElement) {
+            // Pauza jeśli to samo
+            if(this.currentTrackBtn === btnElement && !this.track.paused) {
+                this.track.pause();
+                btnElement.classList.remove('playing');
+                const icon = btnElement.querySelector('.track-icon i') || btnElement.querySelector('i');
+                if(icon) icon.className = 'fas fa-play';
+                return;
+            }
+
+            // Nowy utwór -> Stop wszystkiego
+            this.stopAll();
+            
+            this.track.src = url;
+            this.track.play().catch(e => alert("Błąd odtwarzania. Sprawdź łącze."));
+            
+            this.currentTrackBtn = btnElement;
+            btnElement.classList.add('playing');
+            
+            const icon = btnElement.querySelector('.track-icon i') || btnElement.querySelector('i');
+            if(icon) icon.className = 'fas fa-stop';
+
+            this.track.onended = () => {
+                btnElement.classList.remove('playing');
+                if(icon) icon.className = 'fas fa-play';
+                this.currentTrackBtn = null;
+            };
         },
 
         speak(text) {
             this.stopAll();
-            if(this.state.isHymnPlaying) this.toggleHymn();
-            const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
-            u.lang = "pl-PL"; u.rate = 0.9;
+            // Czyść tekst z HTML
+            const clean = text.replace(/<[^>]*>?/gm, '');
+            const u = new SpeechSynthesisUtterance(clean);
+            u.lang = "pl-PL";
+            u.rate = 0.95;
             this.synth.speak(u);
         }
     };
 
-    // --- 4. GŁÓWNY SILNIK (Renderer) ---
-    const Page = {
-        wrapper: document.getElementById('content-wrapper'),
-        currentSection: '',
+    // 3. UTILS (Narzędzia)
+    const Utils = {
+        escapeHtml: (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
+        stripHtml: (s) => String(s).replace(/<[^>]*>?/gm, ''),
+        formatDate: (ts) => ts ? new Date(ts.toDate()).toLocaleDateString() : '---'
+    };
 
-        async init() {
-            AudioSystem.init();
-            
-            // Globalny Event Listener (Delegacja) - NAPRAWA "CZYTAJ DALEJ" i "LIKE"
-            this.wrapper.addEventListener('click', (e) => this.handleClicks(e));
+    // 4. BUDOWNICZY DOM (Najważniejsza część - tworzy przyciski, które działają)
+    const DOMBuilder = {
+        
+        // Tworzy Kartę Wpisu (Uniwersalną)
+        createCard(data, id, collectionPath) {
+            const card = document.createElement('article');
+            card.className = 'card';
 
-            try {
-                const params = new URLSearchParams(window.location.search);
-                this.currentSection = decodeURIComponent(params.get('nazwa') || 'Kronika');
-                document.title = `${this.currentSection} | Latarnia`;
-
-                // ROUTER
-                if (this.currentSection === 'Głos Latarni') await this.renderAudio();
-                else if (this.currentSection === 'Piciorys Chudego') await this.renderPiciorys();
-                else if (this.currentSection === 'Wsparcie') await this.renderSupport();
-                else if (this.currentSection === 'Galeria') await this.renderGallery();
-                else await this.renderStandard(this.currentSection); // Kronika, Dzień po dniu itd.
-
-            } catch (e) {
-                this.wrapper.innerHTML = `<div style="text-align:center; padding:20px; color:red"><h2>Błąd Krytyczny</h2><p>${e.message}</p></div>`;
-            }
-        },
-
-        // --- OBSŁUGA KLIKNIĘĆ (The Master Handler) ---
-        handleClicks(e) {
-            const target = e.target;
-            
-            // 1. CZYTAJ DALEJ / ZWIŃ
-            const readMoreBtn = target.closest('[data-role="read-more"]');
-            if (readMoreBtn) {
-                const article = readMoreBtn.closest('.story-item');
-                const fullText = article.querySelector('.full-content');
-                const prevText = article.querySelector('.preview-content');
-                
-                if (fullText.classList.contains('hidden')) {
-                    fullText.classList.remove('hidden');
-                    fullText.classList.add('visible');
-                    prevText.classList.add('hidden');
-                    readMoreBtn.innerHTML = 'ZWIŃ <i class="fas fa-arrow-up"></i>';
-                    
-                    // Zlicz wyświetlenie przy rozwinięciu
-                    const docId = article.dataset.id;
-                    const collectionPath = article.dataset.path;
-                    if(docId && collectionPath) {
-                        updateDoc(doc(db, collectionPath, docId), { views: increment(1) }).catch(console.error);
-                    }
-                } else {
-                    fullText.classList.add('hidden');
-                    fullText.classList.remove('visible');
-                    prevText.classList.remove('hidden');
-                    readMoreBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
-                }
-                return;
-            }
-
-            // 2. LIKE
-            const likeBtn = target.closest('[data-role="like"]');
-            if (likeBtn) {
-                const docId = likeBtn.dataset.id;
-                const path = likeBtn.dataset.path;
-                
-                if (Utils.isLiked(docId)) return; // Już polubione
-
-                // Optymistyczna aktualizacja UI
-                Utils.setLiked(docId);
-                likeBtn.style.color = '#ff6b6b';
-                likeBtn.style.borderColor = '#ff6b6b';
-                const counter = likeBtn.querySelector('.count');
-                counter.innerText = parseInt(counter.innerText) + 1;
-
-                // Wysyłka do bazy
-                updateDoc(doc(db, path, docId), { likes: increment(1) }).catch(console.error);
-                return;
-            }
-
-            // 3. LEKTOR
-            const speakerBtn = target.closest('[data-role="speak"]');
-            if (speakerBtn) {
-                const text = speakerBtn.dataset.text;
-                AudioSystem.speak(text);
-            }
-        },
-
-        // --- RENDERERY ---
-
-        // A. AUDIO (Głosy Latarni)
-        async renderAudio() {
-            this.wrapper.innerHTML = `
-                <div class="audio-wrap">
-                    <h1 style="text-align:center">Głos Latarni</h1>
-                    <p style="text-align:center; color:#888;">Posłuchaj, jeśli nie masz siły czytać.</p>
-                    <div id="audio-list" style="margin-top:30px;"><div class="loading-spinner"></div></div>
-                </div>`;
-            
-            const list = document.getElementById('audio-list');
-            // Pobieramy wszystko bez filtrów
-            onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
-                if (snap.empty) { list.innerHTML = '<p style="text-align:center">Brak nagrań.</p>'; return; }
-                list.innerHTML = '';
-                
-                snap.forEach(doc => {
-                    const t = doc.data();
-                    const el = document.createElement('div');
-                    el.className = 'audio-btn';
-                    el.innerHTML = `
-                        <div class="audio-icon"><i class="fas fa-play"></i></div>
-                        <div>
-                            <div style="font-weight:bold; color:#fff; font-size:1.1rem;">${Utils.escapeHtml(t.title)}</div>
-                            <div style="font-size:0.85rem; color:#888;">${Utils.escapeHtml(t.description || '')}</div>
-                        </div>`;
-                    el.onclick = () => AudioSystem.playTrack(t.url, el);
-                    list.appendChild(el);
-                });
-            });
-        },
-
-        // B. STANDARD (Kronika, Dzień po dniu, inne)
-        async renderStandard(sectionName) {
-            const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
-            const snap = await getDocs(q);
-
-            if (snap.empty) { 
-                this.wrapper.innerHTML = `<h2 style="text-align:center; margin-top:50px;">Sekcja "${sectionName}" jest pusta.</h2>`; 
-                return; 
-            }
-
-            let html = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1>`;
-            
-            snap.forEach(doc => {
-                const data = doc.data();
-                const id = doc.id;
-                const path = `sekcje/${sectionName}/entries`;
-                const text = Utils.stripHtml(data.text || '');
-                const preview = text.substring(0, 200) + '...';
-                
-                // Statystyki
-                const views = data.views || 0;
-                const likes = data.likes || 0;
-                const likedStyle = Utils.isLiked(id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
-
-                html += `
-                <article class="story-item" data-id="${id}" data-path="${path}">
-                    <h3>${Utils.escapeHtml(data.title)}</h3>
-                    
-                    <div class="entry-meta">
-                        <span><i class="fas fa-calendar-alt"></i> ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '-'}</span>
-                        <span><i class="fas fa-eye"></i> ${views}</span>
-                        <span><i class="fas fa-heart"></i> ${likes}</span>
-                    </div>
-
-                    <div class="content-container">
-                        <div class="preview-content">${preview}</div>
-                        <div class="full-content hidden" style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
-                            ${data.text}
-                        </div>
-                    </div>
-
-                    <div class="log-actions">
-                        <button class="action-button" data-role="read-more">CZYTAJ DALEJ <i class="fas fa-arrow-down"></i></button>
-                        <button class="action-button" data-role="speak" data-text="${Utils.escapeHtml(preview)}"><i class="fas fa-volume-up"></i></button>
-                        <button class="action-button" data-role="like" data-id="${id}" data-path="${path}" style="${likedStyle}">
-                            <i class="fas fa-heart"></i> <span class="count">${likes}</span>
-                        </button>
-                    </div>
-                </article>`;
-            });
-            this.wrapper.innerHTML = html;
-        },
-
-        // C. PICIORYS
-        async renderPiciorys() {
-            const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
-            if(snap.empty) { this.wrapper.innerHTML = '<h2>Brak Piciorysu.</h2>'; return; }
-            
-            const data = snap.docs[0].data();
-            const id = snap.docs[0].id;
-            const path = 'sekcje/Piciorys Chudego/entries';
-            
-            let [intro, main] = (data.text || '').split('---PODZIAL---');
-            if(!main) { intro = data.text; main = ''; }
-
+            const cleanText = Utils.stripHtml(data.text || '');
+            const previewText = cleanText.substring(0, 300) + '...';
+            const views = data.views || 0;
             const likes = data.likes || 0;
-            const likedStyle = Utils.isLiked(id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
+            const isLiked = localStorage.getItem('liked_' + id);
 
-            this.wrapper.innerHTML = `
-                <div class="log-container story-item" data-id="${id}" data-path="${path}">
-                    <h1 style="text-align:center">${data.introTitle || 'Piciorys'}</h1>
-                    
-                    <div class="content-body" style="line-height:1.8;">${intro}</div>
-                    
-                    <div id="piciorys-main" class="hidden" style="margin-top:30px; border-top:1px solid #444; padding-top:20px;">
-                        <h2>${data.mainTitle || 'Ciąg dalszy'}</h2>
-                        <div style="line-height:1.8;">${main}</div>
-                    </div>
+            // 1. Wstawiamy statyczną treść HTML
+            card.innerHTML = `
+                <h3>${Utils.escapeHtml(data.title || data.name || 'Bez tytułu')}</h3>
+                <div class="meta-row">
+                    <span><i class="fas fa-calendar"></i> ${Utils.formatDate(data.createdAt || data.t)}</span>
+                    <span><i class="fas fa-eye"></i> <span class="view-cnt">${views}</span></span>
+                    <span><i class="fas fa-heart"></i> <span class="like-cnt">${likes}</span></span>
+                </div>
+                <div class="content-body">
+                    <div class="preview">${previewText}</div>
+                    <div class="full-content">${data.text || ''}</div>
+                </div>
+                <div class="actions-row"></div>
+            `;
 
-                    <div class="log-actions" style="justify-content:center; margin-top:40px;">
-                        ${main ? `<button class="action-button" onclick="document.getElementById('piciorys-main').classList.remove('hidden'); this.style.display='none'">CZYTAJ DALEJ</button>` : ''}
-                        
-                        <button class="action-button" data-role="speak" data-text="${Utils.escapeHtml(intro)}">Lektor</button>
-                        <button class="action-button" data-role="like" data-id="${id}" data-path="${path}" style="${likedStyle}">
-                            <i class="fas fa-heart"></i> <span class="count">${likes}</span>
-                        </button>
-                    </div>
-                    <div class="entry-meta" style="justify-content:center; margin-top:20px;">
-                        <span><i class="fas fa-eye"></i> ${data.views||0} Wyświetleń</span>
-                    </div>
-                </div>`;
-            
-            // Zlicz widok
-            updateDoc(doc(db, path, id), { views: increment(1) }).catch(console.error);
-        },
+            // 2. Budujemy przyciski "Ręcznie" (Bezpiecznie)
+            const actionsDiv = card.querySelector('.actions-row');
 
-        // D. WSPARCIE
-        async renderSupport() {
-            this.wrapper.innerHTML = `
-                <div class="support-wrap">
-                    <h1 style="text-align:center">Wsparcie</h1>
-                    <form id="supp-form">
-                        <input id="s-name" placeholder="Twoje imię" required>
-                        <textarea id="s-text" placeholder="Treść..." rows="4" required></textarea>
-                        <button type="submit" class="action-button" style="width:100%; justify-content:center; background:#ffd97b; color:#000;">OPUBLIKUJ</button>
-                    </form>
-                    <div id="feed"></div>
-                </div>`;
-
-            const feed = document.getElementById('feed');
-            onSnapshot(query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc')), (snap) => {
-                feed.innerHTML = '';
-                snap.forEach(d => {
-                    const data = d.data();
-                    const el = document.createElement('div');
-                    el.className = 'card';
-                    const likedStyle = Utils.isLiked(d.id) ? 'color:#ff6b6b; border-color:#ff6b6b;' : '';
-                    
-                    el.innerHTML = `
-                        <h3 style="font-size:1.1rem; margin-bottom:5px">${Utils.escapeHtml(data.name)}</h3>
-                        <p>${Utils.escapeHtml(data.text)}</p>
-                        <div class="log-actions" style="margin-top:15px;">
-                            <button class="action-button" data-role="like" data-id="${d.id}" data-path="support_stories" style="${likedStyle}">
-                                <i class="fas fa-heart"></i> <span class="count">${data.likes||0}</span>
-                            </button>
-                        </div>`;
-                    feed.appendChild(el);
-                });
-            });
-
-            document.getElementById('supp-form').onsubmit = async (e) => {
-                e.preventDefault();
-                try {
-                    await addDoc(collection(db, 'support_stories'), {
-                        name: document.getElementById('s-name').value,
-                        text: document.getElementById('s-text').value,
-                        t: serverTimestamp(), isApproved: false, likes: 0
-                    });
-                    alert("Wysłano do akceptacji!"); e.target.reset();
-                } catch(err) { alert("Błąd wysyłania."); }
+            // Button: Czytaj Dalej
+            const readBtn = document.createElement('button');
+            readBtn.className = 'btn btn-primary';
+            readBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
+            readBtn.onclick = () => {
+                const full = card.querySelector('.full-content');
+                const prev = card.querySelector('.preview');
+                
+                if(full.style.display === 'block') {
+                    full.style.display = 'none';
+                    prev.style.display = 'block';
+                    readBtn.innerHTML = 'CZYTAJ DALEJ <i class="fas fa-arrow-down"></i>';
+                } else {
+                    full.style.display = 'block';
+                    prev.style.display = 'none';
+                    readBtn.innerHTML = 'ZWIŃ <i class="fas fa-arrow-up"></i>';
+                    // Aktualizacja statystyki Views
+                    updateDoc(doc(db, collectionPath, id), { views: increment(1) });
+                    const v = card.querySelector('.view-cnt');
+                    v.innerText = parseInt(v.innerText) + 1;
+                }
             };
-        },
+            actionsDiv.appendChild(readBtn);
 
-        // E. GALERIA
-        async renderGallery() {
-            this.wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Galeria</h1><div id="gallery-grid" class="gallery-grid"><div class="loading-spinner"></div></div>`;
+            // Button: Lektor
+            const lektorBtn = document.createElement('button');
+            lektorBtn.className = 'btn';
+            lektorBtn.innerHTML = '<i class="fas fa-volume-up"></i> LEKTOR';
+            lektorBtn.onclick = () => SoundManager.speak(cleanText);
+            actionsDiv.appendChild(lektorBtn);
+
+            // Button: Like
+            const likeBtn = document.createElement('button');
+            likeBtn.className = 'btn';
             
-            const grid = document.getElementById('gallery-grid');
-            // Zakładam kolekcję 'gallery' z polem 'url'
-            onSnapshot(collection(db, 'gallery'), (snap) => {
-                if(snap.empty) { grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Brak zdjęć.</p>'; return; }
-                grid.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    if(data.url) {
-                        const div = document.createElement('div');
-                        div.className = 'gallery-item';
-                        div.innerHTML = `<img src="${data.url}" alt="Foto" loading="lazy">`;
-                        grid.appendChild(div);
-                    }
-                });
-            });
+            if(isLiked) {
+                likeBtn.innerHTML = '<i class="fas fa-heart"></i> LUBISZ';
+                likeBtn.style.color = '#ff6b6b'; likeBtn.style.borderColor = '#ff6b6b';
+            } else {
+                likeBtn.innerHTML = '<i class="far fa-heart"></i> LUBIĘ TO';
+            }
+
+            likeBtn.onclick = async () => {
+                if(localStorage.getItem('liked_' + id)) return;
+                
+                localStorage.setItem('liked_' + id, 'true');
+                likeBtn.style.color = '#ff6b6b'; likeBtn.style.borderColor = '#ff6b6b';
+                likeBtn.innerHTML = '<i class="fas fa-heart"></i> LUBISZ';
+                const l = card.querySelector('.like-cnt');
+                l.innerText = parseInt(l.innerText) + 1;
+
+                await updateDoc(doc(db, collectionPath, id), { likes: increment(1) });
+            };
+            actionsDiv.appendChild(likeBtn);
+
+            return card;
         }
     };
 
-    // START APLIKACJI
-    document.addEventListener("DOMContentLoaded", () => Page.init());
+    // 5. GŁÓWNY ROUTER
+    const wrapper = document.getElementById('content-wrapper');
+
+    async function initPage() {
+        SoundManager.init();
+        const params = new URLSearchParams(window.location.search);
+        const section = decodeURIComponent(params.get('nazwa') || 'Kronika');
+        document.title = `${section} | Latarnia`;
+
+        try {
+            wrapper.innerHTML = ''; // Czyść spinner przed renderem
+            
+            if (section === 'Głos Latarni') await renderAudio();
+            else if (section === 'Piciorys Chudego') await renderPiciorys();
+            else if (section === 'Wsparcie') await renderSupport();
+            else if (section === 'Galeria') await renderGallery();
+            else await renderStandard(section); // Dzień po dniu, Kronika itp.
+
+        } catch (e) {
+            console.error(e);
+            wrapper.innerHTML = `<h2 style="color:red; text-align:center">Wystąpił błąd: ${e.message}</h2>`;
+        }
+    }
+
+    // --- SEKCJA: GŁOS LATARNI ---
+    async function renderAudio() {
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">Głos Latarni</h1><div id="audio-list"></div>`;
+        const list = document.getElementById('audio-list');
+
+        // Pobieramy wszystko bez filtra 'active'
+        onSnapshot(query(collection(db, 'audio_tracks'), orderBy('order', 'asc')), (snap) => {
+            if(snap.empty) { list.innerHTML = '<p class="text-center">Brak nagrań.</p>'; return; }
+            list.innerHTML = '';
+            
+            snap.forEach(doc => {
+                const t = doc.data();
+                const el = document.createElement('div');
+                el.className = 'audio-track';
+                el.innerHTML = `
+                    <div class="track-icon"><i class="fas fa-play"></i></div>
+                    <div class="track-info">
+                        <h4>${Utils.escapeHtml(t.title)}</h4>
+                        <span>${Utils.escapeHtml(t.description || '')}</span>
+                    </div>
+                `;
+                el.onclick = () => SoundManager.playTrack(t.url, el);
+                list.appendChild(el);
+            });
+        });
+    }
+
+    // --- SEKCJA: PICIORYS ---
+    async function renderPiciorys() {
+        const snap = await getDocs(query(collection(db, 'sekcje', 'Piciorys Chudego', 'entries'), limit(1)));
+        
+        if(snap.empty) { wrapper.innerHTML = '<h2>Piciorys nie został jeszcze spisany.</h2>'; return; }
+        
+        const data = snap.docs[0].data();
+        const id = snap.docs[0].id;
+        
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:30px;">Piciorys Chudego</h1>`;
+        
+        // Używamy tego samego bezpiecznego generatora kart
+        const card = DOMBuilder.createCard(data, id, 'sekcje/Piciorys Chudego/entries');
+        wrapper.appendChild(card);
+        
+        // Zlicz wyświetlenie strony
+        updateDoc(snap.docs[0].ref, { views: increment(1) }).catch(()=>{});
+    }
+
+    // --- SEKCJA: STANDARD (Kronika, Dzień po dniu) ---
+    async function renderStandard(sectionName) {
+        wrapper.innerHTML = `<h1 style="text-align:center; margin-bottom:40px;">${sectionName}</h1><div id="entries-list"><div class="spinner"></div></div>`;
+        const container = document.getElementById('entries-list');
+
+        const q = query(collection(db, 'sekcje', sectionName, 'entries'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+
+        container.innerHTML = ''; // Usuń spinner
+        if(snap.empty) { container.innerHTML = '<p style="text-align:center">Brak wpisów w tej sekcji.</p>'; return; }
+
+        snap.forEach(doc => {
+            const card = DOMBuilder.createCard(doc.data(), doc.id, `sekcje/${sectionName}/entries`);
+            container.appendChild(card);
+        });
+    }
+
+    // --- SEKCJA: WSPARCIE ---
+    async function renderSupport() {
+        wrapper.innerHTML = `
+            <h1 style="text-align:center">Wsparcie</h1>
+            <div class="card">
+                <h3 style="margin-bottom:15px">Dodaj Otuchy</h3>
+                <form id="supp-form">
+                    <input id="in-name" placeholder="Twoje imię" required>
+                    <textarea id="in-text" placeholder="Napisz coś dobrego..." required></textarea>
+                    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center">OPUBLIKUJ</button>
+                </form>
+            </div>
+            <div id="supp-feed"></div>
+        `;
+
+        const feed = document.getElementById('supp-feed');
+        // Tylko zatwierdzone
+        const q = query(collection(db, 'support_stories'), where('isApproved', '==', true), orderBy('t', 'desc'));
+        
+        onSnapshot(q, (snap) => {
+            feed.innerHTML = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.className = 'card';
+                // Uproszczona karta dla wsparcia
+                card.innerHTML = `
+                    <h3 style="font-size:1.1rem">${Utils.escapeHtml(data.name)}</h3>
+                    <p>${Utils.escapeHtml(data.text)}</p>
+                    <div class="actions-row">
+                        <button class="btn like-btn"><i class="far fa-heart"></i> ${data.likes||0}</button>
+                    </div>
+                `;
+                
+                // Lajk dla wsparcia
+                const lBtn = card.querySelector('.like-btn');
+                lBtn.onclick = async () => {
+                    if(lBtn.style.color) return;
+                    lBtn.style.color = '#ff6b6b'; lBtn.style.borderColor = '#ff6b6b';
+                    lBtn.innerHTML = `<i class="fas fa-heart"></i> ${(data.likes||0)+1}`;
+                    await updateDoc(doc.ref, { likes: increment(1) });
+                };
+                
+                feed.appendChild(card);
+            });
+        });
+
+        document.getElementById('supp-form').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, 'support_stories'), {
+                    name: document.getElementById('in-name').value,
+                    text: document.getElementById('in-text').value,
+                    t: serverTimestamp(), isApproved: false, likes: 0
+                });
+                alert("Wysłano do moderacji!"); e.target.reset();
+            } catch(err) { alert("Błąd wysyłania."); }
+        };
+    }
+
+    // --- SEKCJA: GALERIA ---
+    async function renderGallery() {
+        wrapper.innerHTML = `<h1 style="text-align:center">Galeria</h1><div class="gallery-grid"></div>`;
+        const grid = wrapper.querySelector('.gallery-grid');
+        
+        onSnapshot(collection(db, 'gallery'), (snap) => {
+            grid.innerHTML = '';
+            if(snap.empty) { grid.innerHTML = '<p>Brak zdjęć.</p>'; return; }
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                if(d.url) {
+                    const img = document.createElement('img');
+                    img.src = d.url;
+                    img.className = 'gallery-item';
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.appendChild(img);
+                    grid.appendChild(div);
+                }
+            });
+        });
+    }
+
+    // START
+    initPage();
 
   </script>
 </body>
