@@ -1,3 +1,4 @@
+
 // Plik: /js/main.js (WERSJA DO REPO - PEŁNA OPTYMALIZACJA MOBILNA)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -17,6 +18,7 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+window.db = db;
 
 let sparksFromDB = [], player, playlist = [], currentIndex = 0;
 
