@@ -346,7 +346,11 @@ const SectionLoader = {
             player.onended = stopAudio;
 
             // Pobieranie danych z Firestore
-            const q = query(collection(db, 'audio_tracks'), where('active', '==', true), orderBy('category'), orderBy('order'));
+            const q = query(
+              collection(db, 'audio_tracks'),
+              orderBy('category'),
+              orderBy('order')
+            );
             
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
