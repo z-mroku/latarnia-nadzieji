@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // --- Konfiguracja Firebase ---
 const firebaseConfig = {
@@ -14,6 +15,7 @@ const firebaseConfig = {
 // --- Inicjalizacja Aplikacji ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // ==========================================================
 // 🎵 CONFIG HYMNU 🎵
@@ -317,11 +319,27 @@ const SectionLoader = {
                 MusicPlayer.stop(); // Zatrzymaj hymn jeśli gra
                 if(typeof lektor !== 'undefined') lektor.stop(); // Zatrzymaj lektora
 
-                // Start nowego
-                if (track.url || track.filePath) {
-                    player.src = track.url || track.filePath;
+                // Start nowego - obsługa Storage i URL
+                if (track.url) {
+                    player.src = track.url;
                     player.play().catch(e => alert("Błąd odtwarzania: " + e.message));
                     
+                    currentTrackPath = track.filePath;
+                    currentBtn = btn;
+                    btn.classList.add('playing');
+                    const icon = btn.querySelector('.audio-icon i');
+                    if(icon) { icon.className = 'fas fa-stop'; }
+
+                } else if (track.filePath) {
+                    const fileRef = ref(storage, track.filePath);
+                    getDownloadURL(fileRef).then(url => {
+                        player.src = url;
+                        player.play().catch(e => alert("Błąd odtwarzania: " + e.message));
+                    }).catch(err => {
+                        alert("Nie można pobrać pliku audio");
+                        console.error(err);
+                    });
+
                     currentTrackPath = track.filePath;
                     currentBtn = btn;
                     btn.classList.add('playing');
