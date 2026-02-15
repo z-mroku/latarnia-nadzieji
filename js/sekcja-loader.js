@@ -1,7 +1,5 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, query, orderBy, getDocs, limit, doc, updateDoc, increment, addDoc, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-// ✅ KROK 1: IMPORT STORAGE
 import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // --- Konfiguracja Firebase ---
@@ -17,7 +15,6 @@ const firebaseConfig = {
 // --- Inicjalizacja Aplikacji ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-// ✅ KROK 2: INICJALIZACJA STORAGE
 const storage = getStorage(app);
 
 // ==========================================================
@@ -665,7 +662,55 @@ const SectionLoader = {
         },
         renderKsiezniczka(doc) { this.render.renderError.call(this, "Z punktu widzenia księżniczki", "Sekcja w budowie."); },
         renderPomoc(docs) { this.render.renderError.call(this, "Pomoc", "Sekcja w budowie."); },
-        renderGallery() { this.render.renderError.call(this, "Galeria", "Sekcja w budowie."); },
+        
+        async renderGallery() {
+          this.elements.wrapper.innerHTML = `
+            <div style="padding:40px;text-align:center">
+              <h2>Galeria</h2>
+              <div id="galleryGrid" style="
+                display:grid;
+                grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+                gap:20px;
+                margin-top:30px;">
+                Ładowanie zdjęć...
+              </div>
+            </div>
+          `;
+
+          const grid = document.getElementById("galleryGrid");
+
+          const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+
+          const snapshot = await getDocs(q);
+
+          if (snapshot.empty) {
+            grid.innerHTML = "Brak zdjęć";
+            return;
+          }
+
+          grid.innerHTML = "";
+
+          for (const docSnap of snapshot.docs) {
+            const data = docSnap.data();
+
+            try {
+              const fileRef = ref(storage, "gallery/" + data.fileName);
+              const url = await getDownloadURL(fileRef);
+
+              const img = document.createElement("img");
+              img.src = url;
+              img.style.width = "100%";
+              img.style.borderRadius = "12px";
+              img.style.boxShadow = "0 5px 20px rgba(0,0,0,0.4)";
+
+              grid.appendChild(img);
+
+            } catch (err) {
+              console.error("Błąd zdjęcia:", err);
+            }
+          }
+        },
+
         renderStandard(docs) {
              if (!docs || docs.length === 0) return this.render.renderEmpty.call(this);
             const { escapeHtml, stripHtml } = this.utils;
