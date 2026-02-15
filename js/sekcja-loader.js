@@ -5,7 +5,7 @@ import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebas
 // --- Konfiguracja Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD1kuonCrsLNV4ObBiI2jsqdnGx3vaA9_Q",
-  authDomain: "projekt-latarnia.firebaseapp.app",
+  authDomain: "projekt-latarnia.firebaseapp.com", // ✅ Poprawiona domena
   projectId: "projekt-latarnia",
   storageBucket: "projekt-latarnia.firebasestorage.app", // ✅ Poprawny bucket
   messagingSenderId: "244008044225",
