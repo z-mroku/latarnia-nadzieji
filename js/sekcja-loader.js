@@ -318,8 +318,8 @@ const SectionLoader = {
                 if(typeof lektor !== 'undefined') lektor.stop(); // Zatrzymaj lektora
 
                 // Start nowego
-                if (track.url) {
-                    player.src = track.url;
+                if (track.url || track.filePath) {
+                    player.src = track.url || track.filePath;
                     player.play().catch(e => alert("Błąd odtwarzania: " + e.message));
                     
                     currentTrackPath = track.filePath;
