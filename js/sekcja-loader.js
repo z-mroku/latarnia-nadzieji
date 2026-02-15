@@ -331,7 +331,7 @@ const SectionLoader = {
                     if(icon) { icon.className = 'fas fa-stop'; }
 
                 } else if (track.filePath) {
-                    const fileRef = ref(storage, track.filePath);
+                    const fileRef = ref(storage, "audio_tracks/" + track.filePath);
                     getDownloadURL(fileRef).then(url => {
                         player.src = url;
                         player.play().catch(e => alert("Błąd odtwarzania: " + e.message));
