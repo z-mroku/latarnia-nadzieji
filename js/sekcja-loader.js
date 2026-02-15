@@ -15,7 +15,7 @@ const firebaseConfig = {
 // --- Inicjalizacja Aplikacji ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
+const storage = getStorage(app, "gs://projekt-latarnia.firebasestorage.app");
 
 // ==========================================================
 // 🎵 CONFIG HYMNU 🎵
